@@ -1,0 +1,740 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.uitgis.ciams.mapper.CiamsIncentiveMapper">
+
+    <resultMap type="com.uitgis.ciams.dto.IncentiveCalculateDto$AreaIncentive" id="AreaIncentiveMap">
+        <id property="incentiveId" column="incentive_id"/>
+        <result property="incentiveNtfcNo" column="incentive_ntfc_no"/>
+        <result property="areaUseCd" column="area_use_cd"/>
+        <result property="areaUseNm" column="area_use_nm"/>
+        <result property="areaUseCaseNm" column="area_use_case_nm"/>
+        <result property="standardBcr" column="standard_bcr"/>
+        <result property="standardFar" column="standard_far"/>
+        <result property="limitBcr" column="limit_bcr"/>
+        <result property="limitFar" column="limit_far"/>
+
+        <collection property="incentiveItems"
+                    ofType="com.uitgis.ciams.dto.IncentiveCalculateDto$IncentiveItem"
+                    javaType="list">
+            <result property="fieldName" column="field_name"/>
+            <result property="gCategoryNm" column="g_category_nm"/>
+            <result property="mCategoryNm" column="m_category_nm"/>
+            <result property="sCategoryNm" column="s_category_nm"/>
+            <result property="useFormula" column="use_formula"/>
+            <result property="formulaBcr" column="formula_bcr"/>
+            <result property="formulaFar" column="formula_far"/>
+            <result property="formulaBcrParams" column="formula_bcr_params"/>
+            <result property="formulaFarParams" column="formula_far_params"/>
+        </collection>
+    </resultMap>
+
+    <sql id="incentive_calculate_column">
+        t_incentive.incentive_id
+        , calc_id
+        , calc_name
+        , memo
+        , area_use_code
+        , (SELECT code_name FROM ciams_code where code = area_use_code) as area_use_code_name
+        , state
+        , TO_CHAR(create_date, 'YYYY-MM-DD HH24:MI:SS') as create_date
+        , incentives
+        , summary
+        , t_incentive.area_use_cd
+        , t_incentive.area_use_nm
+    </sql>
+
+    <!-- 인센티브 검색 관련 -->
+    <sql id="incen_from_where">
+        FROM ciams_incentive AS t_incentive
+        LEFT JOIN ciams_incentive_loc AS t_loc ON t_incentive.incentive_id = t_loc.incentive_id AND t_loc.rep = 'Y'
+        LEFT JOIN (
+        SELECT
+        incentive_id, MAX(state) as state
+        FROM
+        ciams_incentive_calc
+        GROUP BY incentive_id
+        ) AS t_calc ON t_incentive.incentive_id = t_calc.incentive_id
+        <where>
+            <if test="state != null and !state.equals('')">
+                <if test="state == 0">
+                    AND t_calc.state IS NULL
+                </if>
+
+                <if test="state == 1">
+                    AND t_calc.state = 0
+                </if>
+
+                <if test="state == 2">
+                    AND t_calc.state = 1
+                </if>
+            </if>
+            <if test="pmsNo != null and !pmsNo.equals('')">
+                AND (t_incentive.pms_no like '%' || #{pmsNo} || '%')
+            </if>
+            <if test="regNo != null and !regNo.equals('')">
+                AND (t_incentive.reg_no like '%' || #{regNo} || '%')
+            </if>
+            <if test="licBuilding != null and !licBuildingNm.equals('')">
+                AND (t_incentive.lic_building_nm like '%' || #{licBuildingNm} || '%')
+            </if>
+            <if test="licDevelop != null and !licDevelopNm.equals('')">
+                AND (t_incentive.lic_develop_nm like '%' || #{licDevelopNm} || '%')
+            </if>
+            <if test="emd != null and !emd.equals('')">
+                AND (t_loc.pnu like #{emd} || '%')
+            </if>
+            <if test="ri != null and !ri.equals('')">
+                AND (t_loc.pnu like #{ri} || '%')
+            </if>
+            <if test="mountain">
+                AND (t_loc.pnu like '__________2%')
+            </if>
+            <if test="mainJibun != null and !mainJibun.equals('')">
+                AND (t_loc.pnu like '___________' || #{mainJibun} || '%')
+            </if>
+            <if test="subJibun != null and !subJibun.equals('')">
+                AND (t_loc.pnu like '_______________' || #{subJibun})
+            </if>
+        </where>
+    </sql>
+
+    <select id="getIncentiveTotal"
+            parameterType="com.uitgis.ciams.dto.CiamsIncentiveDto$Search$Find$Params"
+            resultType="int">
+        SELECT COUNT(*) AS total
+        <include refid="incen_from_where"/>
+    </select>
+    <select id="getIncentiveList"
+            parameterType="com.uitgis.ciams.dto.CiamsIncentiveDto$Search$Find$Params"
+            resultType="com.uitgis.ciams.dto.CiamsIncentiveDto$Search$Find$IncenSearchList">
+        SELECT t_incentive.incentive_id,
+        t_incentive.pms_no,
+        t_incentive.reg_no,
+        t_incentive.perm,
+        t_incentive.lic_building,
+        t_incentive.lic_develop,
+        t_incentive.lic_building_nm,
+        t_incentive.lic_develop_nm,
+        t_incentive.reg_date,
+        t_loc.loc,
+        (SELECT
+        CASE t_calc.state
+        WHEN 0 THEN '검토'
+        WHEN 1 THEN '확정'
+        ELSE '미등록'
+        END
+        ) as state
+        <include refid="incen_from_where"/>
+        ORDER BY t_incentive.reg_date DESC, seq_no DESC
+        LIMIT 5 OFFSET #{pageNo}
+    </select>
+
+    <!-- 인센티브 대상지 등록 관련 -->
+    <resultMap
+            type="com.uitgis.ciams.dto.CiamsIncentiveDto$TargetLand$Find$Result"
+            id="TargetLandMap"
+    >
+        <id property="incentiveId" column="incentive_id"/>
+        <result property="pmsNo" column="pms_no"/>
+        <result property="regNo" column="reg_no"/>
+        <result property="perm" column="perm"/>
+        <result property="permNm" column="permNm"/>
+        <result property="area" column="area"/>
+        <result property="areaUseCd" column="area_use_cd"/>
+        <result property="areaUseNm" column="area_use_nm"/>
+        <result property="licBuilding" column="lic_building"/>
+        <result property="licDevelop" column="lic_develop"/>
+        <result property="struc" column="struc"/>
+        <result property="licBuildingNm" column="lic_building_nm"/>
+        <result property="licDevelopNm" column="lic_develop_nm"/>
+        <result property="strucNm" column="struc_nm"/>
+        <result property="department" column="department"/>
+
+        <collection
+                property="incentiveLocs"
+                ofType="com.uitgis.ciams.model.CiamsIncentiveLoc"
+                javaType="list">
+            <result property="incentiveLocId" column="incentive_loc_id"/>
+            <result property="incentiveId" column="incentive_id"/>
+            <result property="pnu" column="pnu"/>
+            <result property="loc" column="loc"/>
+            <result property="jimok" column="jimok"/>
+            <result property="area" column="area"/>
+            <result property="rep" column="rep"/>
+            <result property="xy" column="xy"/>
+        </collection>
+    </resultMap>
+    <select id="selectTargetLand"
+            parameterType="com.uitgis.ciams.dto.CiamsIncentiveDto$TargetLand$Find$Params"
+            resultMap="TargetLandMap">
+        SELECT t_incentive.incentive_id,
+               t_incentive.pms_no,
+               t_incentive.reg_no,
+               t_incentive.perm,
+               t_incentive.perm_nm,
+               t_incentive.area,
+               t_incentive.area_use_cd,
+               t_incentive.area_use_nm,
+               t_incentive.lic_building,
+               t_incentive.lic_develop,
+               t_incentive.struc,
+               t_incentive.lic_building_nm,
+               t_incentive.lic_develop_nm,
+               t_incentive.struc_nm,
+               t_incentive.department,
+               t_loc.*
+        FROM ciams_incentive AS t_incentive
+                 LEFT JOIN ciams_incentive_loc AS t_loc
+                           ON t_incentive.incentive_id = t_loc.incentive_id
+        WHERE t_incentive.incentive_id = #{incentiveId}::UUID
+    </select>
+
+    <insert id="insertIncentive"
+            parameterType="com.uitgis.ciams.dto.CiamsIncentiveDto$Add">
+        --         WITH seq AS (SELECT nextval('ciams_incentive_reg_no_seq') AS seq_no)
+        WITH seq AS (SELECT MAX(seq_no) + 1 AS seq_no FROM ciams_incentive)
+        INSERT
+        INTO ciams_incentive (incentive_id,
+                              seq_no,
+                              pms_no,
+                              reg_no,
+                              perm,
+                              perm_nm,
+                              area,
+                              area_use_cd,
+                              area_use_nm,
+                              lic_develop,
+                              lic_building,
+                              struc,
+                              lic_develop_nm,
+                              lic_building_nm,
+                              struc_nm,
+                              department,
+                              status,
+                              reg_date,
+                              del_yn)
+        SELECT #{incentiveId} ::UUID,
+               seq_no,
+               CONCAT((select EXTRACT('YEAR' from NOW() ::timestamp)), '-',
+                      get_cd_nm(#{perm}, ''), '-',
+                      #{licDevelopNm}, '-',
+                      LPAD(seq_no ::text, 4, '0')),
+               #{regNo},
+               #{perm},
+               get_cd_nm(#{perm}, ''),
+               #{area} ::int,
+               #{areaUseCd},
+               #{areaUseNm},
+               #{licDevelop},
+               #{licBuilding},
+               #{struc},
+               #{licDevelopNm},
+               #{licBuildingNm},
+               #{strucNm},
+               #{department},
+               #{status},
+               Now(),
+               'N'
+        FROM seq;
+    </insert>
+    <insert id="insertIncentiveLocs"
+            parameterType="com.uitgis.ciams.dto.CiamsIncentiveDto$Loc">
+        INSERT INTO ciams_incentive_loc
+        VALUES (#{incentiveLocId} ::UUID,
+                #{incentiveId} ::UUID,
+                #{pnu},
+                #{loc},
+                #{jimok},
+                #{area},
+                #{rep},
+                #{xy})
+    </insert>
+
+    <!-- reg_date = Now()넣어야하나? -->
+    <update id="updateIncentive"
+            parameterType="com.uitgis.ciams.dto.CiamsIncentiveDto$Add">
+        UPDATE ciams_incentive
+        <set>
+            <if test="regNo != null">reg_no = #{regNo},</if>
+            <if test="perm != null">perm = #{perm},</if>
+            <if test="perm != null">perm_nm = get_cd_nm(#{perm}, ''),</if>
+            <if test="area != null">area = #{area} ::int,</if>
+            <if test="areaUseCd != null">area_use_cd = #{areaUseCd},</if>
+            <if test="areaUseNm != null">area_use_nm = #{areaUseNm},</if>
+            <if test="licDevelop != null">lic_develop = #{licDevelop},</if>
+            <if test="licBuilding != null">lic_building = #{licBuilding},</if>
+            <if test="struc != null">struc = #{struc},</if>
+            <if test="licDevelopNm != null">lic_develop_nm = #{licDevelopNm},</if>
+            <if test="licBuildingNm != null">lic_building_nm = #{licBuildingNm},</if>
+            <if test="strucNm != null">struc_nm = #{strucNm},</if>
+            <if test="department != null">department = #{department},</if>
+        </set>
+        WHERE incentive_id = #{incentiveId} ::UUID
+    </update>
+    <update id="updateIncentiveLocs"
+            parameterType="com.uitgis.ciams.dto.CiamsIncentiveDto$Loc">
+        UPDATE ciams_incentive_loc
+        <set>
+            <if test="pnu != null">pnu = #{pnu},</if>
+            <if test="loc != null">loc = #{loc},</if>
+            <if test="jimok != null">jimok = #{jimok},</if>
+            <if test="area != null">area = #{area},</if>
+            <if test="rep != null">rep = #{rep},</if>
+            <if test="xy != null">xy = #{xy},</if>
+        </set>
+        WHERE incentive_loc_id = #{incentiveLocId} ::UUID
+    </update>
+
+    <delete id="deleteIncentive"
+            parameterType="String">
+        DELETE
+        FROM ciams_incentive
+        WHERE incentive_id ::text = #{incentiveId}
+    </delete>
+    <delete id="deleteIncentiveLoc" parameterType="String">
+        DELETE
+        FROM ciams_incentive_loc
+        WHERE incentive_loc_id ::text = #{incentiveLocId}
+    </delete>
+
+    <!-- 인센티브 현황 상세정보 개요 -->
+    <select id="selectIncentiveOverview"
+            parameterType="com.uitgis.ciams.dto.CiamsIncentiveDetailsDto$Overview$Find$Params"
+            resultType="com.uitgis.ciams.dto.CiamsIncentiveDetailsDto$Overview$Find$Result">
+        SELECT t_incentive.*,
+               t_loc.incentive_loc_id,
+               t_loc.pnu,
+               t_loc.loc,
+               t_loc.jimok
+        FROM ciams_incentive AS t_incentive
+                 LEFT JOIN ciams_incentive_loc AS t_loc
+                           ON t_incentive.incentive_id = t_loc.incentive_id
+                               AND t_loc.rep = 'Y'
+        <choose>
+            <when test="@com.uitgis.ciams.util.ValidUtil@notEmpty(incentiveId)">
+                WHERE t_incentive.incentive_id = #{incentiveId} ::UUID
+            </when>
+            <otherwise>
+                WHERE t_incentive.incentive_id = null ::UUID
+            </otherwise>
+        </choose>
+        LIMIT 1
+    </select>
+
+
+    <!--인센티브 체크리스트 -->
+    <select id="selectIncentiveCheckList"
+            parameterType="com.uitgis.ciams.dto.IncentiveCheckListDto$Find$Params"
+            resultType="com.uitgis.ciams.dto.IncentiveCheckListDto$Row">
+        SELECT id
+             , title
+             , TO_CHAR(create_date, 'YYYY-MM-DD HH24:MI:SS') as create_date
+        FROM ciams_incentive_checklist
+        WHERE incentive_id = #{incentiveId} ::UUID
+        ORDER BY create_date DESC
+    </select>
+
+    <update id="insertIncentiveCheckList" useGeneratedKeys="true" keyColumn="id"
+            keyProperty="id"
+            parameterType="com.uitgis.ciams.dto.IncentiveCheckListDto$Insert">
+        INSERT INTO ciams_incentive_checklist
+        ( incentive_id
+        , title
+        , contents
+        , create_date)
+        VALUES ( #{incentiveId} ::UUID
+               , #{title}
+               , #{contents} ::jsonb
+               , now())
+    </update>
+
+    <update id="updateIncentiveCheckList"
+            parameterType="com.uitgis.ciams.dto.IncentiveCheckListDto$Insert">
+        UPDATE ciams_incentive_checklist
+        <set>
+            <if test="title != null">
+                title = #{title},
+            </if>
+            <if test="@com.uitgis.ciams.util.ValidUtil@notEmpty(contents)">
+                contents = #{contents} ::jsonb,
+            </if>
+            create_date = now(),
+        </set>
+        WHERE id = #{id} ::UUID
+    </update>
+
+    <delete id="deleteIncentiveCheckListById"
+            parameterType="com.uitgis.ciams.dto.IncentiveCheckListDto$Delete">
+        DELETE
+        FROM ciams_incentive_checklist
+        WHERE id = #{id} ::UUID
+    </delete>
+
+    <select id="selectIncentiveCheckListById" parameterType="string"
+            resultType="com.uitgis.ciams.model.CiamsIncentiveCheckList">
+        SELECT id
+             , incentive_id
+             , title
+             , contents
+             , TO_CHAR(create_date, 'YYYY-MM-DD HH24:MI:SS') as create_date
+        FROM ciams_incentive_checklist
+        WHERE id = #{id} ::UUID
+    </select>
+
+
+    <!-- 인센티브 정보 -->
+    <select id="selectIncentiveLoc"
+            parameterType="com.uitgis.ciams.dto.CiamsIncentiveDetailsDto$AreaSubject$Find$Params"
+            resultType="com.uitgis.ciams.dto.CiamsIncentiveDetailsDto$AreaSubject$Find$Result">
+        SELECT t_loc.*
+        FROM ciams_incentive_loc AS t_loc
+                 LEFT JOIN ciams_incentive AS t_incentive
+                           ON t_incentive.incentive_id = t_loc.incentive_id
+        WHERE t_incentive.incentive_id = #{incentiveId} ::UUID
+    </select>
+
+
+    <select id="selectAreaUseCdList" parameterType="com.uitgis.ciams.dto.CiamsIncentiveDetailsDto$Overview$Find$Params"
+            resultType="com.uitgis.ciams.model.CiamsCode">
+        SELECT code, code_name
+        FROM ciams_code
+        WHERE code LIKE
+              '%' || (SELECT area_use_cd FROM ciams_incentive WHERE incentive_id = #{incentiveId} ::UUID LIMIT 1) ||
+              '%';
+    </select>
+
+
+    <select id="selectIncentiveCalc"
+            parameterType="com.uitgis.ciams.dto.CiamsIncentiveDetailsDto$IncentiveInfo$Find$Params"
+            resultType="com.uitgis.ciams.dto.CiamsIncentiveDetailsDto$IncentiveInfo$Find$Result">
+        SELECT
+        <include refid="incentive_calculate_column"/>
+        FROM ciams_incentive_calc AS t_calc
+        LEFT JOIN ciams_incentive AS t_incentive
+        ON t_incentive.incentive_id = t_calc.incentive_id ::UUID
+        WHERE t_incentive.incentive_id = #{incentiveId} ::UUID
+        ORDER BY create_date DESC
+    </select>
+
+
+    <select id="selectIncentiveCalculateDetails" parameterType="String"
+            resultType="com.uitgis.ciams.dto.IncentiveCalculateDto$Details">
+        SELECT incentive_id,
+               calc_id,
+               calc_name,
+               memo,
+               incentives,
+               summary
+        FROM ciams_incentive_calc
+        WHERE incentive_id = #{incentiveId}
+    </select>
+
+
+    <select id="selectIncentiveProps" parameterType="com.uitgis.ciams.dto.IncentiveCalculateDto$Find$Params"
+            resultType="com.uitgis.ciams.dto.IncentiveCalculateDto$Props">
+        SELECT code,
+               name,
+               (SELECT case
+                           WHEN use_ref AND code = 'p1' THEN
+                               (SELECT standard_bcr
+                                FROM ciams_incentive_limit
+                                WHERE incentive_ntfc_no = #{incentiveNtfcNo}
+                                  AND area_use_cd = #{areaUseCd})
+                           WHEN use_ref AND code = 'p2' THEN
+                               (SELECT standard_far
+                                FROM ciams_incentive_limit
+                                WHERE incentive_ntfc_no = #{incentiveNtfcNo}
+                                  AND area_use_cd = #{areaUseCd})
+                           ELSE value
+                           end) AS value
+        FROM ciams_incentive_props
+        WHERE incentive_ntfc_no = #{incentiveNtfcNo}
+    </select>
+
+
+    <select id="selectIncentiveCalculateAreas"
+            parameterType="com.uitgis.ciams.dto.IncentiveCalculateDto$Find$Params$Info"
+            resultMap="AreaIncentiveMap">
+        SELECT t_incentive.incentive_id,
+        t_incentive.area_use_cd,
+        ntfc_no AS incentive_ntfc_no,
+        get_cd_nm(t_incentive.area_use_cd, '') AS area_use_nm,
+        <if test="@com.uitgis.ciams.util.ValidUtil@notEmpty(areaUseCode)">
+            get_cd_nm(#{areaUseCode}, '') AS area_use_case_nm,
+        </if>
+        <choose>
+            <when test="@com.uitgis.ciams.util.ValidUtil@notEmpty(areaUseCode)">
+                t_category.area_use_cd = #{areaUseCode},
+            </when>
+            <otherwise>
+                t_category.area_use_cd = t_incentive.area_use_cd,
+            </otherwise>
+        </choose>
+        t_limit.standard_bcr,
+        t_limit.standard_far,
+        t_limit.limit_bcr,
+        t_limit.limit_far,
+        get_cd_nm(t_category.g_category, '') AS g_category_nm,
+        get_cd_nm(t_category.m_category, '') AS m_category_nm,
+        get_cd_nm(t_category.s_category, '') AS s_category_nm,
+        t_category.field_name,
+        t_category.use_formula,
+        t_category.formula_bcr,
+        t_category.formula_far,
+        t_category.formula_bcr_params,
+        t_category.formula_far_params
+        FROM (SELECT ntfc_no FROM ciams_incentive_ntfc WHERE current_yn ORDER BY ntfc_de DESC LIMIT 1) AS ntfc_no
+        LEFT JOIN ciams_incentive AS t_incentive
+        ON
+        t_incentive.incentive_id = #{incentiveId} ::UUID
+        LEFT JOIN ciams_incentive_category AS t_category
+        ON
+        <choose>
+            <when test="@com.uitgis.ciams.util.ValidUtil@notEmpty(areaUseCode)">
+                t_category.area_use_cd = #{areaUseCode} AND
+            </when>
+            <otherwise>
+                t_category.area_use_cd = t_incentive.area_use_cd AND
+            </otherwise>
+        </choose>
+        t_category.incentive_ntfc_no = ntfc_no
+        LEFT JOIN ciams_incentive_limit AS t_limit
+        ON
+        t_limit.area_use_cd = t_incentive.area_use_cd AND
+        t_limit.incentive_ntfc_no = ntfc_no
+        ORDER BY t_category.field_name
+    </select>
+
+
+    <update id="insertIncentiveCalculate" useGeneratedKeys="true" keyColumn="calc_id"
+            keyProperty="calcId"
+            parameterType="com.uitgis.ciams.dto.IncentiveCalculateDto$Insert">
+        INSERT INTO ciams_incentive_calc
+        ( incentive_id
+        , calc_name
+        , memo
+        , area_use_code
+        , create_date
+        , incentives
+        , summary)
+        VALUES ( #{incentiveId} :: UUID
+               , '인센티브산정/' || #{incentiveId} || '/' || (SELECT to_char(now(), 'YYYY-MM-DD HH24:MI:SS'))
+               , #{memo}
+               , #{areaUseCode}
+               , now()
+               , #{incentives} ::jsonb
+               , #{summary} ::jsonb)
+    </update>
+
+
+    <update id="updateIncentiveCalculate"
+            parameterType="com.uitgis.ciams.dto.IncentiveCalculateDto$Insert">
+        UPDATE ciams_incentive_calc
+        <set>
+            <if test="@com.uitgis.ciams.util.ValidUtil@notEmpty(calcId)">
+                calc_name = '인센티브산정/' || #{incentiveId} || '/' || (SELECT to_char(now(), 'YYYY-MM-DD HH24:MI:SS')),
+            </if>
+            <if test="memo != null">
+                memo = #{memo},
+            </if>
+            <if test="@com.uitgis.ciams.util.ValidUtil@notEmpty(areaUseCode)">
+                area_use_code = #{areaUseCode},
+            </if>
+            create_date = now(),
+            <if test="@com.uitgis.ciams.util.ValidUtil@notEmpty(incentives)">
+                incentives = #{incentives} ::jsonb,
+            </if>
+            <if test="@com.uitgis.ciams.util.ValidUtil@notEmpty(summary)">
+                summary = #{summary} ::jsonb,
+            </if>
+        </set>
+        WHERE calc_id = #{calcId} ::UUID
+    </update>
+
+
+    <update id="updateIncentiveCalculateStateById"
+            parameterType="com.uitgis.ciams.dto.IncentiveCalculateDto$Update">
+        UPDATE ciams_incentive_calc
+        <set>
+            <if test="@com.uitgis.ciams.util.ValidUtil@notEmpty(state)">
+                state = #{state},
+            </if>
+        </set>
+        WHERE calc_id = #{calcId} ::UUID
+    </update>
+
+
+    <update id="updateStateDisableAllById" parameterType="String">
+        UPDATE ciams_incentive_calc
+        SET state = 0
+        WHERE incentive_id =
+              (SELECT incentive_id FROM ciams_incentive_calc WHERE calc_id = #{calc_id} ::UUID)
+    </update>
+
+
+    <delete id="deleteIncentiveCalcById"
+            parameterType="com.uitgis.ciams.dto.IncentiveCalculateDto$Delete">
+        DELETE
+        FROM ciams_incentive_calc
+        WHERE calc_id = #{calcId} ::UUID
+    </delete>
+
+
+    <select id="selectIncentiveCalcById" parameterType="string"
+            resultType="com.uitgis.ciams.dto.CiamsIncentiveDetailsDto$IncentiveInfo$Find$Result">
+        SELECT
+        <include refid="incentive_calculate_column"/>
+        FROM ciams_incentive_calc t_calc
+        LEFT JOIN ciams_incentive t_incentive
+        ON t_incentive.incentive_id = t_calc.incentive_id ::UUID
+        WHERE calc_id = #{calcId} ::UUID
+    </select>
+
+
+    <!--인센티브 이력 그룹핑-->
+    <select id="selectGroupByNo" resultType="string">
+        SELECT incentive_id
+        FROM ciams_incentive_calc
+        GROUP BY incentive_id
+    </select>
+
+    <!-- 모니터링 인센티브(토지이용현황)  -->
+    <select id="selectGroupByAreaUse" parameterType="list"
+            resultType="com.uitgis.ciams.dto.CiamsIncentiveDetailsDto$chartGroupData">
+        SELECT
+        res.area_use_nm,
+        count(res.area_use_nm) as cnt
+        FROM (
+        SELECT distinct a.incentive_id, a.area_use_nm
+        FROM ciams_incentive a
+        INNER JOIN ciams_incentive_loc b
+        ON a.incentive_id = b.incentive_id
+        AND del_yn = 'N'
+        WHERE 1=1
+        AND (
+        1 != 1
+        <foreach collection="pnuList" item="pnu">
+            <if test="@com.uitgis.ciams.util.ValidUtil@notEmpty(pnu)">
+                or (b.pnu LIKE #{pnu}||'%')
+            </if>
+        </foreach>
+        )
+
+        ) res
+        GROUP BY res.area_use_nm
+    </select>
+
+    <!-- 모니터링 인센티브(지목현황)  -->
+    <select id="selectGroupByJimok" parameterType="list"
+            resultType="com.uitgis.ciams.dto.CiamsIncentiveDetailsDto$chartGroupData">
+        SELECT
+        aa.jimok,
+        count(aa.jimok) as cnt
+        FROM (
+        SELECT a.incentive_id, b.jimok
+        FROM ciams_incentive a
+        INNER JOIN ciams_incentive_loc b
+        ON a.incentive_id = b.incentive_id
+        AND del_yn = 'N'
+        AND rep = 'Y'
+        ) aa
+        INNER JOIN
+        (
+        SELECT distinct incentive_id
+        FROM ciams_incentive_loc
+        WHERE 1=1
+        AND (
+        1 != 1
+        <foreach collection="pnuList" item="pnu">
+            <if test="@com.uitgis.ciams.util.ValidUtil@notEmpty(pnu)">
+                or (pnu LIKE #{pnu}||'%')
+            </if>
+        </foreach>
+        )
+        ) bb
+        ON aa.incentive_id = bb.incentive_id
+        GROUP BY aa.jimok
+    </select>
+
+    <!-- 모니터링 인센티브(연도별 현황)  -->
+    <select id="selectGroupByYear" parameterType="list"
+            resultType="com.uitgis.ciams.dto.CiamsIncentiveDetailsDto$chartGroupData">
+        SELECT
+        aa.year,
+        count(year) as cnt
+        FROM (
+        SELECT a.incentive_id, to_char(a.reg_date,'yyyy') as year
+        FROM ciams_incentive a
+        INNER JOIN ciams_incentive_loc b
+        ON a.incentive_id = b.incentive_id
+        AND del_yn = 'N'
+        AND rep = 'Y'
+        ) aa
+        INNER JOIN
+        (
+        SELECT distinct incentive_id
+        FROM ciams_incentive_loc
+        WHERE 1=1
+        AND (
+        1 != 1
+        <foreach collection="pnuList" item="pnu">
+            <if test="@com.uitgis.ciams.util.ValidUtil@notEmpty(pnu)">
+                or (pnu LIKE #{pnu}||'%')
+            </if>
+        </foreach>
+        )
+        ) bb
+        ON aa.incentive_id = bb.incentive_id
+        GROUP BY aa.year
+    </select>
+
+
+    <select id="selectGeometrys" parameterType="list"
+            resultType="com.uitgis.ciams.dto.CiamsIncentiveDetailsDto$chartGeometryData">
+        SELECT b.pnu, b.xy
+        FROM ciams_incentive a
+        INNER JOIN ciams_incentive_loc b
+        ON a.incentive_id = b.incentive_id
+        AND del_yn = 'N'
+        WHERE 1 = 1
+        AND (
+        1 != 1
+        <foreach collection="pnuList" item="pnu">
+            <if test="@com.uitgis.ciams.util.ValidUtil@notEmpty(pnu)">
+                or (pnu LIKE #{pnu}||'%')
+            </if>
+        </foreach>
+        )
+
+    </select>
+
+
+    <select id="selectPNUIncentive" parameterType="String"
+            resultType="com.uitgis.ciams.dto.CiamsIncentiveDto$PNUIncentive">
+        SELECT (SELECT loc
+                FROM ciams_incentive_loc
+                WHERE incentive_id = t_loc.incentive_id
+                  AND rep = 'Y'
+                LIMIT 1) AS rep_loc,
+               t_incentive.incentive_id,
+               t_incentive.reg_no,
+               t_incentive.area_use_nm,
+               t_incentive.struc_nm,
+               t_incentive.lic_building_nm,
+               t_incentive.lic_develop_nm,
+               t_incentive.area,
+               t_loc.jimok,
+               t_calc.summary
+        FROM ciams_incentive AS t_incentive
+                 LEFT JOIN ciams_incentive_loc as t_loc
+                           ON t_incentive.incentive_id = t_loc.incentive_id
+                 LEFT JOIN ciams_incentive_calc AS t_calc
+                           ON t_incentive.incentive_id = t_calc.incentive_id
+        WHERE t_loc.pnu = #{pnu}
+          AND t_incentive.del_yn = 'N'
+          AND t_calc.state = 1
+        ORDER BY t_incentive.reg_date DESC, t_calc.create_date DESC
+    </select>
+
+</mapper>

@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.uitgis.ciams.mapper.CiamsPlanContentLinkMapper">
+	<sql id="default_column">
+		plan_content_link_id, plan_content_id, sort_sn, plan_area_id, plan_id
+ 	</sql>
+
+ 	<sql id="default_where">
+        <where>
+	            <if test="@com.uitgis.ciams.util.ValidUtil@notEmpty(planContentLinkId)">
+	                AND plan_content_link_id = #{planContentLinkId}
+	            </if>
+	            <if test="@com.uitgis.ciams.util.ValidUtil@notEmpty(planContentId)">
+	                AND plan_content_id = #{planContentId}
+	            </if>
+	            <if test="@com.uitgis.ciams.util.ValidUtil@notEmpty(planAreaId)">
+	                AND plan_area_id = #{planAreaId}
+	            </if>
+	            <if test="@com.uitgis.ciams.util.ValidUtil@notEmpty(planId)">
+	                AND plan_id = #{planId}
+	            </if>
+        </where>
+    </sql>
+
+ 	<select id="selectList" parameterType="com.uitgis.ciams.dto.CiamsPlanContentLinkDto$Select" resultType="com.uitgis.ciams.model.CiamsPlanContentLink">
+        SELECT <include refid="default_column"/>
+        FROM CIAMS_PLAN_CONTENT_LINK
+        <include refid="default_where"/>
+    </select>
+
+ 	<select id="selectCategoryList" parameterType="com.uitgis.ciams.dto.CiamsPlanContentLinkDto" resultType="com.uitgis.ciams.model.CiamsPlanContentLink">
+        SELECT
+        	lnk.plan_content_link_id
+        	, lnk.plan_content_id
+        	, lnk.sort_sn
+        	, lnk.plan_area_id
+        	, lnk.plan_id
+        FROM CIAMS_PLAN_CONTENT_LINK lnk
+        INNER JOIN CIAMS_PLAN_CONTENT cnt
+	        ON lnk.plan_content_id = cnt.plan_content_id
+		<where>
+			AND plan_area_id = #{planAreaId}
+			and cnt.category = #{category}
+		</where>
+		ORDER BY sort_sn asc
+    </select>
+
+	<insert id="insert" parameterType="com.uitgis.ciams.model.CiamsPlanContentLink">
+        INSERT INTO
+        	CIAMS_PLAN_CONTENT_LINK(<include refid="default_column"/>)
+		VALUES(
+			#{planContentLinkId},
+			#{planContentId},
+			#{sortSn},
+			#{planAreaId},
+			#{planId}
+		)
+    </insert>
+
+    <insert id="insertBatch" parameterType="com.uitgis.ciams.model.CiamsPlanContentLink">
+        INSERT INTO
+        	CIAMS_PLAN_CONTENT_LINK(<include refid="default_column"/>)
+        VALUES
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.planContentLinkId}, #{item.planContentId}, #{item.sortSn}, #{item.planAreaId}, #{item.planId})
+        </foreach>
+    </insert>
+
+    <insert id="updateSortSn" parameterType="com.uitgis.ciams.dto.CiamsPlanContentLinkDto$Modify">
+        UPDATE ciams_plan_content_link set sort_sn = sort_sn + 1
+		FROM ciams_plan_content a
+		where ciams_plan_content_link.plan_content_id = a.plan_content_id
+		and a.category = #{category}
+		and plan_area_id = #{planAreaId}
+    </insert>
+
+
+
+    <update id="update" parameterType="com.uitgis.ciams.model.CiamsPlanContentLink">
+        UPDATE CIAMS_PLAN_CONTENT_LINK
+        <set>
+            sort_sn = #{sortSn}
+        </set>
+        WHERE 1=1
+        AND plan_content_link_id = #{planContentLinkId}
+    </update>
+
+    <update id="delete" parameterType="com.uitgis.ciams.model.CiamsPlanContentLink">
+        DELETE FROM CIAMS_PLAN_CONTENT_LINK
+        WHERE 1=1
+        AND plan_content_link_id = #{planContentLinkId}
+        AND plan_content_id = #{planContentId}
+    </update>
+
+    <update id="deleteByContentId" parameterType="string">
+        DELETE FROM CIAMS_PLAN_CONTENT_LINK
+        WHERE 1=1
+        AND plan_content_id = #{planContentId}
+    </update>
+</mapper>

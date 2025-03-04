@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.uitgis.gis.mapper.GisMapper">
+
+	<!-- 계획 지역 개발행위허가  -->
+	<select id="selectPlanUpi" resultType="com.uitgis.ciams.model.CiamsPlanUpi">
+		SELECT no, year, pnu, loc, jimok, area, purpose, use_area, note, plan_id, plan_type, plan_name
+		FROM ciams_p1_f107
+		WHERE
+			no = #{no}
+	</select>
+
+	<select id="selectPlanUpis" resultType="com.uitgis.ciams.model.CiamsPlanUpi">
+		SELECT no, year, pnu, loc, jimok, area, purpose, use_area, note, plan_id, plan_type, plan_name
+		FROM ciams_p1_f107
+		-- temp
+		WHERE
+		plan_id is not null
+		<!--
+		use_area = '자연녹지지역'
+		OR
+		use_area = '생산관리지역'
+		OR
+		use_area = '계획관리지역'
+		-->
+		<!--		<trim prefix="WHERE" prefixOverrides="AND |OR ">-->
+		<!--			<if test="no != null">AND no = #{no}</if>-->
+		<!--			<if test="purpose != null">AND purpose = #{purpose}</if>-->
+		<!--		</trim>-->
+		order by no desc
+	</select>
+
+	<select id="getPlanUpiSummaryYear" parameterType="com.uitgis.ciams.dto.CiamsPlanUpiDto$Summary$Year$Find" resultType="com.uitgis.ciams.dto.CiamsPlanUpiDto$Summary$Year">
+		SELECT a.year, count(*) as cnt, sum(a.area) as area
+		FROM (select (b.type1::numeric+b.type2::numeric+b.type3::numeric+b.type4::numeric+b.type5::numeric+b.type6::numeric) as sum_column, b.*
+		 		FROM ciams_${planId}_f107 b) a
+		WHERE 1=1
+		<if test="startYear != 0 and endYear != 0">
+	        and a.year <![CDATA[ >= ]]> #{startYear}
+	        and a.year <![CDATA[ <= ]]> #{endYear}
+        </if>
+        <if test="@com.uitgis.ciams.util.ValidUtil@notEmpty(purpose)">
+        AND (
+	        <foreach collection="purpose" item="item" separator="or">
+	        	<if test="item == '형질변경'">
+	        	a.type1::numeric > 0
+	        	</if>
+	        	<if test="item == '공작물'">
+	        	a.type2::numeric > 0
+	        	</if>
+	        	<if test="item == '토석채취'">
+	        	a.type3::numeric > 0
+	        	</if>
+	        	<if test="item == '토지분할'">
+	        	a.type4::numeric > 0
+	        	</if>
+	        	<if test="item == '물건적치'">
+	        	a.type5::numeric > 0
+	        	</if>
+	        	<if test="item == '건축물의건축'">
+	        	a.type6::numeric > 0
+	        	</if>
+	        </foreach>
+	        )
+       	 </if>
+		GROUP BY a.year
+		ORDER BY a.year
+	</select>
+	<select id="getPlanUpiSummaryYearPurpose" parameterType="String" resultType="com.uitgis.ciams.dto.CiamsPlanUpiDto$Summary$YearPurpose">
+		SELECT a.year, a.purpose, sum(a.cnt) as cnt, sum(a.area) as area
+		FROM (
+			SELECT '형질변경' as purpose, type1::numeric as cnt, area, year, 1 as sort from ciams_${planId}_f107
+			WHERE 1=1
+			AND type1::numeric > 0
+			union all
+			SELECT '공작물' as purpose, type2::numeric as cnt, area, year, 2 as sort from ciams_${planId}_f107
+			WHERE 1=1
+			AND type2::numeric > 0
+			union all
+			SELECT '토석채취' as purpose, type3::numeric as cnt, area, year, 3 as sort from ciams_${planId}_f107
+			WHERE 1=1
+			AND type3::numeric > 0
+			union all
+			SELECT '토지분할' as purpose, type4::numeric as cnt, area, year, 4 as sort from ciams_${planId}_f107
+			WHERE 1=1
+			AND type4::numeric > 0
+			union all
+			SELECT '물건적치' as purpose, type5::numeric as cnt, area, year, 5 as sort from ciams_${planId}_f107
+			WHERE 1=1
+			AND type5::numeric > 0
+			union all
+			SELECT '건축물의건축' as purpose, type6::numeric as cnt, area, year, 6 as sort from ciams_${planId}_f107
+			WHERE 1=1
+			AND type6::numeric > 0
+		) a
+		GROUP BY a.year, a.purpose
+		ORDER BY a.year, a.purpose
+	</select>
+	<select id="getPlanUpiPurpose" parameterType="com.uitgis.ciams.dto.CiamsPlanUpiDto$Purpose$Find" resultType="com.uitgis.ciams.dto.CiamsPlanUpiDto$Purpose">
+
+	SELECT
+		purpose
+		,cnt
+		,area
+	FROM (
+		select '형질변경' as purpose, sum(type1::numeric) as cnt, sum(area) as area, 1 as sort from ciams_p1_f107
+		WHERE 1=1
+		AND type1::numeric > 0
+		<if test="startYear != 0 and endYear != 0">
+	       AND year <![CDATA[ >= ]]> #{startYear}
+	       AND year <![CDATA[ <= ]]> #{endYear}
+	    </if>
+		union all
+		select '공작물' as purpose, sum(type2::numeric) as cnt, sum(area) as area, 2 as sort from ciams_p1_f107
+		WHERE 1=1
+		AND type2::numeric > 0
+		<if test="startYear != 0 and endYear != 0">
+	       AND year <![CDATA[ >= ]]> #{startYear}
+	       AND year <![CDATA[ <= ]]> #{endYear}
+	    </if>
+		union all
+		select '토석채취' as purpose, sum(type3::numeric) as cnt, sum(area) as area, 3 as sort from ciams_p1_f107
+		WHERE 1=1
+		AND type3::numeric > 0
+		<if test="startYear != 0 and endYear != 0">
+	       AND year <![CDATA[ >= ]]> #{startYear}
+	       AND year <![CDATA[ <= ]]> #{endYear}
+	    </if>
+		union all
+		select '토지분할' as purpose, sum(type4::numeric) as cnt, sum(area) as area, 4 as sort from ciams_p1_f107
+		WHERE 1=1
+		AND type4::numeric > 0
+		<if test="startYear != 0 and endYear != 0">
+	       AND year <![CDATA[ >= ]]> #{startYear}
+	       AND year <![CDATA[ <= ]]> #{endYear}
+	    </if>
+		union all
+		select '물건적치' as purpose, sum(type5::numeric) as cnt, sum(area) as area, 5 as sort from ciams_p1_f107
+		WHERE 1=1
+		AND type5::numeric > 0
+		<if test="startYear != 0 and endYear != 0">
+	       AND year <![CDATA[ >= ]]> #{startYear}
+	       AND year <![CDATA[ <= ]]> #{endYear}
+	    </if>
+	 union all
+		select '건축물의건축' as purpose, sum(type6::numeric) as cnt, sum(area) as area, 6 as sort from ciams_p1_f107
+		WHERE 1=1
+		AND type6::numeric > 0
+		<if test="startYear != 0 and endYear != 0">
+	       AND year <![CDATA[ >= ]]> #{startYear}
+	       AND year <![CDATA[ <= ]]> #{endYear}
+	    </if>
+	) res
+	ORDER BY res.sort
+<!-- 		SELECT purpose, count(*) as cnt, sum(area) as area -->
+<!-- 		FROM ciams_${planId}_f107 -->
+<!-- 		WHERE 1=1 -->
+<!-- 		<if test="startYear != 0 and endYear != 0"> -->
+<!-- 		       and year <![CDATA[ >= ]]> #{startYear} -->
+<!-- 		       and year <![CDATA[ <= ]]> #{endYear} -->
+<!-- 		     </if> -->
+<!-- 		GROUP BY purpose -->
+<!-- 		ORDER BY purpose -->
+	</select>
+	<select id="getPlanUpiUseArea" parameterType="com.uitgis.ciams.dto.CiamsPlanUpiDto$UseArea$Find" resultType="com.uitgis.ciams.dto.CiamsPlanUpiDto$UseArea">
+		 SELECT a.use_area, count(*) as cnt, sum(a.area) as area
+		 FROM (select (b.type1::numeric+b.type2::numeric+b.type3::numeric+b.type4::numeric+b.type5::numeric+b.type6::numeric) as sum_column, b.*
+		 		FROM ciams_${planId}_f107 b) a
+		 WHERE 1=1
+		 <if test="startYear != 0 and endYear != 0">
+	         and a.year <![CDATA[ >= ]]> #{startYear}
+	         and a.year <![CDATA[ <= ]]> #{endYear}
+         </if>
+         <if test="@com.uitgis.ciams.util.ValidUtil@notEmpty(purpose)">
+        AND (
+	        <foreach collection="purpose" item="item" separator="or">
+	        	<if test="item == '형질변경'">
+	        	type1::numeric > 0
+	        	</if>
+	        	<if test="item == '공작물'">
+	        	type2::numeric > 0
+	        	</if>
+	        	<if test="item == '토석채취'">
+	        	type3::numeric > 0
+	        	</if>
+	        	<if test="item == '토지분할'">
+	        	type4::numeric > 0
+	        	</if>
+	        	<if test="item == '물건적치'">
+	        	type5::numeric > 0
+	        	</if>
+	        	<if test="item == '건축물의건축'">
+	        	type6::numeric > 0
+	        	</if>
+	        </foreach>
+	        )
+       	 </if>
+		 GROUP BY a.use_area
+		 ORDER BY a.use_area
+	</select>
+	<select id="getPlanUpiJimok" parameterType="String" resultType="com.uitgis.ciams.dto.CiamsPlanUpiDto$Jimok">
+		 SELECT a.jimok, count(*) as cnt, sum(a.area) as area
+		 FROM (select (b.type1::numeric+b.type2::numeric+b.type3::numeric+b.type4::numeric+b.type5::numeric+b.type6::numeric) as sum_column, b.*
+		 		FROM ciams_${planId}_f107 b) a
+		 GROUP BY jimok
+		 ORDER BY jimok
+	</select>
+	<!-- 계획 지역 개발행위허가 끝 -->
+
+</mapper>

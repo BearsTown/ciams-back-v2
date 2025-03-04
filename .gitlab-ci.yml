@@ -1,0 +1,35 @@
+stages:
+  - Build
+  - Deploy
+
+.job_template: &job_template
+  only:
+    - main
+  tags:
+    - ciams-back-runner
+
+variables:
+  GIT_CLEAN_FLAGS: -ffdx -e .gradle/
+  WAR_NAME: 'ciams.war'
+  BUILD_PATH: './build/libs'
+  DEPLOY_PATH: '/home/ciams/uitgis/mapstudio/webapps'
+
+before_script:
+  - chmod +x ./gradlew
+
+build:
+  stage: Build
+  script:
+    - ./gradlew clean war -Psite=uitgis -Ptype=dev
+  artifacts:
+    paths:
+      - $BUILD_PATH
+  <<: *job_template
+
+deploy:
+  stage: Deploy
+  script:
+    - sudo chmod 775 $BUILD_PATH/$WAR_NAME
+    - sudo mv $BUILD_PATH/$WAR_NAME $DEPLOY_PATH/
+    - sudo chown -R ciams $DEPLOY_PATH
+  <<: *job_template

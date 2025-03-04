@@ -1,0 +1,148 @@
+plugins {
+    id 'java'
+    id 'war'
+    id 'org.springframework.boot' version '3.4.1'
+    id 'io.spring.dependency-management' version '1.1.7'
+}
+
+group = 'com.uitgis'
+version = '2.0.0'
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
+repositories {
+    mavenLocal()
+    maven { url 'https://repo.maven.apache.org/maven2/' }
+
+    maven {
+        name 'nexus'
+        url 'http://nexus.service-rnd/repository/maven-snapshots/'
+        allowInsecureProtocol true
+        credentials {
+            username 'maven-publisher'
+            password 'maven-publisher'
+        }
+    }
+    mavenCentral()
+}
+
+dependencies {
+    // Spring Boot and security dependencies
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+//    implementation 'org.springframework.security:spring-security-oauth2-authorization-server'
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-authorization-server'
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
+//    implementation 'org.springframework.security.oauth.boot:spring-security-oauth2-autoconfigure:2.1.5.RELEASE'
+
+    // UITGIS dependencies
+    implementation 'com.daonsw.spatial:spatial-common:0.0.3.19-SNAPSHOT'
+    implementation 'com.daonsw.spatial:mapstudio-adapter:0.0.3.19-SNAPSHOT'
+    implementation 'com.daonsw.spatial:data-client:0.0.2.1-SNAPSHOT'
+//    implementation 'com.daonsw.spatial:kras-client:0.0.3-SNAPSHOT'
+    implementation 'com.uitgis.ext:kras-client:2.1.1-SNAPSHOT'
+//    implementation ('com.uitgis.ext:kras-client:2.1.1-SNAPSHOT') {
+//        exclude group: 'jakarta.xml.bind', module: 'jakarta.xml.bind-api'
+//    }
+    implementation('com.uitgis.openapi:k-geo:1.0.4-SNAPSHOT') {
+        exclude group: 'org.slf4j', module: 'slf4j-simple'
+    }
+
+    // MyBatis and logging
+//    implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:2.3.0'
+    implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.3'
+    implementation 'org.bgee.log4jdbc-log4j2:log4jdbc-log4j2-jdbc4.1:1.16'
+
+    // JSON and HWP library
+    implementation 'com.googlecode.json-simple:json-simple:1.1.1'
+    implementation 'kr.dogfoot:hwplib:1.1.1'
+
+    // Utility dependencies
+    implementation 'com.google.code.findbugs:jsr305:3.0.2'
+//    implementation 'org.apache.poi:poi:4.1.2'
+//    implementation 'org.apache.poi:poi-ooxml:4.1.2'
+    implementation 'org.apache.poi:poi:5.2.3'
+    implementation 'org.apache.poi:poi-ooxml:5.2.3'
+//    implementation 'org.apache.httpcomponents:httpclient:4.5.13'
+//    implementation 'org.apache.httpcomponents.client5:httpclient5:5.2.1'
+    implementation 'org.apache.httpcomponents.client5:httpclient5:5.4'
+    implementation 'commons-fileupload:commons-fileupload:1.4'
+//    implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.4'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.2'
+    implementation 'jakarta.xml.bind:jakarta.xml.bind-api:4.0.1'
+    implementation 'org.glassfish.jaxb:jaxb-runtime:4.0.4'
+
+    // Lombok and PostgreSQL
+//    compileOnly 'org.projectlombok:lombok:1.18.24'
+    compileOnly 'org.projectlombok:lombok:1.18.30'
+//    runtimeOnly 'org.postgresql:postgresql:42.3.8'
+    runtimeOnly 'org.postgresql:postgresql:42.6.0'
+//    annotationProcessor 'org.projectlombok:lombok:1.18.24'
+    annotationProcessor 'org.projectlombok:lombok:1.18.30'
+
+    // Spring Boot Tomcat and Test
+//    providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+    // Tomcat 11 명시적 추가
+    implementation 'org.apache.tomcat.embed:tomcat-embed-core:11.0.1'
+    implementation 'org.apache.tomcat.embed:tomcat-embed-el:11.0.1'
+    implementation 'org.apache.tomcat.embed:tomcat-embed-websocket:11.0.1'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
+
+
+ext.site = (!project.hasProperty('site') || !site) ? 'uitgis' : site
+ext.type = (!project.hasProperty('type') || !type) ? 'local' : type
+
+println site
+println type
+
+tasks {
+    processResources {
+        duplicatesStrategy = DuplicatesStrategy.INCLUDE
+        filteringCharset "UTF-8"
+        filesMatching("application.yml") {
+            expand(['site': site, 'type': type])
+        }
+    }
+}
+
+sourceSets {
+    main {
+        resources {
+            srcDirs("src/main/resources", "src/main/resources-env/${site}")
+        }
+    }
+}
+
+bootRun {
+    systemProperty "spring.profiles.active", "${site},${type}"
+}
+
+jar {
+    enabled = false
+}
+
+bootJar {
+    enabled = true
+    archiveFileName = 'ciams.jar'
+}
+
+war {
+    enabled = true
+    archiveFileName = 'ciams.war'
+}
+
+bootWar {
+    enabled = false
+}

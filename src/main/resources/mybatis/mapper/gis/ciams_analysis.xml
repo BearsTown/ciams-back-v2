@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.uitgis.gis.mapper.GisMapper">
+    <sql id="ciamsAnalysis_column">
+        mnum
+        , alias
+        , remark
+        , name
+        , cs_c
+        , area
+        , density
+        , density_re
+        , variation
+        , varia_re
+        , sss_c
+        , sss_rate
+        , sss_re
+        , ita_result
+        , cs_b
+        , cs_b20
+        , deterio
+        , deterio_re
+        , road_a
+        , road_rate
+        , road_re
+        , locala
+        , f_result
+    </sql>
+
+    <sql id="ciamsAnalysis_where_search">
+        <trim prefix="WHERE" prefixOverrides="AND |OR ">
+            <!--<if test="planAreaId != null">AND plan_area_id = #{planAreaId} </if>-->
+            <if test="@com.uitgis.ciams.util.ValidUtil@notEmpty(name)">
+                <bind name="name" value="'%' + name + '%'"/>
+                OR name like #{name}
+                OR remark like #{name}
+            </if>
+        </trim>
+    </sql>
+
+
+    <select id="selectMenu2Sub1OverView"
+            parameterType="com.uitgis.ciams.dto.CiamsMenu2Sub1DetailsDto$Overview$Find$Params"
+            resultType="com.uitgis.ciams.dto.CiamsMenu2Sub1DetailsDto$Overview$Find$Result">
+        SELECT
+        <include refid="ciamsAnalysis_column"/>
+        <choose>
+            <when test="@com.uitgis.ciams.util.ValidUtil@empty(planId)">
+                FROM ciams_analysis
+            </when>
+            <otherwise>
+                FROM ciams_${planId}_analysis
+            </otherwise>
+        </choose>
+        WHERE name = #{name}
+        LIMIT 1
+    </select>
+</mapper>

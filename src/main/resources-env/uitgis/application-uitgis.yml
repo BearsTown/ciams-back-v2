@@ -1,0 +1,97 @@
+scheduler:
+  use: true
+  cron: '0 0 3 ? * SUN'
+
+crs:
+  prj: 'EPSG:5176'
+  use-transform: true
+  use-badekas: true
+
+--- # 로컬 환경 (windows - 개인 PC)
+spring:
+  config.activate.on-profile: local
+
+  datasource:
+    ciams:
+      hikari:
+        jdbc-url: jdbc:log4jdbc:postgresql://211.171.200.236:5432/CIAMS_UITGIS
+        username: CIAMS_UITGIS
+        password: CIAMS_UITGIS
+    gis:
+      hikari:
+        jdbc-url: jdbc:log4jdbc:postgresql://211.171.200.236:5432/MS_GIS_CIAMS_UITGIS
+        username: MS_GIS_CIAMS_UITGIS
+        password: MS_GIS_CIAMS_UITGIS
+    mis:
+      hikari:
+        jdbc-url: jdbc:log4jdbc:postgresql://211.171.200.236:5432/MS_MIS_CIAMS_UITGIS
+        username: MS_MIS_CIAMS_UITGIS
+        password: MS_MIS_CIAMS_UITGIS
+      user-name: system
+
+file:
+  path:
+    prefix: D:\uitgis\ciams\uitgis\files
+
+mapstudio:
+  url: http://211.171.200.236:11001/mapstudio
+
+--- # 개발 환경 (ubuntu - 211.171.200.236)
+spring:
+  config.activate.on-profile: dev
+
+  datasource:
+    ciams:
+      hikari:
+        jdbc-url: jdbc:log4jdbc:postgresql://localhost:5432/CIAMS_UITGIS
+        username: CIAMS_UITGIS
+        password: CIAMS_UITGIS
+    gis:
+      hikari:
+        jdbc-url: jdbc:log4jdbc:postgresql://localhost:5432/MS_GIS_CIAMS_UITGIS
+        username: MS_GIS_CIAMS_UITGIS
+        password: MS_GIS_CIAMS_UITGIS
+    mis:
+      hikari:
+        jdbc-url: jdbc:log4jdbc:postgresql://localhost:5432/MS_MIS_CIAMS_UITGIS
+        username: MS_MIS_CIAMS_UITGIS
+        password: MS_MIS_CIAMS_UITGIS
+      user-name: system
+
+file:
+  path:
+    prefix: /data/ciams/uitgis/ciams/files
+
+mapstudio:
+  url: http://localhost:11001/mapstudio
+
+--- # 운영 환경 (windows server - localhost)
+spring:
+  config.activate.on-profile: prod
+
+  datasource:
+    ciams:
+      hikari:
+        jdbc-url: jdbc:log4jdbc:postgresql://localhost:5432/CIAMS
+        username: CIAMS
+        password: CIAMS
+    gis:
+      hikari:
+        jdbc-url: jdbc:log4jdbc:postgresql://localhost:5432/MS_GIS_CIAMS
+        username: MS_GIS_CIAMS
+        password: MS_GIS_CIAMS
+    mis:
+      hikari:
+        jdbc-url: jdbc:log4jdbc:postgresql://localhost:5432/MS_MIS_CIAMS
+        username: MS_MIS_CIAMS
+        password: MS_MIS_CIAMS
+      user-name: system
+
+file:
+  path:
+    prefix: D:\uitgis\ciams\files
+
+mapstudio:
+  url: http://localhost:11001/mapstudio
+
+---

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.uitgis.ciams.mapper.CiamsPlanMapper">
+
+	<select id="getPlanSummary"
+		resultType="com.uitgis.ciams.model.CiamsPlanSummary">
+		SELECT *
+		FROM ciams_plan_summary where UPPER(plan_id)=
+		UPPER(#{planId})
+		ORDER BY plan_id, gubun, zone_nm asc
+	</select>
+
+	<select id="getPlanMasterSummary"
+		resultType="com.uitgis.ciams.model.CiamsPlanMasterSummary">
+		SELECT
+		plan_id,
+		use_area,
+		use_area_area,
+		plan_area_area,
+		plan_area_type1_cnt,
+		plan_area_type2_cnt,
+		plan_area_type3_cnt,
+		plan_area_type4_cnt,
+		(
+		CAST (plan_area_type1_cnt AS INTEGER) + CAST (plan_area_type2_cnt AS
+		INTEGER) + CAST (plan_area_type3_cnt AS INTEGER) + CAST
+		(plan_area_type4_cnt AS INTEGER)
+		) as plan_area_cnt,
+		CAST (plan_area_type1_cnt AS INTEGER) as plan_area_catagory1,
+		(
+		CAST (plan_area_type2_cnt AS INTEGER) + CAST (plan_area_type3_cnt AS
+		INTEGER) + CAST (plan_area_type4_cnt AS INTEGER)
+		) as plan_area_catagory2,
+		ROUND(
+		(
+		CAST (plan_area_area AS numeric) / CAST (use_area_area AS numeric) * 100
+		),
+		1
+		) as plan_area_rate
+		FROM
+		public.ciams_plan_master_summary
+		where
+		UPPER(plan_id)=		UPPER(#{planId})
+	</select>
+
+</mapper>

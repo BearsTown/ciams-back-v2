@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.uitgis.gis.mapper.MapStudio">
+    <select id="layerExists" parameterType="string" resultType="boolean">
+        SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name ILIKE #{layerName})
+    </select>
+
+    <update id="layerRename" parameterType="com.daonsw.spatial.dto.TableSchemaDto$Rename">
+        ALTER TABLE ${orgTableName} RENAME TO ${newTableName}
+    </update>
+
+    <delete id="deleteLayer" parameterType="string">
+        DROP TABLE IF EXISTS ${layerName}
+    </delete>
+</mapper>

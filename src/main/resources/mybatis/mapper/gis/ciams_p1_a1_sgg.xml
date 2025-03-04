@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.uitgis.gis.mapper.GisSampleMapper">
+	<sql id="default_column">
+		oid, adm_sect_c, sgg_nm, sgg_oid, col_adm_se
+ 	</sql>
+
+    <select id="select" parameterType="string" resultType="com.uitgis.gis.model.GisSampleModel">
+        SELECT <include refid="default_column"/>
+        FROM ciams_p1_a1_sgg
+    </select>
+
+</mapper>

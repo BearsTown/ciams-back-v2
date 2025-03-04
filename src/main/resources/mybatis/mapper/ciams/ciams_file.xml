@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.uitgis.ciams.mapper.CiamsFileMapper">
+	<resultMap id="BaseResultMap" type="com.uitgis.ciams.model.CiamsFile">
+      <id property="id" column="id" />
+      <id property="linkId" column="link_id" />
+      <id property="orgName" column="org_name" />
+      <id property="newName" column="new_name" />
+      <id property="path" column="path" />
+      <id property="ext" column="ext" />
+      <id property="typeCode" column="type_code" />
+      <id property="size" column="size" />
+      <id property="sortSn" column="sort_sn" />
+      <id property="createUser" column="create_user" />
+      <id property="createDate" column="create_date" />
+    </resultMap>
+
+    <sql id="default_column">
+        id
+        , link_id
+        , org_name
+        , new_name
+        , path
+        , ext
+        , type_code
+        , size
+        , sort_sn
+        , create_user
+        , create_date
+    </sql>
+
+    <sql id="join_column">
+        file.id as file_id
+        , file.link_id as file_link_id
+        , file.org_name as file_org_name
+        , file.new_name as file_new_name
+        , file.path as file_path
+        , file.ext as file_ext
+        , file.type_code as file_type_code
+        , file.size as file_size
+        , file.sort_sn as file_sort_sn
+        , file.create_user as file_create_user
+        , file.create_date as file_create_date
+    </sql>
+
+    <sql id="where_search">
+        <if test="@com.uitgis.ciams.util.ValidUtil@notEmpty(linkId)">
+            tb1.link_id = #{linkId}
+        </if>
+        <if test="@com.uitgis.ciams.util.ValidUtil@notEmpty(typeCode)">
+            AND tb1.type_code = #{typeCode}
+        </if>
+        <if test="@com.uitgis.ciams.util.ValidUtil@notEmpty(keyword)">
+            <bind name="keyword" value="'%' + keyword + '%'"/>
+            AND tb1.org_name LIKE #{keyword}
+        </if>
+    </sql>
+
+
+    <update id="insertFiles" parameterType="java.util.List">
+        INSERT INTO ciams_file (
+        id
+        , link_id
+        , "type_code"
+        , "org_name"
+        , "new_name"
+        , "path"
+        , "ext"
+        , "size"
+        , sort_sn
+        , "create_user"
+        , "create_date"
+        )
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (
+            #{item.id}
+            , #{item.linkId}
+            , #{item.typeCode}
+            , #{item.orgName}
+            , #{item.newName}
+            , #{item.path}
+            , #{item.ext}
+            , #{item.size}
+            , #{item.sortSn}
+            , #{item.createUser}
+            , now()
+            )
+        </foreach>
+    </update>
+
+    <update id="updateFilesSortSn" parameterType="java.util.List">
+        <foreach collection="list" item="item" open="" separator=";" close="">
+            UPDATE
+            ciams_file
+            SET
+            "sort_sn" = #{item.sortSn}
+            WHERE
+            "id" = #{item.id}
+        </foreach>
+    </update>
+
+
+    <update id="updateFiles" parameterType="java.util.List">
+        <foreach collection="list" item="item" open="" separator=";" close="">
+            UPDATE
+            ciams_file
+            SET
+            "type_code" = #{item.typeCode}
+            WHERE
+            "id" = #{item.id}
+        </foreach>
+    </update>
+
+
+    <update id="deleteFiles" parameterType="java.util.List">
+        DELETE FROM ciams_file
+        WHERE id IN
+        <foreach collection="list" item="item" open="(" separator="," close=")">
+            #{item.id}
+        </foreach>
+    </update>
+
+
+    <select id="selectById" parameterType="string" resultType="com.uitgis.ciams.model.CiamsFile">
+        SELECT
+        <include refid="default_column"/>
+        FROM ciams_file
+        WHERE
+        id = #{id}
+    </select>
+
+
+    <select id="selectByIds" parameterType="java.util.List" resultType="com.uitgis.ciams.model.CiamsFile">
+        SELECT
+        <include refid="default_column"/>
+        FROM ciams_file
+        <where>
+            <if test="@com.uitgis.ciams.util.ValidUtil@notEmpty(list)">
+                OR id IN
+                <foreach collection="list" item="id" open="(" separator="," close=")">
+                    #{id}
+                </foreach>
+            </if>
+        </where>
+        ORDER BY
+        create_date desc
+    </select>
+
+
+    <select id="selectByLinkIds" parameterType="java.util.List" resultType="com.uitgis.ciams.model.CiamsFile">
+        SELECT
+        <include refid="default_column"/>
+        FROM ciams_file
+        <where>
+            <if test="@com.uitgis.ciams.util.ValidUtil@notEmpty(list)">
+                OR link_id IN
+                <foreach collection="list" item="id" open="(" separator="," close=")">
+                    #{id}
+                </foreach>
+            </if>
+        </where>
+        ORDER BY
+        sort_sn, create_date desc
+    </select>
+
+
+    <!-- 목록 카운트 -->
+    <select id="searchCount" parameterType="map" resultType="int">
+        SELECT
+        COUNT(id)
+        FROM
+        ciams_file tb1
+        <where>
+            <include refid="where_search"/>
+        </where>
+    </select>
+
+
+    <!-- 목록 검색 -->
+    <select id="search" parameterType="map" resultType="com.uitgis.ciams.dto.CiamsFileDto$Search$Row">
+        SELECT
+       (
+              SELECT (#{totalCount} - (rn-1))) AS num ,
+		       id ,
+		       link_id ,
+		       org_name ,
+		       type_code ,
+		       ext ,
+		       size ,
+		       sort_sn ,
+		       create_date
+		FROM   (
+		              SELECT (Row_number() OVER()) AS rn ,
+		                     tb2.*
+		              FROM   (
+		                              SELECT   tb1.*
+		                              FROM     ciams_file tb1
+        <where>
+            <include refid="where_search"></include>
+        </where>
+        ORDER BY
+        tb1.create_date DESC
+        ) tb2
+        ) tb3
+        WHERE rn BETWEEN #{start} AND #{end}
+
+    </select>
+
+</mapper>

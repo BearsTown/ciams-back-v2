@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.uitgis.ciams.mapper.CiamsPlanContentDetailMapper">
+	<sql id="default_column">
+		plan_content_detail_id, plan_content_id, type_name, contents, sort_sn
+ 	</sql>
+
+ 	<sql id="join_column">
+		det.plan_content_detail_id, det.plan_content_id, det.type_name, det.contents, det.sort_sn
+ 	</sql>
+
+ 	<sql id="default_where">
+        <where>
+            <if test="@com.uitgis.ciams.util.ValidUtil@notEmpty(planContentDetailId)">
+                AND plan_content_detail_id = #{planContentDetailId}
+            </if>
+            <if test="@com.uitgis.ciams.util.ValidUtil@notEmpty(planContentId)">
+                AND plan_content_id = #{planContentId}
+            </if>
+        </where>
+    </sql>
+
+ 	<select id="select" parameterType="com.uitgis.ciams.model.CiamsPlanContentDetail" resultType="com.uitgis.ciams.model.CiamsPlanContentDetail">
+        SELECT <include refid="default_column"/>
+        FROM CIAMS_PLAN_CONTENT_DETAIL
+        <include refid="default_where"/>
+    </select>
+
+	<insert id="insert" parameterType="com.uitgis.ciams.model.CiamsPlanContentDetail">
+        INSERT INTO
+        	CIAMS_PLAN_CONTENT_DETAIL(<include refid="default_column"/>)
+		VALUES(
+			#{planContentDetailId},
+			#{planContentId},
+			#{typeName},
+			#{contents},
+			#{sortSn}
+		)
+    </insert>
+
+    <update id="update" parameterType="com.uitgis.ciams.model.CiamsPlanContentDetail">
+        UPDATE CIAMS_PLAN_CONTENT_DETAIL
+        <set>
+            <if test="@com.uitgis.ciams.util.ValidUtil@notEmpty(typeName)">
+                type_name = #{typeName},
+            </if>
+            <if test="@com.uitgis.ciams.util.ValidUtil@notEmpty(contents)">
+                contents = #{contents},
+            </if>
+            <if test="@com.uitgis.ciams.util.ValidUtil@notEmpty(sortSn)">
+                sort_sn = #{sortSn},
+            </if>
+        </set>
+        WHERE plan_content_detail_id = #{planContentDetailId}
+    </update>
+
+    <delete id="delete" parameterType="com.uitgis.ciams.dto.CiamsPlanContentDetailDto$DeleteParam">
+        DELETE FROM CIAMS_PLAN_CONTENT_DETAIL
+        WHERE 1!=1
+        OR plan_content_id =  #{planContentId}
+        OR plan_content_detail_id=  #{planContentDetailId}
+    </delete>
+</mapper>

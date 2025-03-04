@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.uitgis.mis.mapper.MisMapper">
+
+    <select id="selectDtsource" parameterType="String" resultType="com.uitgis.mis.model.Dtsource">
+        SELECT *
+        FROM "GWP_DTSOURCE"
+        WHERE "USER_ID" = (select "USER_ID" from "GWP_USER" where "USERNAME" = #{userName})
+    </select>
+
+    <!--  계획구역 지도 서비스 정보 시작 -->
+    <select id="getMapService" parameterType="com.uitgis.ciams.dto.CiamsPlanMapServiceDto" resultType="com.uitgis.ciams.dto.CiamsPlanMapServiceDto">
+			select * from (
+				select D."DTSOURCE_ID",
+					CASE WHEN S."INS_TYPE" = 'CD002' THEN 'WMS/WFS' ELSE 'WMTS' END as "DTSOURCE_TYPE"
+					,D."SERVICE_NM"
+					, UPPER(replace(SPLIT_PART(D."SERVICE_NM",'_',3),'.xml','')) as  "SERVICE_TYPE"
+					,UPPER(SPLIT_PART(D."SERVICE_NM",'_',2)) as planId
+				from "GWP_DTSOURCE" D left outer join "GWP_SERVICE_INS" S
+					on D."DTSOURCE_ID" = S."DTSOURCE_ID"
+						and UPPER(D."SERVICE_NM") like '%CIAMS%'
+						where S."INS_TYPE" in ('CD002','CD004')
+						and D."DEL_YN" = 'N'
+						order by D."SERVICE_NM",S."INS_TYPE" ) t
+				<if test="planId != null">where UPPER(t.planId) = #{planId}</if>
+		</select>
+
+		<!--  계획구역 지도 서비스 정보 시작 -->
+    <select id="getMapLayers" parameterType="com.uitgis.ciams.dto.CiamsPlanMapLayerDto" resultType="com.uitgis.ciams.dto.CiamsPlanMapLayerDto">
+			SELECT "LAYER_NM", "LAYER_TITLE", "DSCR",  "LAYER_SIZE"
+				FROM public."GWP_LAYERSOURCE" where UPPER("LAYER_NM") like UPPER('CIAMS_${planId}%') order by "LAYER_NM" asc
+		</select>
+
+		<!--  계획구역 지도 서비스 정보 끝 -->
+
+</mapper>

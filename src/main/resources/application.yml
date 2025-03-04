@@ -1,0 +1,129 @@
+# 공통 환경 변수 선언
+# 개별 환경 변수는 각 패키지 파일에 명시 application-{package}.yml
+
+server:
+  port: 8080
+  servlet:
+    context-path: /ciams
+  tomcat:
+    threads:
+      max: 10 # 생성할 수 있는 thread의 총 개수
+      min-spare: 1 # 항상 활성화 되어있는(idle) thread의 개수
+    max-connections: 10 # 수립가능한 connection의 총 개수
+    accept-count: 10 # 작업큐의 사이즈
+    connection-timeout: 20000 # timeout 판단 기준 시간, 20초
+
+spring:
+  profiles:
+    active: ${site}, ${type}
+  servlet:
+    multipart:
+      max-file-size: 1000MB
+      max-request-size: 1000MB
+  datasource:
+    ciams:
+      hikari:
+        # jdbc-url: ...
+        # username: ...
+        # password: ...
+        driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
+        maximum-pool-size: 3
+    gis:
+      hikari:
+        # jdbc-url: ...
+        # username: ...
+        # password: ...
+        driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
+        maximum-pool-size: 3
+    mis:
+      hikari:
+        # jdbc-url: ...
+        # username: ...
+        # password: ...
+        driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
+        maximum-pool-size: 3
+      # username: ...
+
+security:
+  oauth2:
+    authorization:
+      jwt:
+        key-store: key/uitgis-ciams.p12
+        key-alias: uitgis-ciams
+        key-password: uitgis-ciams
+    client:
+      resource-ids: ciams-api-server
+      client-id: ciams-web-client
+      client-secret: cGdtcy13ZWItY2xpZW50LXNlY3JldA==
+
+file:
+  path:
+    temp: /temp
+    static: /files
+    # prefix: ...
+    calc-templates: /calc-templates
+
+auth:
+  user-fail-cnt: 6 #로그인 실패카운트 (0이면 체크안함)
+
+logging:
+  level:
+    root: info
+    jdbc:
+      audit: off
+      sqlonly: off
+      resultset: off
+      sqltiming: off
+      connection: off
+      resultsettable: off
+
+mapstudio:
+  # url: ...
+  user: system
+  api-data: /api/v1/data
+  api-layer-info: /api/v1/layer/info
+  api-layer-table: /api/v1/layer/table
+  token: eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJzeXN0ZW0iLCJMSU5LIjoiQ0QwMDkiLCJhdXRoIjoiUk9MRV9BRE1JTixST0xFX0FQSSIsImlhdCI6MTUyODM2MTI4NywiaXNzIjoibWFwc3R1ZGlvLmp3dCIsImV4cCI6NDY4NDAzNDg4N30.yo_Oih7fli_IZNveACOCyS3GJsSr2B4Umiei_qVkVjSI8KhRuBPaRda3CfBZwqDiBlDrQ8ASZ9GpZk8VPBN6rw
+
+--- #로컬 환경 (windows - 개인 PC)
+spring:
+  config.activate.on-profile: local
+
+logging:
+  level:
+    jdbc:
+      sqltiming: debug
+      connection: debug
+      resultsettable: debug
+
+--- #개발 환경 (ubuntu - 211.171.200.236)
+spring:
+  config.activate.on-profile: dev
+
+logging:
+  file:
+    name: ./logs/ciams.log
+  logback:
+    rollingpolicy:
+      file-name-pattern: \${LOG_FILE}.%d{yyyy-MM-dd}-%i.log
+      max-history: 30
+      max-file-size: 100MB
+
+--- #운영 환경 (windows server)
+spring:
+  config.activate.on-profile: prod
+
+logging:
+#  level:
+#    jdbc:
+#      sqltiming: debug
+#      connection: debug
+#      resultsettable: debug
+  file:
+    name: D:/project/ciams/logs/ciams.log
+  logback:
+    rollingpolicy:
+      file-name-pattern: \${LOG_FILE}.%d{yyyy-MM-dd}-%i.log
+      max-history: 30
+      max-file-size: 100MB
+---

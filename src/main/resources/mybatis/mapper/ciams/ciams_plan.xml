@@ -1,0 +1,258 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.uitgis.ciams.mapper.CiamsPlanMapper">
+
+    <!-- 계획 지역 시작 -->
+
+    <!-- 계획 지역 컬럼 -->
+    <sql id="CiamsPlanArea_column">
+        plan_area_id
+        , plan
+        , plan_group
+        , plan_area_code
+        , plan_area_name
+        , plan_area_loc
+        , plan_area_leng
+        , plan_area_area
+        , plan_area_desc
+        , plan_type
+        , plan_type_reason
+        , plan_area_use
+    </sql>
+
+    <sql id="where_search">
+        <trim prefix="WHERE" prefixOverrides="AND |OR ">
+            <!--<if test="planAreaId != null">AND plan_area_id = #{planAreaId} </if>-->
+            <if test="plan != null">AND plan = #{plan}</if>
+            <if test="planGroup != null">AND plan_group = #{planGroup}</if>
+            <if test="@com.uitgis.ciams.util.ValidUtil@notEmpty(planTypes)">
+                AND plan_type IN
+                <foreach collection="planTypes" item="type" open="(" separator="," close=")">
+                    get_cd_nm(#{type}, null)
+                </foreach>
+            </if>
+            <if test="@com.uitgis.ciams.util.ValidUtil@notEmpty(planAreaName)">
+                <bind name="planAreaName" value="'%' + planAreaName + '%'"/>
+                AND plan_area_name like #{planAreaName}
+            </if>
+            <!-- <if test="planArea_leng != null">AND plan_area_leng = #{planArea_leng} </if>
+            <if test="planArea_area != null">AND plan_area_area = #{planArea_area} </if> -->
+            <!--<if test="planAreaDesc != null">AND plan_area_desc = #{planAreaDesc} </if>-->
+        </trim>
+    </sql>
+
+    <!-- 계획 지역 목록 카운트 -->
+    <select id="selectPlanAreaCount" parameterType="map" resultType="int">
+        SELECT
+        COUNT(plan_area_id)
+        FROM
+        ciams_plan_area
+        <include refid="where_search"></include>
+    </select>
+
+    <!-- 계획 지역 조회 -->
+    <select id="selectPlanArea" parameterType="map" resultType="com.uitgis.ciams.dto.CiamsPlanAreaDto$Search$Row">
+        <include refid="pagination.page_top"/>
+        SELECT
+        <include refid="CiamsPlanArea_column"/>
+        FROM ciams_plan_area
+        <include refid="where_search"/>
+        <include refid="pagination.page_bottom"/>
+    </select>
+
+    <!-- 계획 지역 추가 -->
+    <insert id="insetPlanArea" parameterType="com.uitgis.ciams.model.CiamsPlanArea">
+        INSERT INTO ciams_plan_area(
+        <include refid="CiamsPlanArea_column"/>
+        )
+        VALUES (
+        #{planAreaId}
+        , #{plan}
+        , #{planGroup}
+        , #{planAreaCode}
+        , #{planAreaName}
+        , #{planAreaLoc}
+        , #{planAreaLeng}
+        , #{planAreaArea}
+        , #{planAreaDesc}
+        , #{planType}
+        , #{planTypeReason}
+        , #{planAreaUse}
+        );
+    </insert>
+
+    <!-- 계획 지역 수정 -->
+    <update id="updatePlanArea" parameterType="com.uitgis.ciams.model.CiamsPlanArea">
+        UPDATE ciams_plan_area
+        <trim prefix="SET" suffixOverrides=",">
+            <!-- <if test="planArea_id != null"> plan_area_id = #{planArea_id} </if> -->
+            <if test="plan != null">plan = #{plan}</if>
+            <if test="planGroup != null">plan_group = #{planGroup}</if>
+            <if test="planAreaCode != null">plan_area_code = #{planAreaCode}</if>
+            <if test="planAreaName != null">plan_area_name = #{planAreaName}</if>
+            <if test="planAreaLeng != null">plan_area_leng = #{planAreaLeng}</if>
+            <if test="planAreaArea != null">plan_area_area = #{planAreaArea}</if>
+            <if test="planAreaDesc != null">plan_area_desc = #{planAreaDesc}</if>
+            <if test="planTypeReason != null">plan_type_reason = #{planTypeReason}</if>
+            <if test="planAreaUse != null">plan_area_use = #{planAreaUse}</if>
+            <if test="planType != null">AND plan_type = #{planType}</if>
+        </trim>
+        WHERE plan_area_id = #{planAreaId}
+    </update>
+
+    <!-- 계획 지역 삭제 -->
+    <update id="deletePlanArea" parameterType="com.uitgis.ciams.model.CiamsPlanArea">
+        DELETE
+        FROM ciams_plan_area
+        WHERE plan_area_id = #{planAreaId}
+    </update>
+
+    <!-- 계획 지역 상세 -->
+    <select id="selectById" parameterType="map" resultType="com.uitgis.ciams.dto.CiamsPlanAreaDto$Details$Result">
+        SELECT
+        <include refid="CiamsPlanArea_column"/>
+        FROM ciams_plan_area
+        WHERE plan_area_id = #{id}
+    </select>
+
+    <!-- 계획 지역 끝 -->
+
+    <!-- 계획 레이어 시작 -->
+
+    <!-- 계획 레이어 컬럼 -->
+    <sql id="CiamsPlanLayer_column">
+        plan_layer_id
+        , plan, plan_group, plan_layer_code, plan_layer_name, plan_layer_desc
+    </sql>
+
+    <!-- 계획 레이어 조회 -->
+    <select id="selectPlanLayer" resultType="com.uitgis.ciams.model.CiamsPlanLayer">
+        SELECT
+        <include refid="CiamsPlanLayer_column"/>
+        FROM ciams_plan_layer
+        <trim prefix="WHERE" prefixOverrides="AND |OR ">
+            <if test="planLayerId != null">AND plan_layer_id = #{planLayerId}</if>
+            <if test="plan != null">AND plan = #{plan}</if>
+            <if test="planGroup != null">AND plan_group = #{planGroup}</if>
+            <if test="planLayerCode != null">AND plan_layer_code = #{planLayerCode}</if>
+            <if test="planLayerName != null">AND plan_layer_name = #{planLayerName}</if>
+            <if test="planLayerDesc != null">AND plan_layer_desc = #{planLayerDesc}</if>
+        </trim>
+    </select>
+
+    <!-- 계획 레이어 추가 -->
+    <insert id="insertPlanLayer" parameterType="com.uitgis.ciams.model.CiamsPlanLayer">
+        INSERT INTO ciams_plan_layer(
+        <include refid="CiamsPlanLayer_column"/>
+        )
+        VALUES (
+        #{planLayerId}
+        , #{plan}
+        , #{planGroup}
+        , #{planLayerCode}
+        , #{planLayerName}
+        , #{planLayerDesc}
+        );
+    </insert>
+
+    <!-- 계획 레이어 수정 -->
+    <update id="updatePlanLayer" parameterType="com.uitgis.ciams.model.CiamsPlanLayer">
+        UPDATE ciams_plan_layer
+        <trim prefix="SET" suffixOverrides=",">
+            <!-- <if test="planLayer_id != null"> plan_layer_id = #{planLayer_id} </if> -->
+            <if test="plan != null">plan = #{plan}</if>
+            <if test="planGroup != null">plan_group = #{planGroup}</if>
+            <if test="planLayerCode != null">plan_layer_code = #{planLayerCode}</if>
+            <if test="planLayerName != null">plan_layer_name = #{planLayerName}</if>
+            <if test="planLayerDesc != null">plan_layer_desc = #{planLayerDesc}</if>
+        </trim>
+        WHERE plan_layer_id = #{planLayerId}
+    </update>
+
+    <!-- 계획 레이어 삭제 -->
+    <update id="deletePlanLayer" parameterType="com.uitgis.ciams.model.CiamsPlanLayer">
+        DELETE
+        FROM ciams_plan_layer
+        WHERE plan_layer_id = #{planLayerId}
+    </update>
+
+    <!-- 계획 레이어 꿑 -->
+
+
+    <!-- 계획 지역 인센  -->
+    <resultMap type="com.uitgis.ciams.dto.CiamsPlanAreaIncenDto$AreaIncen" id="AreaIncentiveMap">
+        <result property="areaUseCd" column="area_use_cd"/>
+        <result property="areaUseNm" column="area_use_nm"/>
+        <result property="incentiveNtfcNo" column="incentive_ntfc_no"/>
+        <result property="standard" column="standard"/>
+        <result property="limit" column="limit"/>
+
+        <collection property="incentiveItems"
+                    ofType="com.uitgis.ciams.dto.CiamsPlanAreaIncenDto$IncentiveItem"
+                    javaType="list">
+            <result property="gCategoryNm" column="g_category_nm"/>
+            <result property="mCategoryNm" column="m_category_nm"/>
+            <result property="sCategoryNm" column="s_category_nm"/>
+            <result property="formulaNm" column="formula_nm"/>
+            <result property="increaseNm" column="increase_nm"/>
+        </collection>
+    </resultMap>
+
+    <select id="selectPlanAreaIncen"
+            parameterType="com.uitgis.ciams.dto.CiamsPlanAreaIncenDto$Find$Info"
+            resultMap="AreaIncentiveMap">
+        SELECT
+        t_category.area_use_cd,
+        get_cd_nm(t_category.area_use_cd, '') AS area_use_nm,
+        get_cd_nm(t_category.g_category, '') AS g_category_nm,
+        get_cd_nm(t_category.m_category, '') AS m_category_nm,
+        get_cd_nm(t_category.s_category, '') AS s_category_nm,
+        t_limit.standard_${areaType} AS standard,
+        t_limit.limit_${areaType} AS limit,
+        formula_replace(ntfc_no, t_category.formula_${areaType}, t_category.formula_${areaType}_params) AS formula_nm,
+        formula_replace(ntfc_no, (
+        SELECT increase_${areaType} FROM ciams_incentive_increase WHERE incentive_ntfc_no = ntfc_no
+        AND area_use_cd = t_category.area_use_cd
+        AND target_category = t_category.s_category
+        ), (
+        SELECT increase_${areaType}_params FROM ciams_incentive_increase WHERE incentive_ntfc_no = ntfc_no
+        AND area_use_cd = t_category.area_use_cd
+        AND target_category = t_category.s_category
+        ) ) AS increase_nm
+        FROM (SELECT ntfc_no FROM ciams_incentive_ntfc WHERE current_yn ORDER BY ntfc_de DESC LIMIT 1) AS ntfc_no
+        LEFT JOIN ciams_incentive_category AS t_category
+        ON
+        t_category.incentive_ntfc_no = ntfc_no
+        LEFT JOIN ciams_incentive_limit AS t_limit
+        ON
+        t_limit.incentive_ntfc_no = ntfc_no
+        WHERE
+        t_category.area_use_cd = t_limit.area_use_cd
+        AND
+        t_category.formula_${areaType} IS NOT NULL
+        and t_category.formula_${areaType} != ''
+        <if test="@com.uitgis.ciams.util.ValidUtil@notEmpty(planId)">
+            AND ( t_category.area_use_cd =
+            ANY ( (string_to_array( (SELECT conf_desc FROM ciams_config WHERE id = #{planId}), ',' )) ))
+        </if>
+        ORDER BY t_category.field_name
+    </select>
+
+    <select id="selectPlanAreaIncenIncrease"
+            resultType="com.uitgis.ciams.dto.CiamsPlanAreaIncenDto$AreaIncenIncrease">
+        SELECT area_use_cd,
+               get_cd_nm(area_use_cd, '')     AS area_use_nm,
+               s_category,
+               get_cd_nm(s_category, '')      AS s_category_nm,
+               title,
+               apply_yn,
+               target_category,
+               get_cd_nm(target_category, '') AS target_category_nm
+        FROM ciams_incentive_increase
+        WHERE incentive_ntfc_no =
+              (SELECT ntfc_no FROM ciams_incentive_ntfc WHERE current_yn ORDER BY ntfc_de DESC LIMIT 1)
+    </select>
+
+    <!-- 계획 지역 인센 끝 -->
+</mapper>

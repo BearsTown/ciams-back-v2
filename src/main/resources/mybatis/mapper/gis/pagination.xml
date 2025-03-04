@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="pagination">
+
+	<sql id="page_top">
+		<if test="isPage">
+			<if test="isNumSortAsc"><!-- 순차 -->
+			SELECT
+				tmp2.*
+			FROM (
+				SELECT (ROW_NUMBER() OVER()) rn , tmp.*
+				FROM (
+			</if>
+			<if test="!isNumSortAsc"><!-- 역순 -->
+			SELECT
+				(SELECT (#{totalCount} - (tmp_rn-1))) AS rn, 
+				tmp2.*
+			FROM (
+				SELECT (ROW_NUMBER() OVER()) tmp_rn , tmp.*
+				FROM (
+			</if>
+		</if>
+	</sql>
+
+	<sql id="page_bottom">
+		<if test="isPage">
+			) tmp 
+		) tmp2
+		WHERE tmp2.rn BETWEEN #{start} AND #{end}
+		</if>
+	</sql>
+
+</mapper>

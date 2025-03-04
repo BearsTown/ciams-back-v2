@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.uitgis.gis.mapper.GisMapper">
+
+    <select id="getBuildingByDistrict" parameterType="map" resultType="com.uitgis.ciams.dto.CiamsMonitoringDto$BuildingTypeResult">
+			SELECT b.bd_use,
+			       Count(bd_use) AS cnt
+			FROM   (SELECT *
+			        FROM   ciams_adm_sect_ri
+			        WHERE  emd_cd IN
+			        <foreach collection="emdCds" item="item" open="(" close=")" separator=",">
+			            #{item}
+			        </foreach>
+			        ) a
+			       LEFT OUTER JOIN ciams_f_fac_building b
+			                    ON St_intersects(a.shape, b.shape)
+			GROUP  BY b.bd_use
+		</select>
+
+		<select id="getBuildingBySgg" parameterType="map" resultType="com.uitgis.ciams.dto.CiamsMonitoringDto$BuildingTypeResult">
+			SELECT b.bd_use,
+			       Count(bd_use) AS cnt
+			FROM   (SELECT *
+			        FROM   ciams_sgg) a
+			       LEFT OUTER JOIN ciams_f_fac_building b
+			                    ON St_intersects(a.shape, b.shape)
+			GROUP  BY b.bd_use
+		</select>
+
+		<select id="getBuildingByPlanarea" parameterType="map" resultType="com.uitgis.ciams.dto.CiamsMonitoringDto$BuildingTypeResult">
+			SELECT t.bd_use,
+			       Count(bd_use) AS cnt
+			FROM   (SELECT a.area_id,
+			               b.bd_use
+			        FROM   (SELECT *
+			                FROM   ciams_plan
+		                <if test="areaId != null">
+			                WHERE  area_id::text IN
+			                <foreach collection="areaIds" item="item" open="(" close=")" separator=",">
+							            #{item}
+							        </foreach>
+						        </if>
+			                ) a
+			               LEFT OUTER JOIN ciams_f_fac_building b
+			                            ON St_intersects(a.shape, b.shape))t
+			WHERE  t.bd_use IS NOT NULL
+			GROUP  BY t.bd_use
+		</select>
+
+		<select id="getBuildingOldByDistrict" parameterType="map" resultType="com.uitgis.ciams.dto.CiamsMonitoringDto$BuildingOldResult">
+			SELECT bd_old,
+			       Count(*) AS cnt,
+			       sortNo
+			FROM   (SELECT CASE
+			                 WHEN b.useapr_day IS NULL OR b.useapr_day = '' THEN '미상'
+			                 WHEN Left(b.useapr_day, 4) :: INT <![CDATA[<=]]> #{year} - 30 THEN '30년이상'
+			                 WHEN Left(b.useapr_day, 4) :: INT <![CDATA[<]]> #{year} - 25 THEN '25~30년'
+			                 WHEN Left(b.useapr_day, 4) :: INT <![CDATA[<]]> #{year} - 20 THEN '20~25년'
+			                 WHEN Left(b.useapr_day, 4) :: INT <![CDATA[<]]> #{year} - 15 THEN '15~20년'
+			                 WHEN Left(b.useapr_day, 4) :: INT <![CDATA[<]]> #{year} - 10 THEN '10~15년'
+			                 WHEN Left(b.useapr_day, 4) :: INT <![CDATA[<]]> #{year} - 5 THEN '5~10년'
+			                 WHEN Left(b.useapr_day, 4) :: INT <![CDATA[>=]]> #{year} - 5 THEN '5년이하'
+			                 ELSE Left(b.useapr_day, 4)
+			               END AS bd_old,
+			               CASE
+			                 WHEN b.useapr_day IS NULL OR b.useapr_day = '' THEN '0'
+			                 WHEN Left(b.useapr_day, 4) :: INT <![CDATA[<=]]> #{year} - 30 THEN '1'
+			                 WHEN Left(b.useapr_day, 4) :: INT <![CDATA[<]]> #{year} - 25 THEN '2'
+			                 WHEN Left(b.useapr_day, 4) :: INT <![CDATA[<]]> #{year} - 20 THEN '3'
+			                 WHEN Left(b.useapr_day, 4) :: INT <![CDATA[<]]> #{year} - 15 THEN '4'
+			                 WHEN Left(b.useapr_day, 4) :: INT <![CDATA[<]]> #{year} - 10 THEN '5'
+			                 WHEN Left(b.useapr_day, 4) :: INT <![CDATA[<]]> #{year} - 5 THEN '6'
+			                 WHEN Left(b.useapr_day, 4) :: INT <![CDATA[>=]]> #{year} - 5 THEN '7'
+			                 ELSE Left(b.useapr_day, 4)
+			               END AS sortNo
+			        FROM
+			        <choose>
+				        <when test="emdCd != null">
+				        (SELECT *
+				                FROM   ciams_adm_sect_ri
+				                WHERE  emd_cd IN
+								        <foreach collection="emdCds" item="item" open="(" close=")" separator=",">
+								            #{item}
+								        </foreach>
+							   ) a
+				               left outer join ubs_a4_bld_d010 b
+				                            ON St_intersects(a.shape, b.shape)
+				         </when>
+				         <otherwise>
+				          (SELECT * from ubs_a4_bld_d010) b
+				         </otherwise>
+				       </choose>
+				       ) t
+			GROUP  BY t.bd_old, t.sortNo
+			ORDER BY t.sortNo desc
+		</select>
+
+		<select id="getBuildingOldByPlanarea" parameterType="map" resultType="com.uitgis.ciams.dto.CiamsMonitoringDto$BuildingOldResult">
+			SELECT bd_old,
+			       Count(*) AS cnt,
+			       sortNo
+			FROM   (SELECT CASE
+			                 WHEN b.useapr_day IS NULL OR b.useapr_day = '' THEN '미상'
+			                 WHEN Left(b.useapr_day, 4) :: INT <![CDATA[<=]]> #{year} - 30 THEN '30년이상'
+			                 WHEN Left(b.useapr_day, 4) :: INT <![CDATA[<]]> #{year} - 25 THEN '25~30년'
+			                 WHEN Left(b.useapr_day, 4) :: INT <![CDATA[<]]> #{year} - 20 THEN '20~25년'
+			                 WHEN Left(b.useapr_day, 4) :: INT <![CDATA[<]]> #{year} - 15 THEN '15~20년'
+			                 WHEN Left(b.useapr_day, 4) :: INT <![CDATA[<]]> #{year} - 10 THEN '10~15년'
+			                 WHEN Left(b.useapr_day, 4) :: INT <![CDATA[<]]> #{year} - 5 THEN '5~10년'
+			                 WHEN Left(b.useapr_day, 4) :: INT <![CDATA[>=]]> #{year} - 5 THEN '5년이하'
+			                 ELSE Left(b.useapr_day, 4)
+			               END AS bd_old,
+			               CASE
+			                 WHEN b.useapr_day IS NULL OR b.useapr_day = '' THEN '0'
+			                 WHEN Left(b.useapr_day, 4) :: INT <![CDATA[<=]]> #{year} - 30 THEN '1'
+			                 WHEN Left(b.useapr_day, 4) :: INT <![CDATA[<]]> #{year} - 25 THEN '2'
+			                 WHEN Left(b.useapr_day, 4) :: INT <![CDATA[<]]> #{year} - 20 THEN '3'
+			                 WHEN Left(b.useapr_day, 4) :: INT <![CDATA[<]]> #{year} - 15 THEN '4'
+			                 WHEN Left(b.useapr_day, 4) :: INT <![CDATA[<]]> #{year} - 10 THEN '5'
+			                 WHEN Left(b.useapr_day, 4) :: INT <![CDATA[<]]> #{year} - 5 THEN '6'
+			                 WHEN Left(b.useapr_day, 4) :: INT <![CDATA[>=]]> #{year} - 5 THEN '7'
+			                 ELSE Left(b.useapr_day, 4)
+			               END AS sortNo
+			        FROM
+			        <choose>
+				        <when test="areaId != null">
+				        (SELECT *
+				                FROM   ciams_plan
+			                WHERE  area_id::text IN
+			                <foreach collection="areaIds" item="item" open="(" close=")" separator=",">
+							            #{item}
+							        </foreach>
+			                ) a
+				               left outer join ubs_a4_bld_d010 b
+				                            ON St_intersects(a.shape, b.shape)
+				         </when>
+				         <otherwise>
+				          (SELECT * from ubs_a4_bld_d010) b
+				         </otherwise>
+				       </choose>
+				       ) t
+			GROUP  BY t.bd_old, t.sortNo
+			ORDER BY t.sortNo desc
+		</select>
+
+		<select id="getParcelTypeByDistrict" parameterType="map" resultType="com.uitgis.ciams.dto.CiamsMonitoringDto$CommonResult">
+			SELECT lndcgrcode   AS cd,
+			       lndcgrcodenm AS cdnm,
+			       Count(*)     AS cnt
+			FROM
+			(SELECT *
+			                FROM   land_forest
+		                <if test="emdCd != null">
+			                WHERE  substring(pnu,1,8) IN
+							        <foreach collection="emdCds" item="item" open="(" close=")" separator=",">
+							            #{item}
+							        </foreach>
+							      </if>
+			                ) a
+			GROUP  BY lndcgrcode,
+			          lndcgrcodenm
+			ORDER  BY lndcgrcode;
+		</select>
+
+		<select id="getParcelOwnerByDistrict" parameterType="map" resultType="com.uitgis.ciams.dto.CiamsMonitoringDto$CommonResult">
+			SELECT posesnsecode   AS cd,
+			       posesnsecodenm AS cdnm,
+			       Count(*)       AS cnt
+			FROM
+			(SELECT *
+			                FROM   land_forest
+		                <if test="emdCd != null">
+			                WHERE  substring(pnu,1,8) IN
+							        <foreach collection="emdCds" item="item" open="(" close=")" separator=",">
+							            #{item}
+							        </foreach>
+							      </if>
+			                ) a
+			GROUP  BY posesnsecode,
+			          posesnsecodenm
+			ORDER  BY posesnsecode;
+		</select>
+
+</mapper>

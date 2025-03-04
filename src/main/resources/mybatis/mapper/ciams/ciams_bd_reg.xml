@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.uitgis.ciams.mapper.CiamsBdRegMapper">
+    <!-- 건축물 대장 조회 -->
+    <select id="selectBdReg" parameterType="map" resultType="com.uitgis.ciams.dto.CiamsBdRegDto$Search$Row">
+      SELECT
+			  bd_reg_id,
+			  reg_type_nm,
+			  pnu,
+			  sido_nm,
+			  sgg_nm,
+			  umd_nm,
+			  dong_nm,
+			  land_type_nm,
+			  jibun_ju,
+			  jibun_bu,
+			  address,
+			  sub_parcel,
+			  fl_area,
+			  gr_fl_area,
+			  land_area,
+			  per_date,
+			  con_date,
+			  appuse_date,
+			  addres_road,
+			  main_purpose_nm,
+			  etc_purpose_nm,
+			  roof_nm,
+			  etc_roof_nm,
+			  floor,
+			  basement
+			FROM
+			  ciams_bd_reg
+			where
+			  pnu = #{pnu};
+    </select>
+</mapper>

@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.uitgis.ciams.mapper.CiamsPlanZoneMapper">
+
+    <resultMap id="overView" type="com.uitgis.ciams.dto.CiamsMenu3Sub1DetailsDto$Overview$Find$Result">
+        <result property="zoneNo" column="zone_no"/>
+        <result property="zoneName" column="zone_name"/>
+        <result property="mngType" column="mng_type"/>
+
+        <collection property="baseDescs" ofType="com.uitgis.ciams.dto.CiamsMenu3Sub1DetailsDto$BaseDescDTO" columnPrefix="cpbd_">
+            <id column="category"/>
+            <result property="category" column="category"/>
+
+            <collection property="list" ofType="string">
+                <result column="description" />
+            </collection>
+        </collection>
+
+        <collection property="zoneDescs" ofType="com.uitgis.ciams.dto.CiamsMenu3Sub1DetailsDto$ZoneDescDTO" columnPrefix="cpzd_">
+            <id column="category"/>
+
+            <result property="category" column="category"/>
+            <collection property="list" ofType="string">
+                <result column="description" />
+            </collection>
+        </collection>
+
+        <collection property="zoneIndustries" ofType="com.uitgis.ciams.dto.CiamsMenu3Sub1DetailsDto$ZoneIndustryDTO">
+            <id column="cpzi_category"/>
+
+            <result property="category" column="cpzi_category" />
+            <collection property="list" ofType="com.uitgis.ciams.model.CiamsPlanZoneIndustry">
+                <result property="industryCode" column="industry_code" />
+                <result property="industryName" column="industry_name" />
+            </collection>
+        </collection>
+
+        <collection property="zoneImages" ofType="com.uitgis.ciams.dto.CiamsMenu3Sub1DetailsDto$ZoneImageDTO">
+            <id column="image_category"/>
+
+            <result property="category" column="image_category" />
+            <collection property="list" ofType="com.uitgis.ciams.model.CiamsPlanZoneImage">
+                <result property="id" column="image_id" />
+                <result property="title" column="image_title" />
+                <result property="name" column="image_name" />
+            </collection>
+        </collection>
+    </resultMap>
+
+    <select id="selectMenu3Sub1OverView"
+            parameterType="com.uitgis.ciams.dto.CiamsMenu3Sub1DetailsDto$Overview$Find$Params"
+            resultMap="overView">
+        SELECT
+            z.zone_no,
+            z.zone_name,
+            z.mng_type,
+
+            cpbd.category as cpbd_category,
+            cpbd.description as cpbd_description,
+
+            cpzd.category as cpzd_category,
+            cpzd.description as cpzd_description,
+
+            cpzi.category as cpzi_category,
+            cpzi.industry_code as industry_code,
+            cpzi.industry_name as industry_name,
+
+            cpzimg.id as image_id,
+            cpzimg.category as image_category,
+            cpzimg.title as image_title,
+            cpzimg.name as image_name
+        FROM ciams_zone z
+                 left outer JOIN ciams_plan_base_description cpbd ON z.mng_type = cpbd.mng_type
+                 left outer JOIN ciams_plan_zone_description cpzd ON z.zone_no = cpzd.zone_no
+                 left outer JOIN ciams_plan_zone_image cpzimg ON z.zone_no = cpzimg.zone_no
+                 left outer JOIN ciams_plan_zone_industry cpzi ON z.zone_no = cpzi.zone_no
+        WHERE z.zone_no = #{zoneNo}
+    </select>
+
+    <select id="selectImage" parameterType="int">
+        select zone_no
+             , category
+             , title
+             , path
+             , name
+             , create_date
+        from ciams_plan_zone_image
+        where id = #{id}
+    </select>
+</mapper>

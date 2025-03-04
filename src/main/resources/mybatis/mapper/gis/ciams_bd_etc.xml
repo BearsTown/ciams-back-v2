@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.uitgis.gis.mapper.CiamsBdEtcMapper">
+    <!-- 건축물 기타 조회 -->
+    <select id="selectBdEtc" parameterType="map" resultType="com.uitgis.ciams.dto.CiamsBdEtcDto$Search$Row">
+     	SELECT (SELECT Count(*)  :: int
+        FROM   ciams_p1_f_fac_building_binjib
+        WHERE  pnu = #{pnu}) AS isbinjib,
+       (SELECT Count(*)  :: int
+        FROM   ciams_p1_f_fac_building_wiban
+        WHERE  pnu = #{pnu}) AS iswiban;
+    </select>
+</mapper>

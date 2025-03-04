@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.uitgis.gis.mapper.GisMapper">
+
+    <!-- 계획 지역 시작 -->
+
+    <!-- 계획 지역 컬럼 -->
+    <sql id="CiamsPlanArea_column">
+        plan_id
+        , area_loc as plan_area_loc
+        , area_id as plan_area_id
+        , area_type as plan_area_type
+        , area_type_cd as plan_area_type_cd
+        , area_name as plan_area_name
+        , area_leng as plan_area_leng
+        , area_area as plan_area_area
+        , area_cause  as plan_area_type_reason
+    </sql>
+
+    <sql id="CiamsPlanArea_where_search">
+        <trim prefix="WHERE" prefixOverrides="AND |OR ">
+            <!--<if test="planAreaId != null">AND plan_area_id = #{planAreaId} </if>-->
+            <if test="@com.uitgis.ciams.util.ValidUtil@notEmpty(planId)">AND plan_id = #{planId}</if>
+            <if test="@com.uitgis.ciams.util.ValidUtil@notEmpty(planAreaType)">AND area_type = #{planAreaType}</if>
+            <if test="@com.uitgis.ciams.util.ValidUtil@notEmpty(planAreaTypeCd)">AND area_type_cd = #{planAreaTypeCd}</if>
+            <if test="@com.uitgis.ciams.util.ValidUtil@notEmpty(planAreaTypes)">
+                AND area_type IN
+                <foreach collection="planAreaTypes" item="type" open="(" separator="," close=")">
+                    #{type}
+                </foreach>
+            </if>
+            <if test="@com.uitgis.ciams.util.ValidUtil@notEmpty(planAreaTypeCds)">
+                AND area_type_cd IN
+                <foreach collection="planAreaTypeCds" item="typecd" open="(" separator="," close=")">
+                    #{typecd}
+                </foreach>
+            </if>
+            <if test="@com.uitgis.ciams.util.ValidUtil@notEmpty(planAreaName)">
+                <bind name="planAreaName" value="'%' + planAreaName + '%'"/>
+                AND area_name like #{planAreaName}
+            </if>
+            <!-- <if test="planArea_leng != null">AND plan_area_leng = #{planArea_leng} </if>
+            <if test="planArea_area != null">AND plan_area_area = #{planArea_area} </if> -->
+            <!--<if test="planAreaDesc != null">AND plan_area_desc = #{planAreaDesc} </if>-->
+        </trim>
+    </sql>
+
+    <!-- 계획 지역 목록 카운트 -->
+    <select id="selectPlanAreaCount" parameterType="map" resultType="int">
+        SELECT
+        COUNT(area_id)
+        FROM
+        ciams_plan
+        <include refid="CiamsPlanArea_where_search"/>
+    </select>
+
+    <!-- 계획 지역 조회 -->
+    <select id="getPlanAreaList" parameterType="map" resultType="com.uitgis.ciams.dto.CiamsPlanAreaDto$Search$Row">
+        <include refid="pagination.page_top"/>
+        SELECT
+        <include refid="CiamsPlanArea_column"/>
+        FROM ciams_plan
+        <include refid="CiamsPlanArea_where_search"/>
+        order by area_name
+        <include refid="pagination.page_bottom"/>
+    </select>
+
+    <!-- 계획 지역 상세 -->
+    <select id="getPlanArea" parameterType="map" resultType="com.uitgis.ciams.dto.CiamsPlanAreaDto$Details$Result">
+        SELECT
+        <include refid="CiamsPlanArea_column"/>
+        FROM ciams_plan
+        WHERE 1=1
+        AND area_id = #{planAreaId}
+        AND plan_id = #{planId}
+    </select>
+
+    <!-- 계획 지역 끝 -->
+
+    <update id="updatePlan" parameterType="com.uitgis.gis.model.CiamsPlan">
+        UPDATE ciams_plan
+        <set>
+            <if test="@com.uitgis.ciams.util.ValidUtil@notEmpty(areaType)">
+                area_type = #{areaType},
+            </if>
+            <if test="@com.uitgis.ciams.util.ValidUtil@notEmpty(areaTypeCd)">
+                area_type_cd = #{areaTypeCd},
+            </if>
+            <if test="areaName != null">
+                area_name = #{areaName},
+            </if>
+            <if test="areaLeng != null">
+                area_leng = #{areaLeng},
+            </if>
+            <if test="areaArea != null">
+                area_area = #{areaArea},
+            </if>
+            <if test="@com.uitgis.ciams.util.ValidUtil@notEmpty(areaCause)">
+                area_cause = #{areaCause},
+            </if>
+            <if test="@com.uitgis.ciams.util.ValidUtil@notEmpty(devComArea)">
+                dev_com_area = #{devComArea},
+            </if>
+            <if test="@com.uitgis.ciams.util.ValidUtil@notEmpty(devComArea1)">
+                dev_com_area_1 = #{devComArea1},
+            </if>
+            <if test="@com.uitgis.ciams.util.ValidUtil@notEmpty(areaLoc)">
+                area_loc = #{areaLoc},
+            </if>
+        </set>
+        WHERE 1=1
+        AND area_id = #{areaId}
+        AND plan_id = #{planId}
+    </update>
+
+</mapper>

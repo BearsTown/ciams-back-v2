@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.uitgis.gis.mapper.GisMapper">
+
+	<select id="getPlanUseGroup" parameterType="com.uitgis.ciams.dto.CiamsPlanUseDto$Group" resultType="com.uitgis.ciams.dto.CiamsPlanUseDto$Group">
+			SELECT cdnm AS key,
+			       cdnm AS value,
+			       cdnm AS title,
+			       cd,
+			       #{planId} as planId
+			FROM   ciams_${planId}_use
+			GROUP  BY cdnm, cd
+			ORDER  BY cdnm, cd
+	</select>
+
+</mapper>

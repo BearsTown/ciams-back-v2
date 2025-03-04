@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.uitgis.gis.mapper.GisCiamsPlanZoneMapper">
+    <sql id="ciams_plan_zone_column">
+        zone_no
+        , zone_name
+        , mng_type
+    </sql>
+
+    <sql id="ciams_plan_zone_where_search">
+        <trim prefix="WHERE" prefixOverrides="AND |OR ">
+            <if test="@com.uitgis.ciams.util.ValidUtil@notEmpty(zoneName)">
+                <bind name="zoneName" value="'%' + zoneName + '%'"/>
+                AND zone_name like #{zoneName}
+            </if>
+            <if test="@com.uitgis.ciams.util.ValidUtil@notEmpty(mngType)">
+                AND mng_type = #{mngType}
+            </if>
+        </trim>
+    </sql>
+
+
+    <select id="selectGisCiamsPlanZoneCount" parameterType="map" resultType="int">
+        SELECT
+        COUNT(oid)
+        FROM ciams_zone
+        <include refid="ciams_plan_zone_where_search"/>
+    </select>
+
+
+    <select id="selectGisCiamsPlanZoneList" parameterType="map" resultType="com.uitgis.gis.dto.GisCiamsPlanZoneDTO$Search$Row">
+        <include refid="pagination.page_top"/>
+        SELECT
+        <include refid="ciams_plan_zone_column"/>
+        FROM ciams_zone
+        <include refid="ciams_plan_zone_where_search"/>
+        order by zone_name
+        <include refid="pagination.page_bottom"/>
+    </select>
+
+
+<!--    <select id="selectGisCiamsPlanZone" parameterType="map" resultType="com.uitgis.gis.dto.GisCiamsPlanZoneDTO$Details$Result">-->
+<!--        SELECT-->
+<!--        <include refid="ciams_plan_zone_column"/>-->
+<!--        FROM ciams_zone-->
+<!--        WHERE zone_no = #{zoneNo}-->
+<!--    </select>-->
+
+
+<!--    <select id="selectOverView"-->
+<!--            parameterType="com.uitgis.gis.dto.GisCiamsPlanZoneDTO$Overview$Find$Params"-->
+<!--            resultType="com.uitgis.gis.dto.CiamsMenu1StepCDetailsDto$Overview$Find$Result">-->
+<!--        SELECT-->
+<!--        <include refid="ciams_plan_zone_column"/>-->
+<!--        FROM ciams_zone-->
+<!--        WHERE zone_no = #{zoneNo}-->
+<!--        LIMIT 1-->
+<!--    </select>-->
+
+</mapper>
