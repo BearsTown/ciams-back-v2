@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.uitgis.gis.mapper.GisCiamsDistMapper">
+    <sql id="ciams_dist_column">
+        dist_no
+        , dist_name
+        , dist_area
+    </sql>
+
+    <sql id="ciams_dist_where_search">
+        <trim prefix="WHERE" prefixOverrides="AND |OR ">
+            <if test="@com.uitgis.ciams.util.ValidUtil@notEmpty(keyword)">
+                <bind name="keyword" value="'%' + keyword + '%'"/>
+                OR dist_name like #{keyword}
+            </if>
+        </trim>
+    </sql>
+
+    <select id="selectGisCiamsDistCount" parameterType="map" resultType="int">
+        SELECT
+        COUNT(oid)
+        FROM ciams_dist
+        <include refid="ciams_dist_where_search"/>
+    </select>
+
+
+    <select id="selectGisCiamsDistList" parameterType="map" resultType="com.uitgis.gis.dto.GisCiamsDistDTO$Search$Row">
+        <include refid="pagination.page_top"/>
+        SELECT
+        <include refid="ciams_dist_column"/>
+        FROM ciams_dist
+        <include refid="ciams_dist_where_search"/>
+        order by dist_no
+        <include refid="pagination.page_bottom"/>
+    </select>
+</mapper>

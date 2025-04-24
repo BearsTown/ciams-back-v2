@@ -3,12 +3,11 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.uitgis.gis.mapper.GisMapper">
     <sql id="CiamsPlanArea_column">
-        mnum
-        , alias
-        , remark
-        , name
-        , cs_c
-        , area
+        zone_no
+        , zone_name
+        , use_dist
+        , zone_area
+        , base_cs_c
     </sql>
 
     <sql id="CiamsPlanArea_where_search">
@@ -16,8 +15,8 @@
             <!--<if test="planAreaId != null">AND plan_area_id = #{planAreaId} </if>-->
             <if test="@com.uitgis.ciams.util.ValidUtil@notEmpty(name)">
                 <bind name="name" value="'%' + name + '%'"/>
-                OR name like #{name}
-                OR remark like #{name}
+                OR zone_name like #{name}
+                OR use_dist like #{name}
             </if>
         </trim>
     </sql>
@@ -25,10 +24,10 @@
     <!-- 계획 지역 목록 카운트 -->
     <select id="selectPlanAreaCount" parameterType="map" resultType="int">
         SELECT
-        COUNT(mnum)
+        COUNT(zone_no)
         <choose>
             <when test="planId == null">
-                FROM ciams_plan
+                FROM ciams_zone
             </when>
             <otherwise>
                 FROM ciams_${planId}_plan
@@ -44,14 +43,14 @@
         <include refid="CiamsPlanArea_column"/>
         <choose>
             <when test="planId == null">
-                FROM ciams_plan
+                FROM ciams_zone
             </when>
             <otherwise>
                 FROM ciams_${planId}_plan
             </otherwise>
         </choose>
         <include refid="CiamsPlanArea_where_search"/>
-        order by name
+        order by zone_name
         <include refid="pagination.page_bottom"/>
     </select>
 
@@ -61,7 +60,7 @@
         <include refid="CiamsPlanArea_column"/>
         <choose>
             <when test="planId == null">
-                FROM ciams_plan
+                FROM ciams_zone
             </when>
             <otherwise>
                 FROM ciams_${planId}_plan

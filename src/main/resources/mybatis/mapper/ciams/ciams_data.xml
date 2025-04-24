@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.uitgis.ciams.mapper.CiamsDataMapper">
+
+    <select id="selectDatas"
+            parameterType="int"
+            resultType="com.uitgis.ciams.model.CiamsData">
+        select priority,
+               year,
+               layer_name
+        FROM ciams_data
+        where data_group_id = #{dataGroupId}
+        order by priority
+    </select>
+
+</mapper>

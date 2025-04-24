@@ -11,11 +11,9 @@ import lombok.Setter;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CiamsZone {
-    private String zoneNo;
-    private String zoneName;
-    private String mngType;
-    private String useDist;
-    private Double baseCsC;
-    private Double zoneArea;
+public class CiamsData {
+    private Integer id;
+    private String year;
+    private String layerName;
+    private int priority;
 }

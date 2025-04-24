@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.uitgis.ciams.mapper.Ciams1_1_2Mapper">
+
+    <resultMap id="DensityResultMap" type="com.uitgis.ciams.dto.Ciams1_1_2Dto$Density">
+        <result property="year" column="year"/>
+        <result property="image" column="image"/>
+        <result property="priority" column="priority"/>
+    </resultMap>
+
+    <resultMap id="DensityInfoResultMap" type="com.uitgis.ciams.dto.Ciams1_1_2Dto$DensityInfo">
+        <id property="type" column="type"/>
+        <result property="notes" column="note" typeHandler="com.uitgis.ciams.dto.JsonToListTypeHandler"/>
+        <collection property="infos" ofType="com.uitgis.ciams.dto.Ciams1_1_2Dto$Density" resultMap="DensityResultMap"/>
+    </resultMap>
+
+    <select id="selectDensityInfos" parameterType="string" resultMap="DensityInfoResultMap">
+        select t1.type,
+               t1.note,
+               t2.year,
+               t2.image,
+               t2.priority
+        from ciams_density t1
+                 LEFT JOIN ciams_density_info t2
+                           on t1.type = t2.type
+        where t1.type = #{sggCd}
+        order by t1.type, t2.priority
+    </select>
+</mapper>

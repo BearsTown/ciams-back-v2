@@ -12,8 +12,8 @@ import lombok.Setter;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class GisCiamsPlanZone {
-    private String zoneNo;
-    private String zoneName;
-    private String mngType;
+public class GisCiamsDist {
+    private String distNo;
+    private String distName;
+    private Double distArea;
 }

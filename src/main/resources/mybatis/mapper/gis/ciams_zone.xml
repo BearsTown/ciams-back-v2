@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.uitgis.gis.mapper.GisCiamsZoneMapper">
+
+    <sql id="ciams_zone_column">
+        zone_no
+        , zone_name
+        , mng_Type
+        , use_dist
+        , zone_area
+        , base_cs_c
+        , ita_result
+        , loc_result
+    </sql>
+
+    <sql id="ciams_zone_where_search">
+        <trim prefix="WHERE" prefixOverrides="AND |OR ">
+            <if test="@com.uitgis.ciams.util.ValidUtil@notEmpty(keyword)">
+                <bind name="keyword" value="'%' + keyword + '%'"/>
+                OR zone_name like #{keyword}
+                OR use_dist like #{keyword}
+            </if>
+            <if test="@com.uitgis.ciams.util.ValidUtil@notEmpty(mngType)">
+                AND mng_type = #{mngType}
+            </if>
+        </trim>
+    </sql>
+
+
+    <select id="selectGisCiamsZoneCount" parameterType="map" resultType="int">
+        SELECT
+        COUNT(oid)
+        FROM ciams_zone
+        <include refid="ciams_zone_where_search"/>
+    </select>
+
+
+    <select id="selectGisCiamsZoneList" parameterType="map" resultType="com.uitgis.gis.dto.GisCiamsZoneDTO$Search$Row">
+        <include refid="pagination.page_top"/>
+        SELECT
+        <include refid="ciams_zone_column"/>
+        FROM ciams_zone
+        <include refid="ciams_zone_where_search"/>
+        order by zone_no
+        <include refid="pagination.page_bottom"/>
+    </select>
+</mapper>

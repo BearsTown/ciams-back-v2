@@ -11,8 +11,7 @@ public class CiamsMenu2Sub1DetailsDto {
             @Getter
             @Setter
             public static class Params {
-                private String planId;
-                private String name;
+                private String zoneNo;
             }
 
             @Getter

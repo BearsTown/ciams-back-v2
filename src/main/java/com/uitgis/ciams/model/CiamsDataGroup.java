@@ -11,11 +11,11 @@ import lombok.Setter;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CiamsZone {
-    private String zoneNo;
-    private String zoneName;
-    private String mngType;
-    private String useDist;
-    private Double baseCsC;
-    private Double zoneArea;
+public class CiamsDataGroup {
+    private Integer id;
+    private String name;
+    private String groupColumn;
+    private Boolean useNoneColumn;
+    private String chartAxis;
+    private int priority;
 }

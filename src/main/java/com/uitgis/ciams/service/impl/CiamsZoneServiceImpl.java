@@ -15,11 +15,11 @@ import com.uitgis.ciams.model.CiamsPlanAreaLink;
 import com.uitgis.ciams.model.CiamsPlanLImit;
 import com.uitgis.ciams.model.CiamsPlanMasterSummary;
 import com.uitgis.ciams.model.CiamsPlanSummary;
-import com.uitgis.ciams.service.CiamsPlanZoneService;
+import com.uitgis.ciams.service.CiamsZoneService;
 import com.uitgis.ciams.util.PageUtil;
 import com.uitgis.gis.dto.CiamsF107Dto.Search;
-import com.uitgis.gis.dto.GisCiamsPlanZoneDTO;
-import com.uitgis.gis.mapper.GisCiamsPlanZoneMapper;
+import com.uitgis.gis.dto.GisCiamsZoneDTO;
+import com.uitgis.gis.mapper.GisCiamsZoneMapper;
 import com.uitgis.gis.mapper.GisMapper;
 import com.uitgis.gis.model.CiamsF107;
 import com.uitgis.gis.model.CiamsPlan;
@@ -34,9 +34,9 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 @Service
-public class CiamsPlanZoneServiceImpl implements CiamsPlanZoneService {
+public class CiamsZoneServiceImpl implements CiamsZoneService {
 	private final GisMapper gismapper;
-	private final GisCiamsPlanZoneMapper gisCiamsPlanZoneMapper;
+	private final GisCiamsZoneMapper gisCiamsZoneMapper;
 	private final MisMapper mismapper;
 	private final CiamsPlanMapper ciamsplanmapper;
 	private final CiamsPlanAreaLinkMapper ciamsPlanAreaLinkMapper;
@@ -70,18 +70,18 @@ public class CiamsPlanZoneServiceImpl implements CiamsPlanZoneService {
 		return gismapper.selectPlanAreaCount(params);
 	}
 
-	@Override
-	public CiamsMenu1StepCDto.Search.Result getPlanAreaList(CiamsMenu1StepCDto.Search.Params params) {
-		int totalCount = gismapper.selectPlanAreaCount(params);
-
-		PaginationDto page = PageUtil.setTotalCount(params, totalCount);
-
-		List<CiamsMenu1StepCDto.Search.Row> rows = gismapper.getPlanAreaList(params);
-
-		CiamsMenu1StepCDto.Search.Result result = CiamsMenu1StepCDto.Search.Result.builder().page(page).list(rows).build();
-
-		return result;
-	}
+//	@Override
+//	public CiamsMenu1StepCDto.Search.Result getPlanAreaList(CiamsMenu1StepCDto.Search.Params params) {
+//		int totalCount = gismapper.selectPlanAreaCount(params);
+//
+//		PaginationDto page = PageUtil.setTotalCount(params, totalCount);
+//
+//		List<CiamsMenu1StepCDto.Search.Row> rows = gismapper.getPlanAreaList(params);
+//
+//		CiamsMenu1StepCDto.Search.Result result = CiamsMenu1StepCDto.Search.Result.builder().page(page).list(rows).build();
+//
+//		return result;
+//	}
 
 	@Override
 	public CiamsMenu1StepCDto.Details.Result getPlanArea(CiamsMenu1StepCDto.Search.Detail detail) {
@@ -185,17 +185,20 @@ public class CiamsPlanZoneServiceImpl implements CiamsPlanZoneService {
 	}
 
 
-
-
+	/**
+	 *
+	 *
+	 *
+	 */
 	@Override
-	public GisCiamsPlanZoneDTO.Search.Result getGisCiamsPlanZoneList(GisCiamsPlanZoneDTO.Search.Params params) {
-		int totalCount = gisCiamsPlanZoneMapper.selectGisCiamsPlanZoneCount(params);
+	public GisCiamsZoneDTO.Search.Result getCiamsZoneList(GisCiamsZoneDTO.Search.Params params) {
+		int totalCount = gisCiamsZoneMapper.selectGisCiamsZoneCount(params);
 
 		PaginationDto page = PageUtil.setTotalCount(params, totalCount);
 
-		List<GisCiamsPlanZoneDTO.Search.Row> rows = gisCiamsPlanZoneMapper.selectGisCiamsPlanZoneList(params);
+		List<GisCiamsZoneDTO.Search.Row> rows = gisCiamsZoneMapper.selectGisCiamsZoneList(params);
 
-		GisCiamsPlanZoneDTO.Search.Result result = GisCiamsPlanZoneDTO.Search.Result.builder()
+		GisCiamsZoneDTO.Search.Result result = GisCiamsZoneDTO.Search.Result.builder()
 				.page(page)
 				.list(rows)
 				.build();

@@ -13,13 +13,13 @@ import com.uitgis.ciams.model.CiamsPlanLImit;
 import com.uitgis.ciams.model.CiamsPlanMasterSummary;
 import com.uitgis.ciams.model.CiamsPlanSummary;
 import com.uitgis.gis.dto.CiamsF107Dto.Search;
-import com.uitgis.gis.dto.GisCiamsPlanZoneDTO;
+import com.uitgis.gis.dto.GisCiamsZoneDTO;
 import com.uitgis.gis.model.CiamsF107;
 import com.uitgis.gis.model.CiamsPlan;
 
 import java.util.List;
 
-public interface CiamsPlanZoneService {
+public interface CiamsZoneService {
 	public List<CiamsPlanUseDto.Group> getuseGroup(CiamsPlanUseDto.Group params);
 
 	/**
@@ -34,7 +34,7 @@ public interface CiamsPlanZoneService {
 
 	public int selectPlanAreaCount(CiamsMenu1StepCDto.Search.Params params);
 
-	public CiamsMenu1StepCDto.Search.Result getPlanAreaList(CiamsMenu1StepCDto.Search.Params params);
+//	public CiamsMenu1StepCDto.Search.Result getPlanAreaList(CiamsMenu1StepCDto.Search.Params params);
 
 	public List<CiamsPlanAreaLink> selectPlanAreaLink(String planAreaId);
 
@@ -91,6 +91,7 @@ public interface CiamsPlanZoneService {
 	 *
 	 *
 	 */
-	public GisCiamsPlanZoneDTO.Search.Result getGisCiamsPlanZoneList(GisCiamsPlanZoneDTO.Search.Params params);
+
+	public GisCiamsZoneDTO.Search.Result getCiamsZoneList(GisCiamsZoneDTO.Search.Params params);
 
 }

@@ -14,7 +14,7 @@ import com.uitgis.ciams.model.CiamsPlanLImit;
 import com.uitgis.ciams.model.CiamsPlanMasterSummary;
 import com.uitgis.ciams.model.CiamsPlanSummary;
 import com.uitgis.ciams.service.CiamsCommonService;
-import com.uitgis.ciams.service.CiamsPlanZoneService;
+import com.uitgis.ciams.service.CiamsZoneService;
 import com.uitgis.gis.dto.CiamsF107Dto;
 import com.uitgis.gis.model.CiamsF107;
 import com.uitgis.gis.model.CiamsPlan;
@@ -40,13 +40,13 @@ import java.util.Map;
 @RestController
 public class CiamsPlanContoller {
 
-	private final CiamsPlanZoneService ciamsPlanZoneService;
+	private final CiamsZoneService ciamsZoneService;
 	private final CiamsCommonService ciamsCommonService;
 
 	@GetMapping("/use/getGroup")
 	public ResponseEntity<?> getuseGroup(CiamsPlanUseDto.Group params) {
 		try {
-			List<CiamsPlanUseDto.Group> result = ciamsPlanZoneService.getuseGroup(params);
+			List<CiamsPlanUseDto.Group> result = ciamsZoneService.getuseGroup(params);
 			return ResponseEntity.ok(result);
 		} catch (Exception e) {
 			return ResponseEntity.ok(false);
@@ -59,19 +59,19 @@ public class CiamsPlanContoller {
 
 	@GetMapping("/layer/get")
 	public ResponseEntity<?> getLayer(CiamsPlanLayerDto params) {
-		List<CiamsPlanLayerDto> result = ciamsPlanZoneService.selectPlanLayer(params);
+		List<CiamsPlanLayerDto> result = ciamsZoneService.selectPlanLayer(params);
 		return ResponseEntity.ok(result);
 	}
 
 	@GetMapping("/layer/limit/get")
 	public ResponseEntity<?> getLimitLayer(CiamsPlanLImit params) {
-		List<CiamsPlanLimitDto.Group> result = ciamsPlanZoneService.selectPlanLimitLayer(params);
+		List<CiamsPlanLimitDto.Group> result = ciamsZoneService.selectPlanLimitLayer(params);
 		return ResponseEntity.ok(result);
 	}
 
 	@GetMapping("/layer/limitCdnm/get")
 	public ResponseEntity<?> getCdnmLimitLayer(CiamsPlanLImit params) {
-		List<CiamsPlanLimitDto.Group> result = ciamsPlanZoneService.selectPlanLimitCdnmLayer(params);
+		List<CiamsPlanLimitDto.Group> result = ciamsZoneService.selectPlanLimitCdnmLayer(params);
 		return ResponseEntity.ok(result);
 	}
 
@@ -79,7 +79,7 @@ public class CiamsPlanContoller {
 	public ResponseEntity<?> insert(@RequestBody CiamsPlanLayerDto params) {
 		int count = 0;
 		try {
-			count = ciamsPlanZoneService.insertPlanLayer(params);
+			count = ciamsZoneService.insertPlanLayer(params);
 		} catch (Exception e) {
 			log.error(e.getMessage());
 		}
@@ -101,7 +101,7 @@ public class CiamsPlanContoller {
 		}
 
 		try {
-			count = ciamsPlanZoneService.updatePlanLayer(params);
+			count = ciamsZoneService.updatePlanLayer(params);
 		} catch (Exception e) {
 			log.error(e.getMessage());
 		}
@@ -126,7 +126,7 @@ public class CiamsPlanContoller {
 		params.setPlanLayerId(layerId);
 
 		try {
-			count = ciamsPlanZoneService.deletePlanLayer(params);
+			count = ciamsZoneService.deletePlanLayer(params);
 
 		} catch (Exception e) {
 			log.error(e.getMessage());
@@ -143,8 +143,9 @@ public class CiamsPlanContoller {
 
 	@GetMapping("/area/list")
 	public ResponseEntity<?> getPlanAreaList(CiamsMenu1StepCDto.Search.Params params) {
-		CiamsMenu1StepCDto.Search.Result result = ciamsPlanZoneService.getPlanAreaList(params);
-		return ResponseEntity.ok(result);
+//		CiamsMenu1StepCDto.Search.Result result = ciamsZoneService.getPlanAreaList(params);
+//		return ResponseEntity.ok(result);
+		return ResponseEntity.ok(null);
 	}
 
 	@GetMapping("/area/get/{planId}/{planAreaId}")
@@ -152,13 +153,13 @@ public class CiamsPlanContoller {
 		CiamsMenu1StepCDto.Search.Detail params = new CiamsMenu1StepCDto.Search.Detail();
 		params.setPlanId(planId);
 //		params.setPlanAreaId(planAreaId);
-		CiamsMenu1StepCDto.Details.Result result = ciamsPlanZoneService.getPlanArea(params);
+		CiamsMenu1StepCDto.Details.Result result = ciamsZoneService.getPlanArea(params);
 		return ResponseEntity.ok(result);
 	}
 
 	@GetMapping("{id}/areaLink")
 	public ResponseEntity<?> getAreaLink(@PathVariable("id") String id) {
-		List<CiamsPlanAreaLink> result = ciamsPlanZoneService.selectPlanAreaLink(id);
+		List<CiamsPlanAreaLink> result = ciamsZoneService.selectPlanAreaLink(id);
 		return ResponseEntity.ok(result);
 	}
 
@@ -168,13 +169,13 @@ public class CiamsPlanContoller {
 
 	@GetMapping("/incen/get")
 	public ResponseEntity<?> getPlanAreaIncen(CiamsPlanAreaIncenDto.Find.Info params) {
-		CiamsPlanAreaIncenDto.AreaTypeItems result = ciamsPlanZoneService.selectPlanAreaIncen(params);
+		CiamsPlanAreaIncenDto.AreaTypeItems result = ciamsZoneService.selectPlanAreaIncen(params);
 		return ResponseEntity.ok(result);
 	}
 
 	@GetMapping("/increase/list")
 	public ResponseEntity<?> getPlanAreaIncenIncrease() {
-		List<CiamsPlanAreaIncenDto.AreaIncenIncrease> result = ciamsPlanZoneService.selectPlanAreaIncenIncrease();
+		List<CiamsPlanAreaIncenDto.AreaIncenIncrease> result = ciamsZoneService.selectPlanAreaIncenIncrease();
 		return ResponseEntity.ok(result);
 	}
 
@@ -199,13 +200,13 @@ public class CiamsPlanContoller {
 	@GetMapping("/MapService/list")
 	public ResponseEntity<?> getMapService(CiamsPlanMapServiceDto params) {
 		// params.setPlanId(params.getPlanId().toUpperCase());
-		List<CiamsPlanMapServiceDto> result = ciamsPlanZoneService.getMapService(params);
+		List<CiamsPlanMapServiceDto> result = ciamsZoneService.getMapService(params);
 		return ResponseEntity.ok(result);
 	}
 
 	@GetMapping("/MapLayers/list")
 	public ResponseEntity<?> getMapLayers(CiamsPlanMapLayerDto params) {
-		List<CiamsPlanMapLayerDto> result = ciamsPlanZoneService.getMapLayers(params);
+		List<CiamsPlanMapLayerDto> result = ciamsZoneService.getMapLayers(params);
 		return ResponseEntity.ok(result);
 	}
 
@@ -218,7 +219,7 @@ public class CiamsPlanContoller {
 		CiamsPlanSummary params = new CiamsPlanSummary();
 		params.setPlanId(planId);
 
-		List<CiamsPlanSummary> result = ciamsPlanZoneService.getPlanSummary(params);
+		List<CiamsPlanSummary> result = ciamsZoneService.getPlanSummary(params);
 		return ResponseEntity.ok(result);
 	}
 
@@ -227,7 +228,7 @@ public class CiamsPlanContoller {
 		CiamsPlanMasterSummary params = new CiamsPlanMasterSummary();
 		params.setPlanId(planId);
 
-		List<CiamsPlanMasterSummary> result = ciamsPlanZoneService.getPlanMaterSummary(params);
+		List<CiamsPlanMasterSummary> result = ciamsZoneService.getPlanMaterSummary(params);
 		return ResponseEntity.ok(result);
 	}
 
@@ -235,7 +236,7 @@ public class CiamsPlanContoller {
 	public ResponseEntity<?> updateGis(@RequestBody CiamsPlan params) {
 		int resCnt = 0;
 
-		resCnt = ciamsPlanZoneService.updateGis(params);
+		resCnt = ciamsZoneService.updateGis(params);
 
 		ciamsCommonService.log(MenuEnum.GIS, ActionTypeEnum.UPDATE, params.getPlanId());
 
@@ -245,7 +246,7 @@ public class CiamsPlanContoller {
 	@GetMapping("/intersects/f107")
 	public ResponseEntity<?> getF107(CiamsF107Dto.Search params) {
 
-		List<CiamsF107> result = ciamsPlanZoneService.getF107(params);
+		List<CiamsF107> result = ciamsZoneService.getF107(params);
 		return ResponseEntity.ok(result);
 	}
 }

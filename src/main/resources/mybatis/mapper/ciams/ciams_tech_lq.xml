@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.uitgis.ciams.mapper.CiamsTechLQMapper">
+
+    <resultMap id="highTechResultMap" type="com.uitgis.ciams.dto.CiamsTechLQDto$HighTech$Find$Tech">
+        <result property="techCd" column="tech_cd"/>
+        <result property="techNm" column="tech_nm"/>
+        <result property="corpLq" column="corp_lq"/>
+        <result property="workerLq" column="worker_lq"/>
+        <result property="corpQualified" column="corp_qualified"/>
+        <result property="workerQualified" column="worker_qualified"/>
+    </resultMap>
+
+    <resultMap id="highTechLqResultMap" type="com.uitgis.ciams.dto.CiamsTechLQDto$HighTech$Find$Result">
+        <result property="parentTechCd" column="parent_tech_cd"/>
+        <result property="parentTechNm" column="parent_tech_nm"/>
+        <collection property="techs" ofType="com.example.Tech" resultMap="highTechResultMap"/>
+    </resultMap>
+
+    <select id="selectHighTech" parameterType="com.uitgis.ciams.dto.CiamsTechLQDto$HighTech$Find$Params"
+            resultMap="highTechLqResultMap">
+        WITH combined_data AS (SELECT t_lq.tech_cd,
+                                      t_lq.corp_lq,
+                                      t_lq.worker_lq,
+                                      t_c.sort_sn
+                               FROM ciams_tech_lq t_lq
+                                        JOIN ciams_code t_c ON t_lq.tech_cd = t_c.code
+                               WHERE t_c.parent_code = #{parentTechCd}
+                                 AND
+                                   t_lq.sgg_cd = (SELECT (SELECT conf_value FROM ciams_config WHERE id = 'SIDO_CODE') ||
+                                                         (SELECT conf_value FROM ciams_config WHERE id = 'SGG_CODE')))
+        SELECT #{parentTechCd}                                                 AS parent_tech_cd,
+               (SELECT code_name FROM ciams_code WHERE code = #{parentTechCd}) AS parent_tech_nm,
+               tech_cd,
+               (SELECT code_name FROM ciams_code WHERE code = tech_cd)       AS tech_nm,
+               corp_lq,
+               worker_lq,
+               CASE WHEN corp_lq >= 1 THEN true ELSE false END               AS corp_qualified,
+               CASE WHEN worker_lq >= 1 THEN true ELSE false END             AS worker_qualified
+        FROM combined_data
+        WHERE corp_lq >= 1
+           OR worker_lq >= 1
+        ORDER BY sort_sn
+    </select>
+
+    <select id="selectTechLQ" parameterType="com.uitgis.ciams.dto.CiamsTechLQDto$TechLQ$Find$Params"
+            resultType="com.uitgis.ciams.dto.CiamsTechLQDto$TechLQ$Find$Result">
+        select tech_cd,
+               sgg_cd,
+               sgg_nm,
+               corp_lq,
+               worker_lq
+        from ciams_tech_lq
+        where tech_cd = #{techCd}
+    </select>
+
+</mapper>

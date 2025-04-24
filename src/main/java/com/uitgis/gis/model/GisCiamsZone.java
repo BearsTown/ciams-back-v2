@@ -1,4 +1,4 @@
-package com.uitgis.ciams.model;
+package com.uitgis.gis.model;
 
 
 import lombok.AllArgsConstructor;
@@ -12,7 +12,7 @@ import lombok.Setter;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CiamsAnalysis {
+public class GisCiamsZone {
     private String zoneNo;
     private String zoneName;
     private String useDist;

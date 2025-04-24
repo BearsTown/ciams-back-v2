@@ -32,6 +32,12 @@ public class CiamsCodeController {
     private final CiamsCodeService ciamsCodeService;
     private final CiamsCommonService ciamsCommonService;
 
+    @GetMapping("{code}")
+    public ResponseEntity<?> getCode(@PathVariable String code) {
+        CiamsCodeDto.Find result = ciamsCodeService.selectCodeByCode(code);
+        return ResponseEntity.ok(result);
+    }
+
     /**
      * 하위 코드 목록 조회.
      *
@@ -57,7 +63,7 @@ public class CiamsCodeController {
         ciamsCodeService.addCode(add);
 
         CiamsCodeDto.Find ciamsCode = ciamsCodeService.selectCodeByCode(add.getCode());
-        
+
         ciamsCommonService.log(MenuEnum.CODE, ActionTypeEnum.ADD, ciamsCode.getCode());
 
         return ResponseEntity.ok(ciamsCode);
@@ -68,7 +74,7 @@ public class CiamsCodeController {
         ciamsCodeService.modify(mod);
 
         CiamsCodeDto.Find ciamsCode = ciamsCodeService.selectCodeByCode(mod.getCode());
-        
+
         ciamsCommonService.log(MenuEnum.CODE, ActionTypeEnum.UPDATE, ciamsCode.getCode());
 
         return ResponseEntity.ok(ciamsCode);
@@ -87,7 +93,7 @@ public class CiamsCodeController {
                 .collect(Collectors.toList());
 
         ciamsCodeService.changeCodePriority(codeList);
-        
+
         ciamsCommonService.log(MenuEnum.CODE, ActionTypeEnum.UPDATE, mod.stream().map(a-> a.getCode()).collect(Collectors.toList()));
 
         return ResponseEntity.ok().build();
@@ -97,9 +103,9 @@ public class CiamsCodeController {
     public ResponseEntity<?> remove(@PathVariable String code) throws Exception {
 
         ciamsCodeService.removeByCode(code);
-        
+
         ciamsCommonService.log(MenuEnum.CODE, ActionTypeEnum.DELETE, code);
-        
+
         return ResponseEntity.ok().build();
     }
 
