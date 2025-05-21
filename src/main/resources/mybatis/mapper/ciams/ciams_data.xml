@@ -6,12 +6,12 @@
     <select id="selectDatas"
             parameterType="int"
             resultType="com.uitgis.ciams.model.CiamsData">
-        select priority,
+        SELECT priority,
                year,
                layer_name
         FROM ciams_data
-        where data_group_id = #{dataGroupId}
-        order by priority
+        WHERE data_group_id = #{dataGroupId}
+        ORDER BY priority
     </select>
 
 </mapper>

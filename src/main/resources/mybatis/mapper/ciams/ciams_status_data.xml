@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.uitgis.ciams.mapper.CiamsStatusDataMapper">
+
+    <select id="selectStatusGroups"
+            parameterType="int"
+            resultType="com.uitgis.ciams.dto.CiamsMenu1Sub1TabADto$StatusGroup">
+        SELECT csg.id AS status_group_id,
+               csg.status_id,
+               csg.title,
+               csg.chart_axis,
+               csg.view,
+               csg.priority,
+               csdg.data_id
+        FROM ciams_status_group csg
+                 INNER JOIN
+             ciams_status_data_group csdg
+             ON
+                 csg.id = csdg.status_group_id
+        WHERE csg.status_id = #{statusId}
+        ORDER BY csg.priority
+    </select>
+
+
+    <select id="selectStatusData" parameterType="int"
+            resultType="com.uitgis.ciams.dto.CiamsMenu1Sub1TabADto$StatusData">
+        SELECT data_name, pivot
+        FROM ciams_status_data
+        WHERE id = #{dataId}
+    </select>
+
+
+    <select id="selectStatusColumns" parameterType="int"
+            resultType="com.uitgis.ciams.dto.CiamsMenu1Sub1TabADto$StatusColumn">
+        SELECT CASE
+                   WHEN csdc.use_code = true THEN LOWER(csdc.label)
+                   ELSE LOWER(csdc.name)
+                   END AS name,
+               CASE
+                   WHEN csdc.use_code = true THEN get_cd_nm(csdc.label, '')
+                   ELSE LOWER(csdc.label)
+                   END AS label,
+               csdc.use_code,
+               csdc.use_axis,
+               csdc.data_type,
+               csdc.unit,
+               csdc.series_type
+        FROM ciams_status_data_column_group csdcg
+                 INNER JOIN
+             ciams_status_data_column csdc
+             ON
+                 csdcg.column_id = csdc.id
+        WHERE csdcg.data_id = #{dataId}
+          AND csdc.use_yn = true
+        ORDER BY csdcg.priority
+    </select>
+
+
+    <select id="selectPivot" parameterType="int"
+            resultType="com.uitgis.ciams.dto.CiamsMenu1Sub1TabADto$Pivot">
+        SELECT r_column,
+               c_column,
+               v_column
+        FROM ciams_status_pivot
+        WHERE data_id = #{dataId}
+    </select>
+
+
+    <select id="selectStatusPivotColumns" parameterType="map"
+            resultType="com.uitgis.ciams.dto.CiamsMenu1Sub1TabADto$PivotColumn">
+        SELECT *
+        FROM (VALUES ('A0', '구분', false)) AS static_row(name, label, use_axis)
+        UNION ALL
+        SELECT 'A' || ROW_NUMBER() OVER (ORDER BY ${cColumn}) AS name,
+               ${cColumn}                                     AS label,
+               true                                           AS use_axis
+        FROM ${tableName}
+        GROUP BY ${cColumn}
+    </select>
+
+
+    <select id="findAllRecords" parameterType="string"
+            resultType="java.util.HashMap">
+        SELECT *
+        FROM ${dataName}
+    </select>
+
+
+    <select id="findAllPivotRecords"
+            parameterType="com.uitgis.ciams.dto.CiamsMenu1Sub1TabADto$PivotParams"
+            resultType="java.util.HashMap">
+        SELECT
+--         csdc.label AS "A0",
+        CASE
+        WHEN csdc.use_code = true THEN get_cd_nm(csdc.label  ,'')
+        ELSE csdc.label
+        END AS "A0",
+        <foreach collection="columns" item="col" index="idx" open="" separator="," close="">
+            MAX(CASE WHEN DT.${pivot.cColumn} = #{col} THEN ${pivot.vColumn} END) AS "A${idx + 1}"
+        </foreach>
+        FROM
+        ciams_status_data_column_group csdcg
+        INNER JOIN
+        ciams_status_data_column csdc
+        ON
+        csdcg.column_id = csdc.id
+        INNER JOIN
+        ${dataName} AS DT
+        ON
+        DT.${pivot.rColumn} = csdc.label
+        WHERE
+        csdcg.data_id = #{dataId}
+        AND
+        csdc.use_yn = true
+        GROUP BY
+        csdcg.priority, csdc.use_code, csdc.label
+        ORDER BY
+        csdcg.priority
+    </select>
+
+</mapper>
