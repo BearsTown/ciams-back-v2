@@ -15,5 +15,6 @@ public class CiamsData {
     private Integer id;
     private String year;
     private String layerName;
+    private String style;
     private int priority;
 }

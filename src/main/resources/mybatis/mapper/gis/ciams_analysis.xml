@@ -49,8 +49,8 @@
 
 
     <select id="selectMenu2Sub1OverView"
-            parameterType="com.uitgis.ciams.dto.CiamsMenu2Sub1DetailsDto$Overview$Find$Params"
-            resultType="com.uitgis.ciams.dto.CiamsMenu2Sub1DetailsDto$Overview$Find$Result">
+            parameterType="com.uitgis.ciams.dto.Menu2ZoneDetailsDto$Overview$Find$Params"
+            resultType="com.uitgis.ciams.dto.Menu2ZoneDetailsDto$Overview$Find$Result">
         SELECT
         <include refid="ciamsAnalysis_column"/>
         FROM ciams_analysis

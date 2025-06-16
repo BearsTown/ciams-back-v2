@@ -5,7 +5,7 @@ import com.uitgis.ciams.dto.CiamsMenu1StepCDto;
 import com.uitgis.ciams.dto.CiamsMenu1StepCDto.Details.Result;
 import com.uitgis.ciams.dto.CiamsMenu1StepCDto.Search.Params;
 import com.uitgis.ciams.dto.CiamsMenu1StepCDto.Search.Row;
-import com.uitgis.ciams.dto.CiamsMenu2Sub1DetailsDto;
+import com.uitgis.ciams.dto.Menu2ZoneDetailsDto;
 import com.uitgis.ciams.dto.CiamsMonitoringDto;
 import com.uitgis.ciams.dto.CiamsPlanLimitDto;
 import com.uitgis.ciams.dto.CiamsPlanUpiDto;
@@ -42,7 +42,7 @@ public interface GisMapper {
 	public CiamsMenu1StepCDetailsDto.Overview.Find.Result selectOverView(CiamsMenu1StepCDetailsDto.Overview.Find.Params params);
 
 
-	public CiamsMenu2Sub1DetailsDto.Overview.Find.Result selectMenu2Sub1OverView(CiamsMenu2Sub1DetailsDto.Overview.Find.Params params);
+	public Menu2ZoneDetailsDto.Overview.Find.Result selectMenu2Sub1OverView(Menu2ZoneDetailsDto.Overview.Find.Params params);
 
 
 

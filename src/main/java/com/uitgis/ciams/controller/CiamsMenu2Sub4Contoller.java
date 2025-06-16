@@ -1,8 +1,8 @@
 package com.uitgis.ciams.controller;
 
-import com.uitgis.ciams.dto.CiamsMenu3Sub1DetailsDto;
+import com.uitgis.ciams.dto.CiamsMenu2Sub4DetailsDto;
 import com.uitgis.ciams.model.CiamsImage;
-import com.uitgis.ciams.service.CiamsMenu3Sub1Service;
+import com.uitgis.ciams.service.CiamsMenu2Sub4Service;
 import com.uitgis.ciams.util.FileUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,24 +16,30 @@ import java.io.File;
 
 @Slf4j
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/menu-3/sub-1")
+@RequestMapping("/api/v1/menu-2/sub-4")
 @RestController
-public class CiamsMenu3Sub1Contoller {
+public class CiamsMenu2Sub4Contoller {
 
-    private final CiamsMenu3Sub1Service ciamsMenu3Sub1Service;
+    private final CiamsMenu2Sub4Service ciamsMenu2Sub4Service;
 
     /**
      * 상세정보 개요
      */
     @GetMapping("/overview")
-    public ResponseEntity<CiamsMenu3Sub1DetailsDto.Overview.Find.Result> getMenu2Sub1OverView(CiamsMenu3Sub1DetailsDto.Overview.Find.Params params) {
-        CiamsMenu3Sub1DetailsDto.Overview.Find.Result result = ciamsMenu3Sub1Service.getMenu3Sub1OverView(params);
+    public ResponseEntity<CiamsMenu2Sub4DetailsDto.Overview.Find.Result> getMenu2Sub4OverView(CiamsMenu2Sub4DetailsDto.Overview.Find.Params params) {
+        CiamsMenu2Sub4DetailsDto.Overview.Find.Result result = ciamsMenu2Sub4Service.getMenu2Sub4OverView(params);
+        return ResponseEntity.ok(result);
+    }
+
+    @GetMapping("/info/{zoneNo}")
+    public ResponseEntity<CiamsMenu2Sub4DetailsDto.Info> getMenu2Sub4Info(@PathVariable("zoneNo") String zoneNo) {
+        CiamsMenu2Sub4DetailsDto.Info result = ciamsMenu2Sub4Service.getAnalysisInfo(zoneNo);
         return ResponseEntity.ok(result);
     }
 
     @GetMapping("/image/{id}")
     public ResponseEntity<?> viewImage(@PathVariable("id") int id) {
-        CiamsImage fileInfo = ciamsMenu3Sub1Service.getImage(id);
+        CiamsImage fileInfo = ciamsMenu2Sub4Service.getImage(id);
         File imageFile = FileUtil.getFile(fileInfo);
 
         return FileUtil.responseEntityImage(imageFile);

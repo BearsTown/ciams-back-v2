@@ -1,14 +1,12 @@
 package com.uitgis.ciams.service.impl;
 
-import com.uitgis.ciams.dto.CiamsMenu2Sub1DetailsDto;
 import com.uitgis.ciams.dto.CiamsMenu2Sub2Dto;
 import com.uitgis.ciams.mapper.CiamsDataAttributeMapper;
 import com.uitgis.ciams.mapper.CiamsDataColumnMapper;
 import com.uitgis.ciams.mapper.CiamsDataGroupMapper;
 import com.uitgis.ciams.mapper.CiamsDataMapper;
 import com.uitgis.ciams.model.CiamsDataGroup;
-import com.uitgis.ciams.service.CiamsMenu2Sub1Service;
-import com.uitgis.gis.mapper.GisMapper;
+import com.uitgis.ciams.service.Menu1Service;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -16,17 +14,12 @@ import java.util.List;
 
 @Service
 @AllArgsConstructor
-public class CiamsCiamsMenu2Sub1ServiceImpl implements CiamsMenu2Sub1Service {
-    private final GisMapper gismapper;
+public class CiamsMenu1ServiceImpl implements Menu1Service {
     private final CiamsDataMapper ciamsDataMapper;
     private final CiamsDataColumnMapper ciamsDataColumnMapper;
     private final CiamsDataGroupMapper ciamsDataGroupMapper;
     private final CiamsDataAttributeMapper ciamsDataAttributeMapper;
 
-    @Override
-    public CiamsMenu2Sub1DetailsDto.Overview.Find.Result getMenu2Sub1OverView(CiamsMenu2Sub1DetailsDto.Overview.Find.Params params) {
-        return gismapper.selectMenu2Sub1OverView(params);
-    }
 
     @Override
     public List<CiamsDataGroup> getDataGroups(int parentId) {

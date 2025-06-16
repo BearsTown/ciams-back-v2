@@ -51,31 +51,32 @@
     <select id="selectMenu3Sub1OverView"
             parameterType="com.uitgis.ciams.dto.CiamsMenu3Sub1DetailsDto$Overview$Find$Params"
             resultMap="overView">
-        SELECT
-            z.zone_no,
-            z.zone_name,
-            z.mng_type,
+        SELECT z.zone_no,
+               z.zone_name,
+               z.mng_type,
 
-            cpbd.category as cpbd_category,
-            cpbd.description as cpbd_description,
+               cpbd.category                     as cpbd_category,
+               cpbd.description                  as cpbd_description,
 
-            cpzd.category as cpzd_category,
-            cpzd.description as cpzd_description,
+               cpzd.category                     as cpzd_category,
+               cpzd.description                  as cpzd_description,
 
-            cpzi.category as cpzi_category,
-            cpzi.industry_code as industry_code,
-            cpzi.industry_name as industry_name,
+               cpzi.category                     as cpzi_category,
+               cpzi.industry_code                as industry_code,
+               get_cd_nm(cpzi.industry_code, NULL) as industry_name,
+--             cpzi.industry_name as industry_name,
 
-            cpzimg.id as image_id,
-            cpzimg.category as image_category,
-            cpzimg.title as image_title,
-            cpzimg.name as image_name
+               cpzimg.id                         as image_id,
+               cpzimg.category                   as image_category,
+               cpzimg.title                      as image_title,
+               cpzimg.name                       as image_name
         FROM ciams_zone z
                  left outer JOIN ciams_plan_base_description cpbd ON z.mng_type = cpbd.mng_type
                  left outer JOIN ciams_plan_zone_description cpzd ON z.zone_no = cpzd.zone_no
                  left outer JOIN ciams_plan_zone_image cpzimg ON z.zone_no = cpzimg.zone_no
                  left outer JOIN ciams_plan_zone_industry cpzi ON z.zone_no = cpzi.zone_no
         WHERE z.zone_no = #{zoneNo}
+        ORDER BY cpzi.category, cpzi.industry_code
     </select>
 
     <select id="selectImage" parameterType="int">

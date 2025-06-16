@@ -8,7 +8,8 @@
             resultType="com.uitgis.ciams.model.CiamsData">
         SELECT priority,
                year,
-               layer_name
+               layer_name,
+               style
         FROM ciams_data
         WHERE data_group_id = #{dataGroupId}
         ORDER BY priority

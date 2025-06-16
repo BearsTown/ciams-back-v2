@@ -186,4 +186,33 @@
         AND t2.cls_code = t1.cls_code
         order by worker_cnt desc
     </select>
+
+
+    <select id="selectByZoneNoItaResultDatas" parameterType="string"
+            resultType="com.uitgis.ciams.dto.Menu2Sub1DetailsDto$ItaResultData">
+        SELECT cia.t_code,
+               cia.cls_code,
+               get_cd_nm(cia.t_code || cia.cls_code, '') AS ins_nm,
+               cia.lq_value,
+               cia.gr_value,
+               cia.rs_value,
+               cia.ita_rec,
+               cia.lq_rec,
+               ita.base_corp_cnt,
+               ita.base_emp_cnt,
+               ita.base_emp_avg,
+               ita.past_corp_cnt,
+               ita.past_emp_cnt,
+               ita.past_emp_avg
+        FROM ciams_zone z
+                 LEFT JOIN
+             ciams_ita ita ON z.zone_no = ita.zone_no
+                 LEFT JOIN
+             ciams_industry_analysis cia ON ita.t_code = cia.t_code AND ita.cls_code = cia.cls_code
+        WHERE z.zone_no = #{zoneNo}
+          AND cia.sgg_cd =
+              (SELECT (SELECT conf_value FROM ciams_config WHERE id = 'SIDO_CODE') ||
+                      (SELECT conf_value FROM ciams_config WHERE id = 'SGG_CODE'))
+        order by t_code, cls_code
+    </select>
 </mapper>

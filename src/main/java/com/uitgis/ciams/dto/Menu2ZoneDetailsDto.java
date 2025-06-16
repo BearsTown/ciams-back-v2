@@ -4,7 +4,7 @@ import com.uitgis.ciams.model.CiamsAnalysis;
 import lombok.Getter;
 import lombok.Setter;
 
-public class CiamsMenu2Sub1DetailsDto {
+public class Menu2ZoneDetailsDto {
 
     public static class Overview {
         public static class Find {

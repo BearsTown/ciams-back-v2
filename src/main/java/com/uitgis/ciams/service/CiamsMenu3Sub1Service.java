@@ -1,6 +1,5 @@
 package com.uitgis.ciams.service;
 
-import com.uitgis.ciams.dto.CiamsMenu2Sub1DetailsDto;
 import com.uitgis.ciams.dto.CiamsMenu3Sub1DetailsDto;
 import com.uitgis.ciams.model.CiamsImage;
 
