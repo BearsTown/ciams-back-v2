@@ -20,6 +20,12 @@ public class CiamsMenu1Sub1TabAContoller {
 
     private final CiamsMenu1Sub1TabAService ciamsMenu1Sub1TabAService;
 
+    @GetMapping("/tree")
+    public ResponseEntity<List<CiamsMenu1Sub1TabADto.CiamsStatus>> getStatusTree() {
+        List<CiamsMenu1Sub1TabADto.CiamsStatus> result = ciamsMenu1Sub1TabAService.getStatusTree();
+        return ResponseEntity.ok(result);
+    }
+
     @GetMapping("/group/{statusId}")
     public ResponseEntity<List<CiamsMenu1Sub1TabADto.StatusGroup>> getItaDatas(@PathVariable("statusId") int statusId) {
         List<CiamsMenu1Sub1TabADto.StatusGroup> result = ciamsMenu1Sub1TabAService.getStatusGroups(statusId);

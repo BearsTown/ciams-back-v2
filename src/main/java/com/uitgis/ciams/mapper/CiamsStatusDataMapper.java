@@ -9,6 +9,8 @@ import java.util.Map;
 
 @Mapper
 public interface CiamsStatusDataMapper {
+    public List<CiamsMenu1Sub1TabADto.CiamsStatus> selectStatusTree();
+
     public List<CiamsMenu1Sub1TabADto.StatusGroup> selectStatusGroups(int statusId);
 
     public CiamsMenu1Sub1TabADto.StatusData selectStatusData(int dataId);

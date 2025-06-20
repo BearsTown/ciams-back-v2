@@ -11,6 +11,16 @@ public class CiamsMenu1Sub1TabADto {
 
     @Getter
     @Setter
+    public static class CiamsStatus {
+        private Integer id;
+        private Integer parentId;
+        private String title;
+        private int priority;
+        private List<CiamsStatus> children;
+    }
+
+    @Getter
+    @Setter
     public static class DataInfo {
         private StatusData statusData;
         private List<StatusColumn> columns;
@@ -79,6 +89,7 @@ public class CiamsMenu1Sub1TabADto {
         private String name;
         private String label;
         private boolean useAxis;
+        private String dataType;
     }
 
     @Getter

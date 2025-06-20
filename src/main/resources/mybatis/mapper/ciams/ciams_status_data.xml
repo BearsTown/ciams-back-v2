@@ -3,6 +3,51 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.uitgis.ciams.mapper.CiamsStatusDataMapper">
 
+    <resultMap id="CiamsStatusMap" type="com.uitgis.ciams.dto.CiamsMenu1Sub1TabADto$CiamsStatus">
+        <id property="id" column="id"/>
+        <result property="parentId" column="parent_id"/>
+        <result property="title" column="title"/>
+        <result property="priority" column="priority"/>
+        <collection property="children" ofType="com.uitgis.ciams.dto.CiamsMenu1Sub1TabADto$CiamsStatus">
+            <id property="id" column="child_id"/>
+            <result property="parentId" column="child_parent_id"/>
+            <result property="title" column="child_title"/>
+            <result property="priority" column="child_priority"/>
+        </collection>
+    </resultMap>
+
+    <select id="selectStatusTree" resultMap="CiamsStatusMap">
+        WITH RECURSIVE hierarchy AS (
+            -- 루트 노드 선택
+            SELECT
+                id,
+                parent_id,
+                title,
+                priority,
+                0 as level
+            FROM ciams_status
+            WHERE parent_id IS NULL
+            UNION ALL
+            -- 자식 노드 재귀 선택
+            SELECT
+                c.id,
+                c.parent_id,
+                c.title,
+                c.priority,
+                h.level + 1
+            FROM ciams_status c
+                     INNER JOIN hierarchy h ON c.parent_id = h.id
+        )
+        SELECT
+            id,
+            parent_id,
+            title,
+            priority
+        FROM hierarchy
+        ORDER BY level, priority
+    </select>
+
+
     <select id="selectStatusGroups"
             parameterType="int"
             resultType="com.uitgis.ciams.dto.CiamsMenu1Sub1TabADto$StatusGroup">
@@ -70,11 +115,12 @@
     <select id="selectStatusPivotColumns" parameterType="map"
             resultType="com.uitgis.ciams.dto.CiamsMenu1Sub1TabADto$PivotColumn">
         SELECT *
-        FROM (VALUES ('A0', '구분', false)) AS static_row(name, label, use_axis)
+        FROM (VALUES ('A0', '구분', false, 'STRING')) AS static_row(name, label, use_axis, data_type)
         UNION ALL
         SELECT 'A' || ROW_NUMBER() OVER (ORDER BY ${cColumn}) AS name,
                ${cColumn}                                     AS label,
-               true                                           AS use_axis
+               true                                           AS use_axis,
+               #{dataType}                                    AS data_type
         FROM ${tableName}
         GROUP BY ${cColumn}
     </select>
@@ -93,7 +139,7 @@
         SELECT
 --         csdc.label AS "A0",
         CASE
-        WHEN csdc.use_code = true THEN get_cd_nm(csdc.label  ,'')
+        WHEN csdc.use_code = true THEN get_cd_nm(csdc.label, '')
         ELSE csdc.label
         END AS "A0",
         <foreach collection="columns" item="col" index="idx" open="" separator="," close="">

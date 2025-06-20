@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -17,6 +18,21 @@ import java.util.stream.Collectors;
 @Service
 public class CiamsMenu1Sub1TabAServiceImpl implements CiamsMenu1Sub1TabAService {
     private final CiamsStatusDataMapper ciamsStatusDataMapper;
+
+    @Override
+    public List<CiamsMenu1Sub1TabADto.CiamsStatus> getStatusTree() {
+        List<CiamsMenu1Sub1TabADto.CiamsStatus> allNodes = ciamsStatusDataMapper.selectStatusTree();
+
+        List<CiamsMenu1Sub1TabADto.CiamsStatus> roots = allNodes.stream()
+                .filter(node -> node.getParentId() == null)
+                .collect(Collectors.toList());
+
+        for (CiamsMenu1Sub1TabADto.CiamsStatus root : roots) {
+            setChildren(root, allNodes);
+        }
+
+        return roots;
+    }
 
     @Override
     public List<CiamsMenu1Sub1TabADto.StatusGroup> getStatusGroups(int statusId) {
@@ -33,9 +49,14 @@ public class CiamsMenu1Sub1TabAServiceImpl implements CiamsMenu1Sub1TabAService 
         if (statusData.isPivot()) {
             CiamsMenu1Sub1TabADto.Pivot pivot = ciamsStatusDataMapper.selectPivot(dataId);
 
+            Optional<String> dataType = statusColumns.stream()
+                    .filter(CiamsMenu1Sub1TabADto.StatusColumn::isUseAxis)
+                    .map(CiamsMenu1Sub1TabADto.StatusColumn::getDataType)
+                    .findFirst();
 
             Map<String, String> map = new HashMap<>();
             map.put("cColumn", pivot.getCColumn());
+            map.put("dataType", dataType.orElse("STRING"));
             map.put("tableName", statusData.getDataName());
 
             List<CiamsMenu1Sub1TabADto.PivotColumn> pivotColumns = ciamsStatusDataMapper.selectStatusPivotColumns(map);
@@ -102,5 +123,15 @@ public class CiamsMenu1Sub1TabAServiceImpl implements CiamsMenu1Sub1TabAService 
         return dataInfo;
     }
 
+    private void setChildren(CiamsMenu1Sub1TabADto.CiamsStatus parent, List<CiamsMenu1Sub1TabADto.CiamsStatus> allNodes) {
+        List<CiamsMenu1Sub1TabADto.CiamsStatus> children = allNodes.stream()
+                .filter(node -> parent.getId().equals(node.getParentId()))
+                .collect(Collectors.toList());
 
+        parent.setChildren(children);
+
+        for (CiamsMenu1Sub1TabADto.CiamsStatus child : children) {
+            setChildren(child, allNodes);
+        }
+    }
 }
