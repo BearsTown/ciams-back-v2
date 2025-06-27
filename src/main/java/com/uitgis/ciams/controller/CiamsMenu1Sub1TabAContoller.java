@@ -26,9 +26,15 @@ public class CiamsMenu1Sub1TabAContoller {
         return ResponseEntity.ok(result);
     }
 
+//    @GetMapping("/group/{statusId}")
+//    public ResponseEntity<List<CiamsMenu1Sub1TabADto.StatusGroup>> getItaDatas(@PathVariable("statusId") int statusId) {
+//        List<CiamsMenu1Sub1TabADto.StatusGroup> result = ciamsMenu1Sub1TabAService.getStatusGroups(statusId);
+//        return ResponseEntity.ok(result);
+//    }
+
     @GetMapping("/group/{statusId}")
-    public ResponseEntity<List<CiamsMenu1Sub1TabADto.StatusGroup>> getItaDatas(@PathVariable("statusId") int statusId) {
-        List<CiamsMenu1Sub1TabADto.StatusGroup> result = ciamsMenu1Sub1TabAService.getStatusGroups(statusId);
+    public ResponseEntity<CiamsMenu1Sub1TabADto.CiamsStatusInfo> getItaDatas(@PathVariable("statusId") int statusId) {
+        CiamsMenu1Sub1TabADto.CiamsStatusInfo result = ciamsMenu1Sub1TabAService.getStatusInfo(statusId);
         return ResponseEntity.ok(result);
     }
 

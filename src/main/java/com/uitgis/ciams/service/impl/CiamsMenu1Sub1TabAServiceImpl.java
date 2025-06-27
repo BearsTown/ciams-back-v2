@@ -1,6 +1,8 @@
 package com.uitgis.ciams.service.impl;
 
 import com.uitgis.ciams.dto.CiamsMenu1Sub1TabADto;
+import com.uitgis.ciams.dto.CiamsSourceGroupDto;
+import com.uitgis.ciams.mapper.CiamsSourceMapper;
 import com.uitgis.ciams.mapper.CiamsStatusDataMapper;
 import com.uitgis.ciams.service.CiamsMenu1Sub1TabAService;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +20,7 @@ import java.util.stream.Collectors;
 @Service
 public class CiamsMenu1Sub1TabAServiceImpl implements CiamsMenu1Sub1TabAService {
     private final CiamsStatusDataMapper ciamsStatusDataMapper;
+    private final CiamsSourceMapper ciamsSourceMapper;
 
     @Override
     public List<CiamsMenu1Sub1TabADto.CiamsStatus> getStatusTree() {
@@ -34,10 +37,26 @@ public class CiamsMenu1Sub1TabAServiceImpl implements CiamsMenu1Sub1TabAService 
         return roots;
     }
 
+//    @Override
+//    public List<CiamsMenu1Sub1TabADto.StatusGroup> getStatusGroups(int statusId) {
+//        return ciamsStatusDataMapper.selectStatusGroups(statusId);
+//    }
+
     @Override
-    public List<CiamsMenu1Sub1TabADto.StatusGroup> getStatusGroups(int statusId) {
-        return ciamsStatusDataMapper.selectStatusGroups(statusId);
+    public CiamsMenu1Sub1TabADto.CiamsStatusInfo getStatusInfo(int statusId) {
+        CiamsSourceGroupDto.Find.Params params = CiamsSourceGroupDto.Find.Params
+                .builder()
+                .category("일반현황")
+                .targetId(Integer.toString(statusId))
+                .build();
+
+        return CiamsMenu1Sub1TabADto.CiamsStatusInfo
+                .builder()
+                .sources(ciamsSourceMapper.selectSources(params))
+                .groups(ciamsStatusDataMapper.selectStatusGroups(statusId))
+                .build();
     }
+
 
     @Override
     public CiamsMenu1Sub1TabADto.DataInfo getDataInfo(int dataId) {

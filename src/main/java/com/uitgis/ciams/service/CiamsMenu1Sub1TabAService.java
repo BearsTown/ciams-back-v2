@@ -7,7 +7,9 @@ import java.util.List;
 public interface CiamsMenu1Sub1TabAService {
 	public List<CiamsMenu1Sub1TabADto.CiamsStatus> getStatusTree();
 
-	public List<CiamsMenu1Sub1TabADto.StatusGroup> getStatusGroups(int statusId);
+
+//	public List<CiamsMenu1Sub1TabADto.StatusGroup> getStatusGroups(int statusId);
+	public CiamsMenu1Sub1TabADto.CiamsStatusInfo getStatusInfo(int statusId);
 
 	public CiamsMenu1Sub1TabADto.DataInfo getDataInfo(int dataId);
 }
