@@ -1,6 +1,6 @@
 package com.uitgis.ciams.service;
 
-import com.daonsw.spatial.adpater.mapstudio.dto.MapStudioResult;
+import com.uitgis.spatial.adpater.mapstudio.dto.MapStudioResult;
 import com.uitgis.gis.dto.UploadDataDto;
 
 public interface CiamsGisService {

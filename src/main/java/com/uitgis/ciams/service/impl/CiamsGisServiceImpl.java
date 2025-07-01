@@ -1,7 +1,7 @@
 package com.uitgis.ciams.service.impl;
 
-import com.daonsw.spatial.adpater.mapstudio.dto.MapStudioResult;
-import com.daonsw.spatial.util.ValidUtil;
+import com.uitgis.spatial.adpater.mapstudio.dto.MapStudioResult;
+import com.uitgis.spatial.util.ValidUtil;
 import com.uitgis.gis.dto.UploadDataDto;
 import com.uitgis.ciams.config.MapStudioProp;
 import com.uitgis.ciams.service.CiamsGisService;

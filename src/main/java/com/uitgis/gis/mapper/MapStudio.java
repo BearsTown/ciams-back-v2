@@ -1,6 +1,6 @@
 package com.uitgis.gis.mapper;
 
-import com.daonsw.spatial.dto.TableSchemaDto;
+import com.uitgis.spatial.dto.TableSchemaDto;
 import org.apache.ibatis.annotations.Mapper;
 
 @Mapper

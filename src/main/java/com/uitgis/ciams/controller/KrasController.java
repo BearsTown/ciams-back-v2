@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+
 import javax.xml.stream.XMLStreamException;
 import java.io.IOException;
 import java.security.Principal;
@@ -40,7 +41,7 @@ public class KrasController {
 	 */
 	@GetMapping("{krasSvcId}")
 	public ResponseEntity<?> unit(@PathVariable KrasSvcEnum krasSvcId, @ModelAttribute CiamsKrasRequestDto krasReq)
-			throws JAXBException, XMLStreamException, KrasException, IOException {
+			throws XMLStreamException, KrasException, IOException, JAXBException {
 
 		KrasConfig.DataParam param = OpenApiConfig.getKrasParam();
 		param.setKrasSvcId(krasSvcId);

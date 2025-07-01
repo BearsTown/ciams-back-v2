@@ -6,7 +6,7 @@
         SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name ILIKE #{layerName})
     </select>
 
-    <update id="layerRename" parameterType="com.daonsw.spatial.dto.TableSchemaDto$Rename">
+    <update id="layerRename" parameterType="com.uitgis.spatial.dto.TableSchemaDto$Rename">
         ALTER TABLE ${orgTableName} RENAME TO ${newTableName}
     </update>
 

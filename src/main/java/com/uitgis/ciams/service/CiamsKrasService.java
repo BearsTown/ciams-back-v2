@@ -1,9 +1,9 @@
 package com.uitgis.ciams.service;
 
-import com.daonsw.spatial.adpater.mapstudio.dto.MapStudioResult;
-import com.daonsw.spatial.dto.LayerFileInfo;
-import com.daonsw.spatial.dto.TableSchemaDto;
-import com.daonsw.spatial.util.DateUtil;
+import com.uitgis.spatial.adpater.mapstudio.dto.MapStudioResult;
+import com.uitgis.spatial.dto.LayerFileInfo;
+import com.uitgis.spatial.dto.TableSchemaDto;
+import com.uitgis.spatial.util.DateUtil;
 import com.uitgis.ciams.dto.KrasMultiPartFile;
 import com.uitgis.ciams.enums.KrasContentTypeEnum;
 import com.uitgis.ciams.exception.CustomException;
