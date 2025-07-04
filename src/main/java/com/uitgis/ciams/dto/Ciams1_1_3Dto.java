@@ -1,12 +1,40 @@
 package com.uitgis.ciams.dto;
 
+import com.uitgis.gis.dto.GisCiamsZoneDTO;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Ciams1_1_3Dto {
+
+    public static class Search {
+
+        @Getter
+        @Setter
+        public static class Params extends PaginationDto {
+            private String keyword;
+            private String sggCd;
+        }
+
+        @Getter
+        @Setter
+        public static class Row extends ItaResultData {
+            private int rn;
+        }
+
+        @Getter
+        @Setter
+        @Builder
+        public static class Result {
+            private PaginationDto page; // 페이징 정보
+
+            @Builder.Default
+            private List<Ciams1_1_3Dto.Search.Row> list = new ArrayList<>();     // 검색 결과 리스트
+        }
+    }
 
     @Getter
     @Setter

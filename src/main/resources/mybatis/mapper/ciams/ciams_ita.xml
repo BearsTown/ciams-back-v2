@@ -87,24 +87,35 @@
     </select>
 
 
-    <select id="selectItaResultDatas" parameterType="string"
-            resultType="com.uitgis.ciams.dto.Ciams1_1_3Dto$ItaResultData">
-        select t_code,
-               cls_code,
-               get_cd_nm(t_code || cls_code, '') AS ins_nm,
-               lq_value,
-               lq_class,
-               gr_value,
-               gr_class,
-               rs_value,
-               rs_class,
-               ita_rec,
-               lq_rec,
-               corp_cnt,
-               worker_cnt
-        from ciams_industry_analysis
-        where sgg_cd = #{sggCd}
-        ORDER BY t_code, cls_code
+    <select id="selectItaResultDataCount" parameterType="map" resultType="int">
+        SELECT
+        COUNT(*)
+        FROM ciams_industry_analysis
+        WHERE sgg_cd = #{sggCd}
+    </select>
+
+
+    <select id="selectItaResultDataList" parameterType="map"
+            resultType="com.uitgis.ciams.dto.Ciams1_1_3Dto$Search$Row">
+        <include refid="pagination.page_top"/>
+        SELECT
+            t_code,
+            cls_code,
+            get_cd_nm(t_code || cls_code, '') AS ins_nm,
+            lq_value,
+            lq_class,
+            gr_value,
+            gr_class,
+            rs_value,
+            rs_class,
+            ita_rec,
+            lq_rec,
+            corp_cnt,
+            worker_cnt
+        FROM ciams_industry_analysis
+            WHERE sgg_cd = #{sggCd}
+            ORDER BY t_code, cls_code
+        <include refid="pagination.page_bottom"/>
     </select>
 
 

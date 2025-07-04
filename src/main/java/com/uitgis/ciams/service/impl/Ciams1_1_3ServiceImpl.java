@@ -1,8 +1,11 @@
 package com.uitgis.ciams.service.impl;
 
 import com.uitgis.ciams.dto.Ciams1_1_3Dto;
+import com.uitgis.ciams.dto.PaginationDto;
 import com.uitgis.ciams.mapper.Ciams1_1_3Mapper;
 import com.uitgis.ciams.service.Ciams1_1_3Service;
+import com.uitgis.ciams.util.PageUtil;
+import com.uitgis.gis.dto.GisCiamsZoneDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -26,8 +29,19 @@ public class Ciams1_1_3ServiceImpl implements Ciams1_1_3Service {
 	}
 
 	@Override
-	public List<Ciams1_1_3Dto.ItaResultData> getItaResultDatas(String sggCd) {
-		return ciams1_1_3Mapper.selectItaResultDatas(sggCd);
+	public Ciams1_1_3Dto.Search.Result getItaResultDataList(Ciams1_1_3Dto.Search.Params params) {
+		int totalCount = ciams1_1_3Mapper.selectItaResultDataCount(params);
+
+		PaginationDto page = PageUtil.setTotalCount(params, totalCount);
+
+		List<Ciams1_1_3Dto.Search.Row> rows = ciams1_1_3Mapper.selectItaResultDataList(params);
+
+		Ciams1_1_3Dto.Search.Result result = Ciams1_1_3Dto.Search.Result.builder()
+				.page(page)
+				.list(rows)
+				.build();
+
+		return result;
 	}
 
 	@Override

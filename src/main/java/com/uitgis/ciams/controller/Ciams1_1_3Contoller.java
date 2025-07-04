@@ -1,7 +1,6 @@
 package com.uitgis.ciams.controller;
 
 import com.uitgis.ciams.dto.Ciams1_1_3Dto;
-import com.uitgis.ciams.dto.CiamsTechLQDto;
 import com.uitgis.ciams.service.Ciams1_1_3Service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -36,9 +35,9 @@ public class Ciams1_1_3Contoller {
         return ResponseEntity.ok(result);
     }
 
-    @GetMapping("/ita/result/{sggCd}")
-    public ResponseEntity<List<Ciams1_1_3Dto.ItaResultData>> getItaResultDatas(@PathVariable("sggCd") String sggCd) {
-        List<Ciams1_1_3Dto.ItaResultData> result = ciams1_1_3Service.getItaResultDatas(sggCd);
+    @GetMapping("/ita/result")
+    public ResponseEntity<Ciams1_1_3Dto.Search.Result> getItaResultDataList(Ciams1_1_3Dto.Search.Params params) {
+        Ciams1_1_3Dto.Search.Result result = ciams1_1_3Service.getItaResultDataList(params);
         return ResponseEntity.ok(result);
     }
 

@@ -9,7 +9,7 @@ public interface Ciams1_1_3Service {
 
 	public List<Ciams1_1_3Dto.IndustryArea> getIndustryAreas(boolean exclude);
 
-	public List<Ciams1_1_3Dto.ItaResultData> getItaResultDatas(String sggCd);
+	public Ciams1_1_3Dto.Search.Result getItaResultDataList(Ciams1_1_3Dto.Search.Params params);
 
 	public Ciams1_1_3Dto.IndustryStatus.Find.Result getIndustryStatus(Ciams1_1_3Dto.IndustryStatus.Find.Params params);
 }

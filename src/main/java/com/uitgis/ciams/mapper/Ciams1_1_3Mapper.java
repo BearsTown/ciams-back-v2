@@ -12,7 +12,9 @@ public interface Ciams1_1_3Mapper {
 
     public List<Ciams1_1_3Dto.IndustryArea> selectIndustryAreas(@Param("exclude") boolean exclude);
 
-    public List<Ciams1_1_3Dto.ItaResultData> selectItaResultDatas(String sggCd);
+    public int selectItaResultDataCount(Ciams1_1_3Dto.Search.Params params);
+
+    public List<Ciams1_1_3Dto.Search.Row> selectItaResultDataList(Ciams1_1_3Dto.Search.Params params);
 
     public List<Ciams1_1_3Dto.IndustryStatusData> selectIndustryStatusDatas(Ciams1_1_3Dto.IndustryStatus.Find.Params params);
 
