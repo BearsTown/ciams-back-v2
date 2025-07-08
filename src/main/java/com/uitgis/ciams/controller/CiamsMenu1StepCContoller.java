@@ -1,7 +1,6 @@
 package com.uitgis.ciams.controller;
 
 import com.uitgis.ciams.dto.CiamsMenu1StepCDetailsDto;
-import com.uitgis.ciams.dto.CiamsMenu1StepCDto;
 import com.uitgis.ciams.service.CiamsMenu1StepCService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,15 +17,6 @@ public class CiamsMenu1StepCContoller {
 
     private final CiamsMenu1StepCService ciamsMenu1StepCService;
 
-    /**
-     *
-     */
-
-    @GetMapping("/area/list")
-    public ResponseEntity<?> getPlanAreaList(CiamsMenu1StepCDto.Search.Params params) {
-        CiamsMenu1StepCDto.Search.Result result = ciamsMenu1StepCService.getPlanAreaList(params);
-        return ResponseEntity.ok(result);
-    }
 
     /**
      * 상세정보 개요

@@ -11,28 +11,47 @@ import com.uitgis.ext.kras.dto.xml.Kras000002Result;
 import com.uitgis.ext.kras.dto.xml.Kras000026Result;
 import com.uitgis.ext.kras.dto.xml.KrasResultHeader;
 import com.uitgis.ext.kras.enums.KrasSvcEnum;
+import jakarta.servlet.ServletContext;
 import jakarta.xml.bind.JAXBException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-
 import javax.xml.stream.XMLStreamException;
 import java.io.IOException;
 import java.security.Principal;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 
 @Slf4j
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/openapi/kras/")
 @RestController
 public class KrasController {
+	private final Executor executor;
+
 	private final KrasService krasService = new KrasService();
+
+	@Autowired
+	public KrasController(ServletContext servletContext) {
+		this.executor = Executors.newFixedThreadPool(10, new ThreadFactory() {
+			@Override
+			public Thread newThread(Runnable r) {
+				Thread thread = new Thread(r);
+				thread.setContextClassLoader(servletContext.getClassLoader());
+				return thread;
+			}
+		});
+	}
 
 	/**
 	 * KRAS 연계 데이터 조회.
@@ -77,7 +96,7 @@ public class KrasController {
 		return ResponseEntity.ok(result);
 	}
 
-	private CompletableFuture<Object> getKrasDataBySvcId(@ModelAttribute CiamsKrasRequestDto krasReq, KrasSvcEnum svcId) {
+	protected CompletableFuture<Object> getKrasDataBySvcId(@ModelAttribute CiamsKrasRequestDto krasReq, KrasSvcEnum svcId) {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
 				KrasConfig.DataParam param = OpenApiConfig.getKrasParam();
@@ -88,7 +107,7 @@ public class KrasController {
 				log.error("KRAS service [{}] call error.", svcId.name() + e);
 			}
 			return null;
-		});
+		}, executor);
 	}
 
 	private boolean isSuccess(KrasResultHeader header) {
