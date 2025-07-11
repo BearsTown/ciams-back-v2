@@ -18,7 +18,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.uitgis.ciams.config.UitPasswordEncoder;
 import com.uitgis.ciams.dto.PaginationDto;
 import com.uitgis.ciams.dto.CiamsUserRoleDto;
 import com.uitgis.ciams.dto.CiamsSsoUserDto;
@@ -40,7 +39,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RequiredArgsConstructor
 @Service
-public class CiamsCiamsSsoUserServiceImpl implements CiamsSsoUserService {
+public class CiamsSsoUserServiceImpl implements CiamsSsoUserService {
 
 	private final CiamsSsoUserMapper ciamsSsoUserMapper;
 	private final CiamsUserRoleMapper ciamsUserRoleMapper;

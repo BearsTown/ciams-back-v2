@@ -8,7 +8,7 @@ import lombok.Setter;
 
 import java.util.List;
 
-public class CiamsMenu2Sub2Dto {
+public class Menu2Sub2Dto {
 
     @Getter
     @Setter

@@ -46,13 +46,17 @@
 
     <select id="selectTechLQ" parameterType="com.uitgis.ciams.dto.CiamsTechLQDto$TechLQ$Find$Params"
             resultType="com.uitgis.ciams.dto.CiamsTechLQDto$TechLQ$Find$Result">
-        select tech_cd,
+        SELECT tech_cd,
                sgg_cd,
                sgg_nm,
                corp_lq,
                worker_lq
-        from ciams_tech_lq
-        where tech_cd = #{techCd}
+        FROM ciams_tech_lq
+        WHERE tech_cd = #{techCd}
+          AND (
+            corp_lq > 0
+                OR worker_lq > 0
+            )
     </select>
 
 </mapper>

@@ -1,7 +1,7 @@
 package com.uitgis.ciams.controller;
 
-import com.uitgis.ciams.dto.CiamsMenu1Sub1TabADto;
-import com.uitgis.ciams.service.CiamsMenu1Sub1TabAService;
+import com.uitgis.ciams.dto.Menu1Sub1TabADto;
+import com.uitgis.ciams.service.Menu1Sub1TabAService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -16,13 +16,13 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/status")
 @RestController
-public class CiamsMenu1Sub1TabAContoller {
+public class Menu1Sub1TabAContoller {
 
-    private final CiamsMenu1Sub1TabAService ciamsMenu1Sub1TabAService;
+    private final Menu1Sub1TabAService menu1Sub1TabAService;
 
     @GetMapping("/tree")
-    public ResponseEntity<List<CiamsMenu1Sub1TabADto.CiamsStatus>> getStatusTree() {
-        List<CiamsMenu1Sub1TabADto.CiamsStatus> result = ciamsMenu1Sub1TabAService.getStatusTree();
+    public ResponseEntity<List<Menu1Sub1TabADto.CiamsStatus>> getStatusTree() {
+        List<Menu1Sub1TabADto.CiamsStatus> result = menu1Sub1TabAService.getStatusTree();
         return ResponseEntity.ok(result);
     }
 
@@ -33,14 +33,14 @@ public class CiamsMenu1Sub1TabAContoller {
 //    }
 
     @GetMapping("/group/{statusId}")
-    public ResponseEntity<CiamsMenu1Sub1TabADto.CiamsStatusInfo> getItaDatas(@PathVariable("statusId") int statusId) {
-        CiamsMenu1Sub1TabADto.CiamsStatusInfo result = ciamsMenu1Sub1TabAService.getStatusInfo(statusId);
+    public ResponseEntity<Menu1Sub1TabADto.CiamsStatusInfo> getItaDatas(@PathVariable("statusId") int statusId) {
+        Menu1Sub1TabADto.CiamsStatusInfo result = menu1Sub1TabAService.getStatusInfo(statusId);
         return ResponseEntity.ok(result);
     }
 
     @GetMapping("/{dataId}/info")
-    public ResponseEntity<CiamsMenu1Sub1TabADto.DataInfo> getDataInfo(@PathVariable("dataId") int dataId) {
-        CiamsMenu1Sub1TabADto.DataInfo result = ciamsMenu1Sub1TabAService.getDataInfo(dataId);
+    public ResponseEntity<Menu1Sub1TabADto.DataInfo> getDataInfo(@PathVariable("dataId") int dataId) {
+        Menu1Sub1TabADto.DataInfo result = menu1Sub1TabAService.getDataInfo(dataId);
         return ResponseEntity.ok(result);
     }
 }

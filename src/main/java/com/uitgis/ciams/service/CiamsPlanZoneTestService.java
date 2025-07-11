@@ -1,8 +1,7 @@
 package com.uitgis.ciams.service;
 
-import com.uitgis.ciams.dto.CiamsMenu3Sub1DetailsDto;
-import com.uitgis.ciams.dto.CiamsPlanZoneDto;
+import com.uitgis.ciams.dto.Menu3Sub1DetailsDto;
 
 public interface CiamsPlanZoneTestService {
-	public CiamsMenu3Sub1DetailsDto.Overview.Find.Result getMenu3Sub1OverView(CiamsMenu3Sub1DetailsDto.Overview.Find.Params params);
+	public Menu3Sub1DetailsDto.Info.Find.Result getMenu3Sub1OverView(Menu3Sub1DetailsDto.Info.Find.Params params);
 }

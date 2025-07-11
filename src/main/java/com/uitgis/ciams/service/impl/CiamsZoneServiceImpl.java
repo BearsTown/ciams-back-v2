@@ -1,10 +1,10 @@
 package com.uitgis.ciams.service.impl;
 
+import com.uitgis.ciams.dto.CiamsZoneDTO;
 import com.uitgis.ciams.dto.PaginationDto;
+import com.uitgis.ciams.mapper.CiamsZoneMapper;
 import com.uitgis.ciams.service.CiamsZoneService;
 import com.uitgis.ciams.util.PageUtil;
-import com.uitgis.gis.dto.GisCiamsZoneDTO;
-import com.uitgis.gis.mapper.GisCiamsZoneMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -15,22 +15,27 @@ import java.util.List;
 @RequiredArgsConstructor
 @Service
 public class CiamsZoneServiceImpl implements CiamsZoneService {
-	private final GisCiamsZoneMapper gisCiamsZoneMapper;
+	private final CiamsZoneMapper ciamsZoneMapper;
 
 	@Override
-	public GisCiamsZoneDTO.Search.Result getCiamsZoneList(GisCiamsZoneDTO.Search.Params params) {
-		int totalCount = gisCiamsZoneMapper.selectGisCiamsZoneCount(params);
+	public CiamsZoneDTO.Search.Result getCiamsZoneList(CiamsZoneDTO.Search.Params params) {
+		int totalCount = ciamsZoneMapper.selectCiamsZoneCount(params);
 
 		PaginationDto page = PageUtil.setTotalCount(params, totalCount);
 
-		List<GisCiamsZoneDTO.Search.Row> rows = gisCiamsZoneMapper.selectGisCiamsZoneList(params);
+		List<CiamsZoneDTO.Search.Row> rows = ciamsZoneMapper.selectCiamsZoneList(params);
 
-		GisCiamsZoneDTO.Search.Result result = GisCiamsZoneDTO.Search.Result.builder()
+		CiamsZoneDTO.Search.Result result = CiamsZoneDTO.Search.Result.builder()
 				.page(page)
 				.list(rows)
 				.build();
 
 		return result;
+	}
+
+	@Override
+	public CiamsZoneDTO.Overview.Find.Result getCiamsZoneOverView(CiamsZoneDTO.Overview.Find.Params params) {
+		return ciamsZoneMapper.selectCiamsZoneOverView(params);
 	}
 
 }

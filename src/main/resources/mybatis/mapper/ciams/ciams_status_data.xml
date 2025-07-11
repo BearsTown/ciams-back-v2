@@ -3,12 +3,12 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.uitgis.ciams.mapper.CiamsStatusDataMapper">
 
-    <resultMap id="CiamsStatusMap" type="com.uitgis.ciams.dto.CiamsMenu1Sub1TabADto$CiamsStatus">
+    <resultMap id="CiamsStatusMap" type="com.uitgis.ciams.dto.Menu1Sub1TabADto$CiamsStatus">
         <id property="id" column="id"/>
         <result property="parentId" column="parent_id"/>
         <result property="title" column="title"/>
         <result property="priority" column="priority"/>
-        <collection property="children" ofType="com.uitgis.ciams.dto.CiamsMenu1Sub1TabADto$CiamsStatus">
+        <collection property="children" ofType="com.uitgis.ciams.dto.Menu1Sub1TabADto$CiamsStatus">
             <id property="id" column="child_id"/>
             <result property="parentId" column="child_parent_id"/>
             <result property="title" column="child_title"/>
@@ -50,7 +50,7 @@
 
     <select id="selectStatusGroups"
             parameterType="int"
-            resultType="com.uitgis.ciams.dto.CiamsMenu1Sub1TabADto$StatusGroup">
+            resultType="com.uitgis.ciams.dto.Menu1Sub1TabADto$StatusGroup">
         SELECT csg.id AS status_group_id,
                csg.status_id,
                csg.title,
@@ -69,7 +69,7 @@
 
 
     <select id="selectStatusData" parameterType="int"
-            resultType="com.uitgis.ciams.dto.CiamsMenu1Sub1TabADto$StatusData">
+            resultType="com.uitgis.ciams.dto.Menu1Sub1TabADto$StatusData">
         SELECT data_name, pivot
         FROM ciams_status_data
         WHERE id = #{dataId}
@@ -77,7 +77,7 @@
 
 
     <select id="selectStatusColumns" parameterType="int"
-            resultType="com.uitgis.ciams.dto.CiamsMenu1Sub1TabADto$StatusColumn">
+            resultType="com.uitgis.ciams.dto.Menu1Sub1TabADto$StatusColumn">
         SELECT CASE
                    WHEN csdc.use_code = true THEN LOWER(csdc.label)
                    ELSE LOWER(csdc.name)
@@ -103,7 +103,7 @@
 
 
     <select id="selectPivot" parameterType="int"
-            resultType="com.uitgis.ciams.dto.CiamsMenu1Sub1TabADto$Pivot">
+            resultType="com.uitgis.ciams.dto.Menu1Sub1TabADto$Pivot">
         SELECT r_column,
                c_column,
                v_column
@@ -113,7 +113,7 @@
 
 
     <select id="selectStatusPivotColumns" parameterType="map"
-            resultType="com.uitgis.ciams.dto.CiamsMenu1Sub1TabADto$PivotColumn">
+            resultType="com.uitgis.ciams.dto.Menu1Sub1TabADto$PivotColumn">
         SELECT *
         FROM (VALUES ('A0', '구분', false, 'STRING')) AS static_row(name, label, use_axis, data_type)
         UNION ALL
@@ -134,7 +134,7 @@
 
 
     <select id="findAllPivotRecords"
-            parameterType="com.uitgis.ciams.dto.CiamsMenu1Sub1TabADto$PivotParams"
+            parameterType="com.uitgis.ciams.dto.Menu1Sub1TabADto$PivotParams"
             resultType="java.util.HashMap">
         SELECT
 --         csdc.label AS "A0",

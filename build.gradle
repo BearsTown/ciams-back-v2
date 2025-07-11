@@ -134,12 +134,12 @@ jar {
 
 bootJar {
     enabled = true
-    archiveFileName = 'ciams.jar'
+    archiveFileName = "ciams-${site}.jar"
 }
 
 war {
     enabled = true
-    archiveFileName = 'ciams.war'
+    archiveFileName = "ciams-${site}.war"
 }
 
 bootWar {

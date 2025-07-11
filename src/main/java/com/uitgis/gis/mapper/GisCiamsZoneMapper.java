@@ -7,7 +7,7 @@ import java.util.List;
 
 @Mapper
 public interface GisCiamsZoneMapper {
-	public int selectGisCiamsZoneCount(GisCiamsZoneDTO.Search.Params params);
-
-	public List<GisCiamsZoneDTO.Search.Row> selectGisCiamsZoneList(GisCiamsZoneDTO.Search.Params params);
+//	public int selectGisCiamsZoneCount(GisCiamsZoneDTO.Search.Params params);
+//
+//	public List<GisCiamsZoneDTO.Search.Row> selectGisCiamsZoneList(GisCiamsZoneDTO.Search.Params params);
 }

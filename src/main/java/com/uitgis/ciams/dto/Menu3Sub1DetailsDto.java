@@ -1,6 +1,5 @@
 package com.uitgis.ciams.dto;
 
-import com.uitgis.ciams.model.CiamsAnalysis;
 import com.uitgis.ciams.model.CiamsPlanZoneImage;
 import com.uitgis.ciams.model.CiamsPlanZoneIndustry;
 import lombok.Getter;
@@ -8,9 +7,9 @@ import lombok.Setter;
 
 import java.util.List;
 
-public class CiamsMenu2Sub4DetailsDto {
+public class Menu3Sub1DetailsDto {
 
-    public static class Overview {
+    public static class Info {
         public static class Find {
             @Getter
             @Setter
@@ -20,20 +19,18 @@ public class CiamsMenu2Sub4DetailsDto {
 
             @Getter
             @Setter
-            public static class Result extends CiamsAnalysis {
+            public static class Result {
+                private String zoneNo;
+                private String zoneName;
+                private String mngCd;
+                private String mngType;
+
+                private List<BaseDescDTO> baseDescs;
+                private List<ZoneDescDTO> zoneDescs;
+                private List<ZoneImageDTO> zoneImages;
+                private List<ZoneIndustryDTO> zoneIndustries;
             }
         }
-    }
-
-    @Getter
-    @Setter
-    public static class Info {
-        private String zoneNo;
-        private String zoneName;
-
-        private List<BaseDescDTO> descs;
-        private List<ImageDTO> images;
-        private List<IndustryDTO> industries;
     }
 
     @Getter
@@ -45,14 +42,21 @@ public class CiamsMenu2Sub4DetailsDto {
 
     @Getter
     @Setter
-    public static class IndustryDTO {
+    public static class ZoneDescDTO {
+        private String category;
+        private List<String> list;
+    }
+
+    @Getter
+    @Setter
+    public static class ZoneIndustryDTO {
         private String category;
         private List<CiamsPlanZoneIndustry> list;
     }
 
     @Getter
     @Setter
-    public static class ImageDTO {
+    public static class ZoneImageDTO {
         private String category;
         private List<CiamsPlanZoneImage> list;
     }

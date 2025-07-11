@@ -9,7 +9,7 @@ import lombok.Setter;
 import java.util.List;
 import java.util.Map;
 
-public class CiamsMenu1Sub1TabADto {
+public class Menu1Sub1TabADto {
 
     @Getter
     @Setter
@@ -18,7 +18,7 @@ public class CiamsMenu1Sub1TabADto {
     @AllArgsConstructor
     public static class CiamsStatusInfo {
         List<CiamsSourceGroupDto.Find.Result> sources;
-        List<CiamsMenu1Sub1TabADto.StatusGroup> groups;
+        List<Menu1Sub1TabADto.StatusGroup> groups;
     }
 
     @Getter

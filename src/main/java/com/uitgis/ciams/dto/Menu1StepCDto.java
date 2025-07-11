@@ -10,7 +10,7 @@ import java.util.List;
 
 @Getter
 @Setter
-public class CiamsMenu1StepCDto {
+public class Menu1StepCDto {
     public static class Search {
     	@Getter
         @Setter
@@ -39,7 +39,7 @@ public class CiamsMenu1StepCDto {
             private PaginationDto page; // 페이징 정보
 
             @Builder.Default
-            private List<CiamsMenu1StepCDto.Search.Row> list = new ArrayList<>();     // 검색 결과 리스트
+            private List<Menu1StepCDto.Search.Row> list = new ArrayList<>();     // 검색 결과 리스트
         }
     }
 

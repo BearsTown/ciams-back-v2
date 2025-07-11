@@ -1,10 +1,10 @@
 package com.uitgis.ciams.service.impl;
 
-import com.uitgis.ciams.dto.CiamsMenu1Sub1TabADto;
+import com.uitgis.ciams.dto.Menu1Sub1TabADto;
 import com.uitgis.ciams.dto.CiamsSourceGroupDto;
 import com.uitgis.ciams.mapper.CiamsSourceMapper;
 import com.uitgis.ciams.mapper.CiamsStatusDataMapper;
-import com.uitgis.ciams.service.CiamsMenu1Sub1TabAService;
+import com.uitgis.ciams.service.Menu1Sub1TabAService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -18,19 +18,19 @@ import java.util.stream.Collectors;
 @Slf4j
 @RequiredArgsConstructor
 @Service
-public class CiamsMenu1Sub1TabAServiceImpl implements CiamsMenu1Sub1TabAService {
+public class Menu1Sub1TabAServiceImpl implements Menu1Sub1TabAService {
     private final CiamsStatusDataMapper ciamsStatusDataMapper;
     private final CiamsSourceMapper ciamsSourceMapper;
 
     @Override
-    public List<CiamsMenu1Sub1TabADto.CiamsStatus> getStatusTree() {
-        List<CiamsMenu1Sub1TabADto.CiamsStatus> allNodes = ciamsStatusDataMapper.selectStatusTree();
+    public List<Menu1Sub1TabADto.CiamsStatus> getStatusTree() {
+        List<Menu1Sub1TabADto.CiamsStatus> allNodes = ciamsStatusDataMapper.selectStatusTree();
 
-        List<CiamsMenu1Sub1TabADto.CiamsStatus> roots = allNodes.stream()
+        List<Menu1Sub1TabADto.CiamsStatus> roots = allNodes.stream()
                 .filter(node -> node.getParentId() == null)
                 .collect(Collectors.toList());
 
-        for (CiamsMenu1Sub1TabADto.CiamsStatus root : roots) {
+        for (Menu1Sub1TabADto.CiamsStatus root : roots) {
             setChildren(root, allNodes);
         }
 
@@ -43,14 +43,14 @@ public class CiamsMenu1Sub1TabAServiceImpl implements CiamsMenu1Sub1TabAService 
 //    }
 
     @Override
-    public CiamsMenu1Sub1TabADto.CiamsStatusInfo getStatusInfo(int statusId) {
+    public Menu1Sub1TabADto.CiamsStatusInfo getStatusInfo(int statusId) {
         CiamsSourceGroupDto.Find.Params params = CiamsSourceGroupDto.Find.Params
                 .builder()
                 .category("일반현황")
                 .targetId(Integer.toString(statusId))
                 .build();
 
-        return CiamsMenu1Sub1TabADto.CiamsStatusInfo
+        return Menu1Sub1TabADto.CiamsStatusInfo
                 .builder()
                 .sources(ciamsSourceMapper.selectSources(params))
                 .groups(ciamsStatusDataMapper.selectStatusGroups(statusId))
@@ -59,18 +59,18 @@ public class CiamsMenu1Sub1TabAServiceImpl implements CiamsMenu1Sub1TabAService 
 
 
     @Override
-    public CiamsMenu1Sub1TabADto.DataInfo getDataInfo(int dataId) {
-        CiamsMenu1Sub1TabADto.DataInfo dataInfo = new CiamsMenu1Sub1TabADto.DataInfo();
-        CiamsMenu1Sub1TabADto.StatusData statusData = ciamsStatusDataMapper.selectStatusData(dataId);
-        List<CiamsMenu1Sub1TabADto.StatusColumn> statusColumns = ciamsStatusDataMapper.selectStatusColumns(dataId);
-        CiamsMenu1Sub1TabADto.Chart chart = new CiamsMenu1Sub1TabADto.Chart();
+    public Menu1Sub1TabADto.DataInfo getDataInfo(int dataId) {
+        Menu1Sub1TabADto.DataInfo dataInfo = new Menu1Sub1TabADto.DataInfo();
+        Menu1Sub1TabADto.StatusData statusData = ciamsStatusDataMapper.selectStatusData(dataId);
+        List<Menu1Sub1TabADto.StatusColumn> statusColumns = ciamsStatusDataMapper.selectStatusColumns(dataId);
+        Menu1Sub1TabADto.Chart chart = new Menu1Sub1TabADto.Chart();
 
         if (statusData.isPivot()) {
-            CiamsMenu1Sub1TabADto.Pivot pivot = ciamsStatusDataMapper.selectPivot(dataId);
+            Menu1Sub1TabADto.Pivot pivot = ciamsStatusDataMapper.selectPivot(dataId);
 
             Optional<String> dataType = statusColumns.stream()
-                    .filter(CiamsMenu1Sub1TabADto.StatusColumn::isUseAxis)
-                    .map(CiamsMenu1Sub1TabADto.StatusColumn::getDataType)
+                    .filter(Menu1Sub1TabADto.StatusColumn::isUseAxis)
+                    .map(Menu1Sub1TabADto.StatusColumn::getDataType)
                     .findFirst();
 
             Map<String, String> map = new HashMap<>();
@@ -78,18 +78,18 @@ public class CiamsMenu1Sub1TabAServiceImpl implements CiamsMenu1Sub1TabAService 
             map.put("dataType", dataType.orElse("STRING"));
             map.put("tableName", statusData.getDataName());
 
-            List<CiamsMenu1Sub1TabADto.PivotColumn> pivotColumns = ciamsStatusDataMapper.selectStatusPivotColumns(map);
+            List<Menu1Sub1TabADto.PivotColumn> pivotColumns = ciamsStatusDataMapper.selectStatusPivotColumns(map);
 
             dataInfo.setPivotColumns(pivotColumns);
 
 
 
             List<String> columnParams = pivotColumns.stream()
-                    .filter(CiamsMenu1Sub1TabADto.PivotColumn::isUseAxis)
-                    .map(CiamsMenu1Sub1TabADto.PivotColumn::getLabel)
+                    .filter(Menu1Sub1TabADto.PivotColumn::isUseAxis)
+                    .map(Menu1Sub1TabADto.PivotColumn::getLabel)
                     .toList();
 
-            CiamsMenu1Sub1TabADto.PivotParams params = CiamsMenu1Sub1TabADto.PivotParams
+            Menu1Sub1TabADto.PivotParams params = Menu1Sub1TabADto.PivotParams
                     .builder()
                     .dataId(dataId)
                     .dataName(statusData.getDataName())
@@ -106,8 +106,8 @@ public class CiamsMenu1Sub1TabAServiceImpl implements CiamsMenu1Sub1TabAService 
 //            List<String> categories = columnParams;
 
             List<String> legend = statusColumns.stream()
-                    .filter(CiamsMenu1Sub1TabADto.StatusColumn::isUseAxis)
-                    .map(CiamsMenu1Sub1TabADto.StatusColumn::getLabel)
+                    .filter(Menu1Sub1TabADto.StatusColumn::isUseAxis)
+                    .map(Menu1Sub1TabADto.StatusColumn::getLabel)
                     .toList();
 
             chart.setLegend(legend);
@@ -118,8 +118,8 @@ public class CiamsMenu1Sub1TabAServiceImpl implements CiamsMenu1Sub1TabAService 
             List<Map<String, Object>> data = ciamsStatusDataMapper.findAllRecords(statusData.getDataName());
 
             List<String> legend = statusColumns.stream()
-                    .filter(CiamsMenu1Sub1TabADto.StatusColumn::isUseAxis)
-                    .map(CiamsMenu1Sub1TabADto.StatusColumn::getLabel)
+                    .filter(Menu1Sub1TabADto.StatusColumn::isUseAxis)
+                    .map(Menu1Sub1TabADto.StatusColumn::getLabel)
                     .toList();
 
             String key = statusColumns.get(0).getName();
@@ -142,14 +142,14 @@ public class CiamsMenu1Sub1TabAServiceImpl implements CiamsMenu1Sub1TabAService 
         return dataInfo;
     }
 
-    private void setChildren(CiamsMenu1Sub1TabADto.CiamsStatus parent, List<CiamsMenu1Sub1TabADto.CiamsStatus> allNodes) {
-        List<CiamsMenu1Sub1TabADto.CiamsStatus> children = allNodes.stream()
+    private void setChildren(Menu1Sub1TabADto.CiamsStatus parent, List<Menu1Sub1TabADto.CiamsStatus> allNodes) {
+        List<Menu1Sub1TabADto.CiamsStatus> children = allNodes.stream()
                 .filter(node -> parent.getId().equals(node.getParentId()))
                 .collect(Collectors.toList());
 
         parent.setChildren(children);
 
-        for (CiamsMenu1Sub1TabADto.CiamsStatus child : children) {
+        for (Menu1Sub1TabADto.CiamsStatus child : children) {
             setChildren(child, allNodes);
         }
     }

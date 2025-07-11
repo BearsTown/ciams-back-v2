@@ -1,12 +1,18 @@
 package com.uitgis.ciams.controller;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import com.uitgis.ciams.dto.CiamsMenu3Sub1DetailsDto;
-import com.uitgis.ciams.dto.CiamsPlanZoneDto;
+import com.uitgis.ciams.dto.CiamsConfigDto;
+import com.uitgis.ciams.dto.Menu3Sub1DetailsDto;
+import com.uitgis.ciams.enums.ActionTypeEnum;
+import com.uitgis.ciams.enums.MenuEnum;
+import com.uitgis.ciams.exception.CustomException;
+import com.uitgis.ciams.model.CiamsConfig;
+import com.uitgis.ciams.service.CiamsCommonService;
+import com.uitgis.ciams.service.CiamsConfigService;
+import com.uitgis.ciams.service.CiamsFileService;
 import com.uitgis.ciams.service.CiamsPlanZoneTestService;
+import com.uitgis.ciams.util.ValidUtil;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,18 +23,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.uitgis.ciams.dto.CiamsConfigDto;
-import com.uitgis.ciams.enums.ActionTypeEnum;
-import com.uitgis.ciams.enums.MenuEnum;
-import com.uitgis.ciams.exception.CustomException;
-import com.uitgis.ciams.model.CiamsConfig;
-import com.uitgis.ciams.service.CiamsCommonService;
-import com.uitgis.ciams.service.CiamsConfigService;
-import com.uitgis.ciams.service.CiamsFileService;
-import com.uitgis.ciams.util.ValidUtil;
-
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -43,8 +40,8 @@ public class CiamsConfigController {
 	private final CiamsCommonService ciamsCommonService;
 
 	@GetMapping("/test")
-	public ResponseEntity<CiamsMenu3Sub1DetailsDto.Overview.Find.Result> test(CiamsMenu3Sub1DetailsDto.Overview.Find.Params params) {
-		CiamsMenu3Sub1DetailsDto.Overview.Find.Result result = ciamsPlanZoneTestService.getMenu3Sub1OverView(params);
+	public ResponseEntity<Menu3Sub1DetailsDto.Info.Find.Result> test(Menu3Sub1DetailsDto.Info.Find.Params params) {
+		Menu3Sub1DetailsDto.Info.Find.Result result = ciamsPlanZoneTestService.getMenu3Sub1OverView(params);
 		return ResponseEntity.ok(result);
 	}
 

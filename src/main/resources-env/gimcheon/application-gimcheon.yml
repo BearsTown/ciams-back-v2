@@ -34,7 +34,7 @@ file:
     prefix: D:\uitgis\ciams\gimcheon\files
 
 mapstudio:
-  url: http://211.171.200.236:10701/mapstudio
+  url: http://211.171.200.236:11011/mapstudio
 
 --- # 개발 환경 (ubuntu - 211.171.200.236)
 spring:
@@ -63,7 +63,7 @@ file:
     prefix: /data/ciams/gimcheon/ciams/files
 
 mapstudio:
-  url: http://211.171.200.236:10701/mapstudio
+  url: http://211.171.200.236:11011/mapstudio
 
 --- # 운영 환경 (windows server - localhost)
 spring:

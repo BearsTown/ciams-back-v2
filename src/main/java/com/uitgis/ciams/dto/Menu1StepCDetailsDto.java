@@ -4,7 +4,7 @@ import com.uitgis.ciams.model.CiamsPlanArea;
 import lombok.Getter;
 import lombok.Setter;
 
-public class CiamsMenu1StepCDetailsDto {
+public class Menu1StepCDetailsDto {
 
     public static class Overview {
         public static class Find {

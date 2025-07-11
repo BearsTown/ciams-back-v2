@@ -1,8 +1,9 @@
 package com.uitgis.ciams.service;
 
-import com.uitgis.gis.dto.GisCiamsZoneDTO;
+import com.uitgis.ciams.dto.CiamsZoneDTO;
 
 public interface CiamsZoneService {
-	public GisCiamsZoneDTO.Search.Result getCiamsZoneList(GisCiamsZoneDTO.Search.Params params);
+	public CiamsZoneDTO.Search.Result getCiamsZoneList(CiamsZoneDTO.Search.Params params);
 
+	public CiamsZoneDTO.Overview.Find.Result getCiamsZoneOverView(CiamsZoneDTO.Overview.Find.Params params);
 }

@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @AllArgsConstructor
-public class CiamsMenu2ServiceImpl implements Menu2Service {
+public class Menu2ServiceImpl implements Menu2Service {
     private final GisMapper gismapper;
     private final CiamsDataMapper ciamsDataMapper;
     private final CiamsDataColumnMapper ciamsDataColumnMapper;

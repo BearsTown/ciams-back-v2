@@ -2,59 +2,5 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.uitgis.gis.mapper.GisMapper">
-    <sql id="ciamsAnalysis_column">
-        zone_name
-        , zone_no
-        , use_dist
-        , zone_area
-        , dvs_type
-        , dvs_no
-        , mng_type
-        , mng_no
-        , local_area
-        , local_cs
-        , base_cs_c
-        , density
-        , density_re
-        , past_cs_c
-        , variation
-        , varia_re
-        , sss_c
-        , sss_rate
-        , sss_re
-        , ita_result
-        , cs_b
-        , cs_b20
-        , deterio
-        , deterio_re
-        , road_a
-        , road_rate
-        , road_re
-        , loc_result
-        , division
-        , base_year
-        , past_year
-    </sql>
 
-    <sql id="ciamsAnalysis_where_search">
-        <trim prefix="WHERE" prefixOverrides="AND |OR ">
-            <!--<if test="planAreaId != null">AND plan_area_id = #{planAreaId} </if>-->
-            <if test="@com.uitgis.ciams.util.ValidUtil@notEmpty(name)">
-                <bind name="name" value="'%' + name + '%'"/>
-                OR zone_name like #{name}
-                OR use_dist like #{name}
-            </if>
-        </trim>
-    </sql>
-
-
-    <select id="selectMenu2Sub1OverView"
-            parameterType="com.uitgis.ciams.dto.Menu2ZoneDetailsDto$Overview$Find$Params"
-            resultType="com.uitgis.ciams.dto.Menu2ZoneDetailsDto$Overview$Find$Result">
-        SELECT
-        <include refid="ciamsAnalysis_column"/>
-        FROM ciams_analysis
-        WHERE zone_no = #{zoneNo}
-        LIMIT 1
-    </select>
 </mapper>

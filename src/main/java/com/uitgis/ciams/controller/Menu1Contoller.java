@@ -1,6 +1,6 @@
 package com.uitgis.ciams.controller;
 
-import com.uitgis.ciams.dto.CiamsMenu2Sub2Dto;
+import com.uitgis.ciams.dto.Menu2Sub2Dto;
 import com.uitgis.ciams.model.CiamsDataGroup;
 import com.uitgis.ciams.service.Menu1Service;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +29,7 @@ public class Menu1Contoller {
 
     @GetMapping("/config/{id}")
     public ResponseEntity<?> getDataConfig(@PathVariable("id") int dataGroupId) {
-        CiamsMenu2Sub2Dto.DataConfig result = menu1Service.getDataConfig(dataGroupId);
+        Menu2Sub2Dto.DataConfig result = menu1Service.getDataConfig(dataGroupId);
         return ResponseEntity.ok(result);
     }
 }
