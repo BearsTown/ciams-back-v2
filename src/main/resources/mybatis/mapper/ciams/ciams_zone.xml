@@ -59,8 +59,10 @@
         <trim prefix="WHERE" prefixOverrides="AND |OR ">
             <if test="@com.uitgis.ciams.util.ValidUtil@notEmpty(keyword)">
                 <bind name="keyword" value="'%' + keyword + '%'"/>
-                OR zone_name LIKE #{keyword}
-                OR use_dist LIKE #{keyword}
+                (
+                    zone_name LIKE #{keyword}
+                    OR use_dist LIKE #{keyword}
+                )
             </if>
             <if test="@com.uitgis.ciams.util.ValidUtil@notEmpty(itaReCd)">
                 AND ita_re_cd = #{itaReCd}
