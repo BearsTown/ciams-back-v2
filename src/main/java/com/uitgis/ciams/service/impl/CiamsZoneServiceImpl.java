@@ -1,6 +1,6 @@
 package com.uitgis.ciams.service.impl;
 
-import com.uitgis.ciams.dto.CiamsZoneDTO;
+import com.uitgis.ciams.dto.CiamsZoneDto;
 import com.uitgis.ciams.dto.PaginationDto;
 import com.uitgis.ciams.mapper.CiamsZoneMapper;
 import com.uitgis.ciams.service.CiamsZoneService;
@@ -17,15 +17,22 @@ import java.util.List;
 public class CiamsZoneServiceImpl implements CiamsZoneService {
 	private final CiamsZoneMapper ciamsZoneMapper;
 
+
+	/**
+	 * 대상지 목록
+	 *
+	 * @param params
+	 * @return
+	 */
 	@Override
-	public CiamsZoneDTO.Search.Result getCiamsZoneList(CiamsZoneDTO.Search.Params params) {
-		int totalCount = ciamsZoneMapper.selectCiamsZoneCount(params);
+	public CiamsZoneDto.Search.Result getCiamsZones(CiamsZoneDto.Search.Params params) {
+		int totalCount = ciamsZoneMapper.countCiamsZone(params);
 
 		PaginationDto page = PageUtil.setTotalCount(params, totalCount);
 
-		List<CiamsZoneDTO.Search.Row> rows = ciamsZoneMapper.selectCiamsZoneList(params);
+		List<CiamsZoneDto.Search.Row> rows = ciamsZoneMapper.findAllCiamsZones(params);
 
-		CiamsZoneDTO.Search.Result result = CiamsZoneDTO.Search.Result.builder()
+		CiamsZoneDto.Search.Result result = CiamsZoneDto.Search.Result.builder()
 				.page(page)
 				.list(rows)
 				.build();
@@ -33,9 +40,16 @@ public class CiamsZoneServiceImpl implements CiamsZoneService {
 		return result;
 	}
 
+
+	/**
+	 * 대상지 개요
+	 *
+	 * @param params
+	 * @return
+	 */
 	@Override
-	public CiamsZoneDTO.Overview.Find.Result getCiamsZoneOverView(CiamsZoneDTO.Overview.Find.Params params) {
-		return ciamsZoneMapper.selectCiamsZoneOverView(params);
+	public CiamsZoneDto.Overview.Find.Result getCiamsZoneOverView(CiamsZoneDto.Overview.Find.Params params) {
+		return ciamsZoneMapper.findCiamsZoneOverView(params);
 	}
 
 }

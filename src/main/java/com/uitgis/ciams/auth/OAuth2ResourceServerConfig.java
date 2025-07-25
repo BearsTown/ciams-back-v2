@@ -16,6 +16,7 @@ public class OAuth2ResourceServerConfig {
     private String resourceIds;
 
     private static final String[] PERMIT_ALL = {
+            "/kras",
             "/rsa/key",
             "/error/**",
             "/cmm/signUp",

@@ -28,9 +28,9 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 @RequestMapping("api/v1/codes")
 public class CiamsCodeController {
-
     private final CiamsCodeService ciamsCodeService;
     private final CiamsCommonService ciamsCommonService;
+
 
     @GetMapping("{code}")
     public ResponseEntity<?> getCode(@PathVariable String code) {
@@ -38,10 +38,11 @@ public class CiamsCodeController {
         return ResponseEntity.ok(result);
     }
 
+
     /**
      * 하위 코드 목록 조회.
      *
-     * @param parentId 상위 코드 아이디
+     * @param parentCode 상위 코드 아이디
      * @return 하위 코드 목록
      */
     @GetMapping("{parentCode}/child")
@@ -58,6 +59,7 @@ public class CiamsCodeController {
         return ResponseEntity.ok(result);
     }
 
+
     @PostMapping
     public ResponseEntity<?> addCode(@RequestBody CiamsCodeDto.Add add) throws Exception {
         ciamsCodeService.addCode(add);
@@ -69,6 +71,7 @@ public class CiamsCodeController {
         return ResponseEntity.ok(ciamsCode);
     }
 
+
     @PutMapping
     public ResponseEntity<?> modify(@RequestBody CiamsCodeDto.Modify mod) throws Exception {
         ciamsCodeService.modify(mod);
@@ -79,6 +82,7 @@ public class CiamsCodeController {
 
         return ResponseEntity.ok(ciamsCode);
     }
+
 
     @PutMapping("priority")
     public ResponseEntity<?> changeCodePriority(@RequestBody List<CiamsCodeDto.Modify> mod) throws Exception {
@@ -99,6 +103,7 @@ public class CiamsCodeController {
         return ResponseEntity.ok().build();
     }
 
+
     @DeleteMapping("{code}")
     public ResponseEntity<?> remove(@PathVariable String code) throws Exception {
 
@@ -109,9 +114,11 @@ public class CiamsCodeController {
         return ResponseEntity.ok().build();
     }
 
+
     @GetMapping("/sub")
     public ResponseEntity<?> selectCodeSublist(CiamsCodeDto.Sub sub) {
         List<CiamsCode> list = ciamsCodeService.selectCodeSublist(sub);
         return ResponseEntity.ok(list);
     }
+
 }

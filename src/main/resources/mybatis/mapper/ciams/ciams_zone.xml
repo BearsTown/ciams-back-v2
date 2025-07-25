@@ -80,7 +80,7 @@
     </sql>
 
 
-    <select id="selectCiamsZoneCount" parameterType="map" resultType="int">
+    <select id="countCiamsZone" parameterType="map" resultType="int">
         SELECT
         COUNT(zone_no)
         FROM ciams_zone
@@ -89,7 +89,7 @@
 
 
     <!-- 대상지 목록 -->
-    <select id="selectCiamsZoneList" parameterType="map" resultType="com.uitgis.ciams.dto.CiamsZoneDTO$Search$Row">
+    <select id="findAllCiamsZones" parameterType="map" resultType="com.uitgis.ciams.dto.CiamsZoneDto$Search$Row">
         <include refid="pagination.page_top"/>
         SELECT
         <include refid="ciams_zone_list_column"/>
@@ -101,13 +101,14 @@
 
 
     <!-- 대상지 개요 -->
-    <select id="selectCiamsZoneOverView"
-            parameterType="com.uitgis.ciams.dto.CiamsZoneDTO$Overview$Find$Params"
-            resultType="com.uitgis.ciams.dto.CiamsZoneDTO$Overview$Find$Result">
+    <select id="findCiamsZoneOverView"
+            parameterType="com.uitgis.ciams.dto.CiamsZoneDto$Overview$Find$Params"
+            resultType="com.uitgis.ciams.dto.CiamsZoneDto$Overview$Find$Result">
         SELECT
         <include refid="ciams_zone_column"/>
         FROM ciams_zone
         WHERE zone_no = #{zoneNo}
         LIMIT 1
     </select>
+
 </mapper>

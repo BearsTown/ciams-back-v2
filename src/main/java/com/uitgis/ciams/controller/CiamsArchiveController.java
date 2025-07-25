@@ -40,10 +40,10 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("api/v1/archive")
 @RestController
 public class CiamsArchiveController {
-
 	private final CiamsArchiveService ciamsArchiveService;
 	private final CiamsFileService ciamsFileService;
 	private final CiamsCommonService ciamsCommonService;
+
 
 	/**
 	 * 단건 조회
@@ -56,6 +56,7 @@ public class CiamsArchiveController {
 		return ResponseEntity.ok(archive);
 	}
 
+
 	/**
 	 * 파일 정보를 포함하는 다건 조회
 	 *
@@ -67,6 +68,7 @@ public class CiamsArchiveController {
 		return ResponseEntity.ok(list);
 
 	}
+
 
 	/**
 	 * 등록(관리자)
@@ -95,6 +97,7 @@ public class CiamsArchiveController {
 
 		return ResponseEntity.ok(result);
 	}
+
 
 	/**
 	 * 수정(관리자)
@@ -147,6 +150,7 @@ public class CiamsArchiveController {
 		return ResponseEntity.ok().build();
 	}
 
+
 	/**
 	 * 단건 삭제(관리자)
 	 */
@@ -162,6 +166,7 @@ public class CiamsArchiveController {
 
 		return ResponseEntity.ok(rtn > 0 ? true : false);
 	}
+
 
 	/**
 	 * 일괄 삭제. 데이터 삭제후 파일도 같이 삭제(관리자)

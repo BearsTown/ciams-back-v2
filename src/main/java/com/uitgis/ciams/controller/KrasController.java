@@ -17,7 +17,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -38,8 +37,8 @@ import java.util.concurrent.ThreadFactory;
 @RestController
 public class KrasController {
 	private final Executor executor;
-
 	private final KrasService krasService = new KrasService();
+
 
 	@Autowired
 	public KrasController(ServletContext servletContext) {
@@ -52,6 +51,7 @@ public class KrasController {
 			}
 		});
 	}
+
 
 	/**
 	 * KRAS 연계 데이터 조회.
@@ -71,6 +71,7 @@ public class KrasController {
 
 		return ResponseEntity.ok(resultDto);
 	}
+
 
 	@GetMapping
 	public ResponseEntity<?> all(@ModelAttribute CiamsKrasRequestDto krasReq, Principal principal) throws Exception {
@@ -96,6 +97,7 @@ public class KrasController {
 		return ResponseEntity.ok(result);
 	}
 
+
 	protected CompletableFuture<Object> getKrasDataBySvcId(@ModelAttribute CiamsKrasRequestDto krasReq, KrasSvcEnum svcId) {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
@@ -110,6 +112,7 @@ public class KrasController {
 		}, executor);
 	}
 
+
 	private boolean isSuccess(KrasResultHeader header) {
 		if (header.getCode().equals("0000")) {
 			return true;
@@ -118,4 +121,5 @@ public class KrasController {
 			return false;
 		}
 	}
+
 }

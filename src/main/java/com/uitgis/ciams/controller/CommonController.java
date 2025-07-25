@@ -27,6 +27,7 @@ public class CommonController {
 
 	private boolean krasLoading;
 
+
 	@GetMapping("/kras")
 	public ResponseEntity<?> renewalKrasData() throws Exception {
 		if (krasLoading) return ResponseEntity.ok("KRAS DATA LOADING...");
@@ -35,13 +36,15 @@ public class CommonController {
 		ciamsKrasService.renewalKrasData();
 		krasLoading = false;
 		log.info("Renewal Kras Data End");
-		return ResponseEntity.ok(null);
+		return ResponseEntity.ok("KRAS DATA END");
 	}
+
 
 	@GetMapping("/rsa/key")
 	public ResponseEntity<String> getRsaPublicKey() {
 		return ResponseEntity.ok(CipherUtil.getPublicKey());
 	}
+
 
 	@PostMapping("/cmm/signUp")
 	public ResponseEntity<?> addUser(@RequestBody CiamsSsoUserDto.Add dto) throws Exception{
@@ -56,4 +59,5 @@ public class CommonController {
 
 		return ResponseEntity.ok().build();
 	}
+
 }

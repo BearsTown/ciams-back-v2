@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.uitgis.ciams.mapper.basic.loc.status.DensityMapper">
+
+    <resultMap id="DensityResultMap" type="com.uitgis.ciams.dto.basic.loc.status.DensityDto$Density">
+        <result property="year" column="year"/>
+        <result property="image" column="image"/>
+        <result property="priority" column="priority"/>
+    </resultMap>
+
+    <resultMap id="DensityInfoResultMap" type="com.uitgis.ciams.dto.basic.loc.status.DensityDto$DensityInfo">
+        <id property="type" column="type"/>
+        <result property="notes" column="note" typeHandler="com.uitgis.ciams.dto.JsonToListTypeHandler"/>
+        <collection property="densities" ofType="com.uitgis.ciams.dto.basic.loc.status.DensityDto$Density" resultMap="DensityResultMap"/>
+    </resultMap>
+
+
+    <!-- 사업체 밀도변화 정보 -->
+    <select id="findDensityInfoByType" parameterType="string" resultMap="DensityInfoResultMap">
+        SELECT t1.type,
+               t1.note,
+               t2.year,
+               t2.image,
+               t2.priority
+        FROM ciams_density t1
+                 LEFT JOIN ciams_density_info t2
+                           ON t1.type = t2.type
+        WHERE t1.type = #{sggCd}
+        ORDER BY t1.type, t2.priority
+    </select>
+
+</mapper>

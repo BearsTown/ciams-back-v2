@@ -18,8 +18,6 @@ import lombok.ToString;
 @Builder
 @ToString
 public class KrasResultDto {
-
-
 	private String code;
 	private String message;
 
@@ -30,8 +28,7 @@ public class KrasResultDto {
 	@Getter
 	@Setter
 	@NoArgsConstructor
-	public static class ifAll{
-
+	public static class ifAll {
 		@Builder
 		public ifAll(KrasLandInfo krasLandInfo
 				, KrasOfficialLandPrice[] jigaList
@@ -49,4 +46,5 @@ public class KrasResultDto {
 		private KrasLandUsePlanLegend[] krasLandUsePlanLegends;
 		private KrasLandUsePlanRestrict[] landUsePlanRestrict;
 	}
+
 }

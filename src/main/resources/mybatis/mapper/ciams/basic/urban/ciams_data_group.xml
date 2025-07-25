@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.uitgis.ciams.mapper.basic.urban.CiamsDataGroupMapper">
+
+    <select id="findAllDataGroupsById"
+            parameterType="int"
+            resultType="com.uitgis.ciams.model.basic.urban.CiamsDataGroup">
+        SELECT
+            id,
+            name,
+            group_column,
+            use_none_column,
+            chart_axis,
+            priority
+        FROM ciams_data_group
+        WHERE parent_id = #{parentId}
+        ORDER BY priority
+    </select>
+
+</mapper>

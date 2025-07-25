@@ -20,11 +20,11 @@ public class CiamsDistServiceImpl implements CiamsDistService {
 
 	@Override
 	public GisCiamsDistDTO.Search.Result getCiamsDistList(GisCiamsDistDTO.Search.Params params) {
-		int totalCount = gisCiamsDistMapper.selectGisCiamsDistCount(params);
+		int totalCount = gisCiamsDistMapper.countGisCiamsDist(params);
 
 		PaginationDto page = PageUtil.setTotalCount(params, totalCount);
 
-		List<GisCiamsDistDTO.Search.Row> rows = gisCiamsDistMapper.selectGisCiamsDistList(params);
+		List<GisCiamsDistDTO.Search.Row> rows = gisCiamsDistMapper.findAllGisCiamsDists(params);
 
 		GisCiamsDistDTO.Search.Result result = GisCiamsDistDTO.Search.Result.builder()
 				.page(page)
@@ -33,4 +33,5 @@ public class CiamsDistServiceImpl implements CiamsDistService {
 
 		return result;
 	}
+	
 }

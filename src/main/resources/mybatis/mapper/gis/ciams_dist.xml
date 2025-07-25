@@ -17,7 +17,7 @@
         </trim>
     </sql>
 
-    <select id="selectGisCiamsDistCount" parameterType="map" resultType="int">
+    <select id="countGisCiamsDist" parameterType="map" resultType="int">
         SELECT
         COUNT(oid)
         FROM ciams_dist
@@ -25,7 +25,7 @@
     </select>
 
 
-    <select id="selectGisCiamsDistList" parameterType="map" resultType="com.uitgis.gis.dto.GisCiamsDistDTO$Search$Row">
+    <select id="findAllGisCiamsDists" parameterType="map" resultType="com.uitgis.gis.dto.GisCiamsDistDTO$Search$Row">
         <include refid="pagination.page_top"/>
         SELECT
         <include refid="ciams_dist_column"/>

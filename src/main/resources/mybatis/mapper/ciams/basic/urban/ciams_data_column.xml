@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.uitgis.ciams.mapper.basic.urban.CiamsDataColumnMapper">
+
+    <select id="findAllDataColumnsById"
+            parameterType="int"
+            resultType="com.uitgis.ciams.model.basic.urban.CiamsDataColumn">
+        SELECT
+            id,
+            name,
+            label,
+            shorts,
+            use_range,
+            start,
+            "end",
+            color,
+            priority
+        FROM ciams_data_column
+        WHERE data_group_id = #{dataGroupId}
+        ORDER BY priority
+    </select>
+
+</mapper>

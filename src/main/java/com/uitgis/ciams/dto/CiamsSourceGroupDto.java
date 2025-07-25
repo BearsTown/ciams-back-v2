@@ -14,7 +14,6 @@ import java.util.List;
 public class CiamsSourceGroupDto {
 
     public static class Find {
-
         @Getter
         @Setter
         @Builder
@@ -35,6 +34,7 @@ public class CiamsSourceGroupDto {
         }
     }
 
+
     @Getter
     @Setter
     public static class SourceDTO {
@@ -43,4 +43,5 @@ public class CiamsSourceGroupDto {
         private Integer priority;
         private CiamsSource source;
     }
+
 }

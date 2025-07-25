@@ -8,6 +8,7 @@ import lombok.Setter;
 import org.springframework.web.multipart.MultipartFile;
 
 public class UploadDataDto {
+
     @Getter
     @Setter
     @NoArgsConstructor
@@ -26,4 +27,5 @@ public class UploadDataDto {
         // reverse는 WGS84(GRS80)에서 Bessel 타원체로의 변환 파라메터가 자동 추가되 타원체 변환을 수행함..
         private String badekas; // 세계 측지계 변환 여부
     }
+
 }

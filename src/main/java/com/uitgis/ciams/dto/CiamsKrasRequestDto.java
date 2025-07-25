@@ -13,7 +13,4 @@ import lombok.Setter;
 @AllArgsConstructor
 public class CiamsKrasRequestDto {
     private String pnu;
-//    private String url;
-//    private String key;
-//    private Boolean isProd;
 }

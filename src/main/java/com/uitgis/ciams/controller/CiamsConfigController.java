@@ -1,7 +1,6 @@
 package com.uitgis.ciams.controller;
 
 import com.uitgis.ciams.dto.CiamsConfigDto;
-import com.uitgis.ciams.dto.Menu3Sub1DetailsDto;
 import com.uitgis.ciams.enums.ActionTypeEnum;
 import com.uitgis.ciams.enums.MenuEnum;
 import com.uitgis.ciams.exception.CustomException;
@@ -9,7 +8,6 @@ import com.uitgis.ciams.model.CiamsConfig;
 import com.uitgis.ciams.service.CiamsCommonService;
 import com.uitgis.ciams.service.CiamsConfigService;
 import com.uitgis.ciams.service.CiamsFileService;
-import com.uitgis.ciams.service.CiamsPlanZoneTestService;
 import com.uitgis.ciams.util.ValidUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,18 +30,10 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("api/v1/config")
 public class CiamsConfigController {
-
-	private final CiamsPlanZoneTestService ciamsPlanZoneTestService;
-
-	private final CiamsConfigService ciamsConfigService;
 	private final CiamsFileService ciamsFileService;
+	private final CiamsConfigService ciamsConfigService;
 	private final CiamsCommonService ciamsCommonService;
 
-	@GetMapping("/test")
-	public ResponseEntity<Menu3Sub1DetailsDto.Info.Find.Result> test(Menu3Sub1DetailsDto.Info.Find.Params params) {
-		Menu3Sub1DetailsDto.Info.Find.Result result = ciamsPlanZoneTestService.getMenu3Sub1OverView(params);
-		return ResponseEntity.ok(result);
-	}
 
 	@GetMapping
 	public ResponseEntity<List<CiamsConfigDto.WithFile>> list(CiamsConfigDto.Find param) {
@@ -52,11 +42,13 @@ public class CiamsConfigController {
 		return ResponseEntity.ok(list);
 	}
 
+
 	@GetMapping("types")
 	public ResponseEntity<List<CiamsConfigDto.WithFile>> getConfigTypes(){
 		List<CiamsConfigDto.WithFile> configTypes= ciamsConfigService.getConfigTypeList();
 		return ResponseEntity.ok(configTypes);
 	}
+
 
 	@GetMapping("{id}")
 	public ResponseEntity<CiamsConfig> getConfig(@PathVariable String id) throws CustomException {
@@ -66,6 +58,7 @@ public class CiamsConfigController {
 
 		return ResponseEntity.ok(ciamsConfig);
 	}
+
 
 	@PostMapping
 	public ResponseEntity<CiamsConfig> add(CiamsConfigDto.Add param) throws Exception {
@@ -83,6 +76,7 @@ public class CiamsConfigController {
 
 		return ResponseEntity.ok(ciamsConfig);
 	}
+
 
 	@PutMapping("{id}")
 	public ResponseEntity<CiamsConfig> modify(@PathVariable String id, CiamsConfigDto.Modify param) throws Exception {
@@ -109,6 +103,7 @@ public class CiamsConfigController {
 
 		return ResponseEntity.ok(ciamsConfig);
 	}
+
 
 	@DeleteMapping("{id}")
 	public ResponseEntity<?> remove(@PathVariable String id) throws Exception {
@@ -137,4 +132,5 @@ public class CiamsConfigController {
 
 		return ResponseEntity.ok(true);
 	}
+
 }

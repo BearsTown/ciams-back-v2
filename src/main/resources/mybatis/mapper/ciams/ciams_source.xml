@@ -3,23 +3,6 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.uitgis.ciams.mapper.CiamsSourceMapper">
 
-<!--    <resultMap id="SourcesResultMap" type="com.uitgis.ciams.dto.CiamsSourceGroupDto$Find$Result">-->
-<!--        <id property="id" column="id" />-->
-<!--        <result property="category" column="category" />-->
-<!--        <result property="targetId" column="target_id" />-->
-<!--        <result property="targetDesc" column="target_desc" />-->
-<!--        <result property="sourceId" column="source_id" />-->
-<!--        <result property="timePoint" column="time_point" />-->
-<!--        <result property="priority" column="priority" />-->
-<!--        <association property="sources" javaType="com.uitgis.ciams.model.CiamsSource">-->
-<!--            <id property="id" column="source_id" />-->
-<!--            <result property="sourceOrgan" column="source_organ" />-->
-<!--            <result property="sourceService" column="source_service" />-->
-<!--            <result property="title" column="title" />-->
-<!--            <result property="sub" column="sub" />-->
-<!--        </association>-->
-<!--    </resultMap>-->
-
     <resultMap id="SourcesResultMap" type="com.uitgis.ciams.dto.CiamsSourceGroupDto$Find$Result">
         <id property="targetId" column="target_id"/>
         <result property="category" column="category"/>
@@ -41,7 +24,8 @@
         </collection>
     </resultMap>
 
-    <select id="selectSources" parameterType="com.uitgis.ciams.dto.CiamsSourceGroupDto$Find$Params" resultMap="SourcesResultMap">
+
+    <select id="findAllSources" parameterType="com.uitgis.ciams.dto.CiamsSourceGroupDto$Find$Params" resultMap="SourcesResultMap">
         SELECT
             csg.id,
             csg.category,

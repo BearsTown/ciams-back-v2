@@ -7,7 +7,7 @@ import java.util.List;
 
 @Mapper
 public interface GisCiamsDistMapper {
-	public int selectGisCiamsDistCount(GisCiamsDistDTO.Search.Params params);
+	int countGisCiamsDist(GisCiamsDistDTO.Search.Params params);
 
-	public List<GisCiamsDistDTO.Search.Row> selectGisCiamsDistList(GisCiamsDistDTO.Search.Params params);
+	List<GisCiamsDistDTO.Search.Row> findAllGisCiamsDists(GisCiamsDistDTO.Search.Params params);
 }

@@ -12,6 +12,7 @@ import java.util.List;
 @Getter
 @Setter
 public class GisCiamsZoneDTO {
+
     public static class Search {
 
         @Getter
@@ -53,6 +54,7 @@ public class GisCiamsZoneDTO {
 
         }
     }
+
 }
 
 

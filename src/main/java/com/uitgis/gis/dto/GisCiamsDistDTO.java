@@ -12,6 +12,7 @@ import java.util.List;
 @Getter
 @Setter
 public class GisCiamsDistDTO {
+
     public static class Search {
 
         @Getter
@@ -40,6 +41,7 @@ public class GisCiamsDistDTO {
         }
     }
 
+
     public static class Details {
         @Getter
         @Setter
@@ -47,6 +49,7 @@ public class GisCiamsDistDTO {
 
         }
     }
+
 }
 
 

@@ -1,15 +1,35 @@
 package com.uitgis.ciams.mapper;
 
-import com.uitgis.ciams.dto.CiamsZoneDTO;
+import com.uitgis.ciams.dto.CiamsZoneDto;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
 
 @Mapper
 public interface CiamsZoneMapper {
-    public int selectCiamsZoneCount(CiamsZoneDTO.Search.Params params);
+    /**
+     * 대상지 목록
+     *
+     * @param params
+     * @return
+     */
+    int countCiamsZone(CiamsZoneDto.Search.Params params);
 
-    public List<CiamsZoneDTO.Search.Row> selectCiamsZoneList(CiamsZoneDTO.Search.Params params);
 
-    public CiamsZoneDTO.Overview.Find.Result selectCiamsZoneOverView(CiamsZoneDTO.Overview.Find.Params params);
+    /**
+     * 대상지 목록
+     *
+     * @param params
+     * @return
+     */
+    List<CiamsZoneDto.Search.Row> findAllCiamsZones(CiamsZoneDto.Search.Params params);
+
+
+    /**
+     * 대상지 개요
+     *
+     * @param params
+     * @return
+     */
+    CiamsZoneDto.Overview.Find.Result findCiamsZoneOverView(CiamsZoneDto.Overview.Find.Params params);
 }

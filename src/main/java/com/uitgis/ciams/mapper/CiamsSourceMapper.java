@@ -7,5 +7,11 @@ import java.util.List;
 
 @Mapper
 public interface CiamsSourceMapper {
-    public List<CiamsSourceGroupDto.Find.Result> selectSources(CiamsSourceGroupDto.Find.Params params);
+    /**
+     * 출처 목록
+     *
+     * @param params
+     * @return
+     */
+    List<CiamsSourceGroupDto.Find.Result> findAllSources(CiamsSourceGroupDto.Find.Params params);
 }

@@ -35,6 +35,7 @@ import java.util.concurrent.ExecutionException;
 public class KgeoController {
     private final KGeoService kgeoService = new KGeoService();
 
+
     @PostMapping("{service}")
     public ResponseEntity<?> getKgeoServiceData(@PathVariable String service, @RequestBody Map<String, Object> params) {
         AbstractApiResponse<IApiResult> response = null;
@@ -90,9 +91,11 @@ public class KgeoController {
         return ResponseEntity.ok(result);
     }
 
+
     private CompletableFuture<IApiResponse> getKgeoData(KGeoType kGeoType, Map<String, Object> request) throws Exception {
         return getKgeoData(kGeoType, KGeoUtil.convertRequestMapToDto(kGeoType, request));
     }
+
 
     private CompletableFuture<IApiResponse> getKgeoData(KGeoType kGeoType, IApiRequest request) {
         return CompletableFuture.supplyAsync(() -> {
@@ -106,6 +109,7 @@ public class KgeoController {
         });
     }
 
+
     private void put(KGeoType kGeoType, CompletableFuture<IApiResponse> cf, Map<String, IApiResult> result) throws ExecutionException, InterruptedException {
         AbstractApiResponse<IApiResult> response = (AbstractApiResponse<IApiResult>) cf.get();
 
@@ -113,4 +117,5 @@ public class KgeoController {
             result.put(kGeoType.name(), response.getResult());
         }
     }
+
 }
