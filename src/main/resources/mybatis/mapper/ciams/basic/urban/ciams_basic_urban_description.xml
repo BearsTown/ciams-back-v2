@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.uitgis.ciams.mapper.basic.urban.CiamsBasicUrbanDescriptionMapper">
+
+    <!-- 노트 목록 -->
+    <select id="findAllNotes" parameterType="com.uitgis.ciams.dto.basic.urban.CiamsBasicUrbanDto$Info$Find$Params"
+            resultType="com.uitgis.ciams.model.basic.urban.CiamsBasicUrbanDescription">
+        SELECT id
+             , category
+             , data_group_id
+             , target_id
+             , description
+             , priority
+        FROM ciams_basic_urban_description
+        WHERE data_group_id = #{dataGroupId}
+          AND target_id = #{targetId}
+        ORDER BY priority
+    </select>
+
+</mapper>

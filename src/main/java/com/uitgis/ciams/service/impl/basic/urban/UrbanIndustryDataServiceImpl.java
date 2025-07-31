@@ -1,6 +1,8 @@
 package com.uitgis.ciams.service.impl.basic.urban;
 
+import com.uitgis.ciams.dto.basic.urban.CiamsBasicUrbanDto;
 import com.uitgis.ciams.dto.basic.urban.UrbanIndustryDto;
+import com.uitgis.ciams.mapper.basic.urban.CiamsBasicUrbanDescriptionMapper;
 import com.uitgis.ciams.mapper.basic.urban.CiamsDataAttributeMapper;
 import com.uitgis.ciams.mapper.basic.urban.CiamsDataColumnMapper;
 import com.uitgis.ciams.mapper.basic.urban.CiamsDataGroupMapper;
@@ -19,6 +21,7 @@ public class UrbanIndustryDataServiceImpl implements UrbanIndustryDataService {
     private final CiamsDataGroupMapper ciamsDataGroupMapper;
     private final CiamsDataColumnMapper ciamsDataColumnMapper;
     private final CiamsDataAttributeMapper ciamsDataAttributeMapper;
+    private final CiamsBasicUrbanDescriptionMapper ciamsBasicUrbanDescriptionMapper;
 
 
     /**
@@ -41,12 +44,19 @@ public class UrbanIndustryDataServiceImpl implements UrbanIndustryDataService {
      */
     @Override
     public UrbanIndustryDto.MetaData getMetaData(int dataGroupId) {
-        UrbanIndustryDto.MetaData metaData = UrbanIndustryDto.MetaData.builder()
+        return UrbanIndustryDto.MetaData.builder()
                 .years(ciamsDataMapper.findAllDataById(dataGroupId))
                 .columns(ciamsDataColumnMapper.findAllDataColumnsById(dataGroupId))
                 .attributes(ciamsDataAttributeMapper.findAllDataAttributesById(dataGroupId))
                 .build();
-        return metaData;
+    }
+
+
+    @Override
+    public CiamsBasicUrbanDto.Info.Find.Result getDataInfo(CiamsBasicUrbanDto.Info.Find.Params params) {
+        return CiamsBasicUrbanDto.Info.Find.Result.builder()
+                .descriptions(ciamsBasicUrbanDescriptionMapper.findAllNotes(params))
+                .build();
     }
 
 }

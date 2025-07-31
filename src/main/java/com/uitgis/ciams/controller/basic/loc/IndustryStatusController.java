@@ -52,7 +52,7 @@ public class IndustryStatusController {
      * @param type
      * @return
      */
-    @GetMapping("/density/{type}")
+    @GetMapping("/density/{type}/info")
     public ResponseEntity<DensityDto.DensityInfo> getDensityInfo(@PathVariable("type") String type) {
         DensityDto.DensityInfo result = densityService.getDensityInfo(type);
         return ResponseEntity.ok(result);

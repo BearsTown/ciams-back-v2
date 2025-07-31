@@ -2,10 +2,12 @@ package com.uitgis.ciams.service.impl.basic.loc.characteristic;
 
 import com.uitgis.ciams.dto.CiamsSourceGroupDto;
 import com.uitgis.ciams.dto.PaginationDto;
+import com.uitgis.ciams.dto.basic.loc.CiamsBasicLocDescriptionDto;
 import com.uitgis.ciams.dto.basic.loc.characteristic.CharResultDto;
 import com.uitgis.ciams.dto.basic.loc.characteristic.ItaDto;
 import com.uitgis.ciams.dto.basic.loc.characteristic.StatusDto;
 import com.uitgis.ciams.mapper.CiamsSourceMapper;
+import com.uitgis.ciams.mapper.basic.loc.CiamsBasicLocDescriptionMapper;
 import com.uitgis.ciams.mapper.basic.loc.characteristic.ITAMapper;
 import com.uitgis.ciams.service.basic.loc.characteristic.ITAService;
 import com.uitgis.ciams.util.PageUtil;
@@ -21,6 +23,9 @@ import java.util.List;
 public class ITAServiceImpl implements ITAService {
     private final ITAMapper ITAMapper;
     private final CiamsSourceMapper ciamsSourceMapper;
+    private final CiamsBasicLocDescriptionMapper ciamsBasicLocDescriptionMapper;
+
+    private final String Category = "산업특성분석";
 
     /**
      * 산업기반분석
@@ -29,19 +34,25 @@ public class ITAServiceImpl implements ITAService {
      */
     @Override
     public ItaDto.Info.Find.Result getItaInfo() {
+        String type = "산업기반분석";
+
         CiamsSourceGroupDto.Find.Params sourcesParams = CiamsSourceGroupDto.Find.Params
                 .builder()
-                .category("산업특성분석")
-                .targetId("산업기반분석")
+                .category(Category)
+                .targetId(type)
                 .build();
 
-        ItaDto.Info.Find.Result result = ItaDto.Info.Find.Result
+        CiamsBasicLocDescriptionDto.Find.Params descParams = CiamsBasicLocDescriptionDto.Find.Params
                 .builder()
-                // notes
-                .sources(ciamsSourceMapper.findAllSources(sourcesParams))
+                .category(Category)
+                .type(type)
                 .build();
 
-        return result;
+        return ItaDto.Info.Find.Result
+                .builder()
+                .sources(ciamsSourceMapper.findAllSources(sourcesParams))
+                .descriptions(ciamsBasicLocDescriptionMapper.findAllNotes(descParams))
+                .build();
     }
 
 
@@ -59,12 +70,10 @@ public class ITAServiceImpl implements ITAService {
 
         List<ItaDto.Data.Search.Row> rows = ITAMapper.findAllItaDatas(params);
 
-        ItaDto.Data.Search.Result result = ItaDto.Data.Search.Result.builder()
+        return ItaDto.Data.Search.Result.builder()
                 .page(page)
                 .list(rows)
                 .build();
-
-        return result;
     }
 
 
@@ -78,14 +87,21 @@ public class ITAServiceImpl implements ITAService {
     public StatusDto.IndustryStatus.Find.Result getIndustryStatus(StatusDto.IndustryStatus.Find.Params params) {
         CiamsSourceGroupDto.Find.Params sourcesParams = CiamsSourceGroupDto.Find.Params
                 .builder()
-                .category("산업특성분석")
+                .category(Category)
                 .targetId(params.getType())
+                .build();
+
+        CiamsBasicLocDescriptionDto.Find.Params descParams = CiamsBasicLocDescriptionDto.Find.Params
+                .builder()
+                .category(Category)
+                .type(params.getType())
                 .build();
 
         return StatusDto.IndustryStatus.Find.Result
                 .builder()
-                .sources(ciamsSourceMapper.findAllSources(sourcesParams))
                 .industryReps(ITAMapper.findAllIndustryReps(params))
+                .sources(ciamsSourceMapper.findAllSources(sourcesParams))
+                .descriptions(ciamsBasicLocDescriptionMapper.findAllNotes(descParams))
                 .build();
     }
 
@@ -104,12 +120,10 @@ public class ITAServiceImpl implements ITAService {
 
         List<CharResultDto.Char.Search.Row> rows = ITAMapper.findAllItaResultDatas(params);
 
-        CharResultDto.Char.Search.Result result = CharResultDto.Char.Search.Result.builder()
+        return CharResultDto.Char.Search.Result.builder()
                 .page(page)
                 .list(rows)
                 .build();
-
-        return result;
     }
 
 

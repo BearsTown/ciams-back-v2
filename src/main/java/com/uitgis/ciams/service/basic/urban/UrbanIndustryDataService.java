@@ -1,5 +1,6 @@
 package com.uitgis.ciams.service.basic.urban;
 
+import com.uitgis.ciams.dto.basic.urban.CiamsBasicUrbanDto;
 import com.uitgis.ciams.dto.basic.urban.UrbanIndustryDto;
 import com.uitgis.ciams.model.basic.urban.CiamsDataGroup;
 
@@ -9,4 +10,6 @@ public interface UrbanIndustryDataService {
     List<CiamsDataGroup> getDataGroups(int parentId);
 
     UrbanIndustryDto.MetaData getMetaData(int dataGroupId);
+
+    CiamsBasicUrbanDto.Info.Find.Result getDataInfo(CiamsBasicUrbanDto.Info.Find.Params params);
 }

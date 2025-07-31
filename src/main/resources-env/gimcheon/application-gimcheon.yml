@@ -92,6 +92,6 @@ file:
     prefix: D:\project\ciams\files
 
 mapstudio:
-  url: http://111.3.11.67:11001/mapstudio
+  url: http://111.3.11.67:40880/mapstudio
 
 ---

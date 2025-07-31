@@ -1,5 +1,7 @@
 package com.uitgis.ciams.dto.basic.loc.status;
 
+import com.uitgis.ciams.dto.CiamsSourceGroupDto;
+import com.uitgis.ciams.model.basic.loc.CiamsBasicLocDescription;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -12,6 +14,7 @@ public class ManufacturingDto {
         @Getter
         @Setter
         public static class Params {
+            private String type;
             private String category;
         }
     }
@@ -21,10 +24,11 @@ public class ManufacturingDto {
     @Setter
     @Builder
     public static class Info {
-        private List<String> notes;
         private List<Status> statuses;
         private List<Density> densities;
         private List<Increase> increases;
+        private List<CiamsBasicLocDescription> descriptions;
+        private List<CiamsSourceGroupDto.Find.Result> sources;
     }
 
 
@@ -73,6 +77,8 @@ public class ManufacturingDto {
         public static class Info {
             private List<CategoryStatus.Status> statuses;
             private List<CategoryStatus.CategoryGroup> categoryGroups;
+            private List<CiamsBasicLocDescription> descriptions;
+            private List<CiamsSourceGroupDto.Find.Result> sources;
         }
 
         @Getter

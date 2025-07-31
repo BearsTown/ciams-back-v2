@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.uitgis.ciams.mapper.basic.loc.status.DensityMapper">
+
+    <!-- 사업체 밀도변화 정보 -->
+    <select id="findDensityByType" parameterType="string"
+            resultType="com.uitgis.ciams.dto.basic.loc.status.DensityDto$Density">
+        SELECT type
+             , year
+             , image
+             , priority
+        FROM ciams_basic_loc_density
+        WHERE type = #{type}
+        ORDER by priority
+    </select>
+
+</mapper>

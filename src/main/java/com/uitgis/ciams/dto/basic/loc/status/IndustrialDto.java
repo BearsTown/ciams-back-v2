@@ -1,5 +1,7 @@
 package com.uitgis.ciams.dto.basic.loc.status;
 
+import com.uitgis.ciams.dto.CiamsSourceGroupDto;
+import com.uitgis.ciams.model.basic.loc.CiamsBasicLocDescription;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -12,6 +14,7 @@ public class IndustrialDto {
         @Getter
         @Setter
         public static class Params {
+            private String type;
             private String category;
         }
     }
@@ -21,9 +24,10 @@ public class IndustrialDto {
     @Setter
     @Builder
     public static class Info {
-        private List<String> notes;
         private List<Status> statuses;
         private List<Density> densities;
+        private List<CiamsBasicLocDescription> descriptions;
+        private List<CiamsSourceGroupDto.Find.Result> sources;
     }
 
 

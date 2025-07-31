@@ -1,6 +1,10 @@
 package com.uitgis.ciams.service.impl.basic.loc.status;
 
+import com.uitgis.ciams.dto.CiamsSourceGroupDto;
+import com.uitgis.ciams.dto.basic.loc.CiamsBasicLocDescriptionDto;
 import com.uitgis.ciams.dto.basic.loc.status.DensityDto;
+import com.uitgis.ciams.mapper.CiamsSourceMapper;
+import com.uitgis.ciams.mapper.basic.loc.CiamsBasicLocDescriptionMapper;
 import com.uitgis.ciams.mapper.basic.loc.status.DensityMapper;
 import com.uitgis.ciams.service.basic.loc.status.DensityService;
 import lombok.RequiredArgsConstructor;
@@ -12,7 +16,11 @@ import org.springframework.stereotype.Service;
 @Service
 public class DensityServiceImpl implements DensityService {
 	private final DensityMapper densityMapper;
+	private final CiamsSourceMapper ciamsSourceMapper;
+	private final CiamsBasicLocDescriptionMapper ciamsBasicLocDescriptionMapper;
 
+
+	private final String Category = "산업현황분석";
 
 	/**
 	 * 사업체 밀도변화 정보
@@ -22,7 +30,24 @@ public class DensityServiceImpl implements DensityService {
 	 */
 	@Override
 	public DensityDto.DensityInfo getDensityInfo(String type) {
-		return densityMapper.findDensityInfoByType(type);
+		CiamsSourceGroupDto.Find.Params sourcesParams = CiamsSourceGroupDto.Find.Params
+				.builder()
+				.category(Category)
+				.targetId(type)
+				.build();
+
+		CiamsBasicLocDescriptionDto.Find.Params descParams = CiamsBasicLocDescriptionDto.Find.Params
+				.builder()
+				.category(Category)
+				.type(type)
+				.build();
+
+		return DensityDto.DensityInfo
+				.builder()
+				.densities(densityMapper.findDensityByType(type))
+				.sources(ciamsSourceMapper.findAllSources(sourcesParams))
+				.descriptions(ciamsBasicLocDescriptionMapper.findAllNotes(descParams))
+				.build();
 	}
 
 }

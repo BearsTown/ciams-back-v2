@@ -1,6 +1,7 @@
 package com.uitgis.ciams.dto.basic.loc.characteristic;
 
 import com.uitgis.ciams.dto.CiamsSourceGroupDto;
+import com.uitgis.ciams.model.basic.loc.CiamsBasicLocDescription;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -24,6 +25,7 @@ public class StatusDto {
                 // image
                 // notes
                 private List<IndustryRep> industryReps;
+                private List<CiamsBasicLocDescription> descriptions;
                 private List<CiamsSourceGroupDto.Find.Result> sources;
             }
         }
