@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.uitgis.ciams.user.mapper.classifyAnalysis.ClassComprehensiveMapper">
+    <sql id="ciamsAnalysis_column">
+        zone_name
+        , zone_no
+        , use_dist
+        , zone_area
+        , dvs_type
+        , dvs_no
+        , mng_type
+        , mng_no
+        , local_area
+        , local_cs
+        , base_cs_c
+        , density
+        , density_re
+        , past_cs_c
+        , variation
+        , varia_re
+        , sss_c
+        , sss_rate
+        , sss_re
+        , ita_result
+        , cs_b
+        , cs_b20
+        , deterio
+        , deterio_re
+        , road_a
+        , road_rate
+        , road_re
+        , loc_result
+        , division
+        , base_year
+        , past_year
+    </sql>
+
+    <resultMap id="info" type="com.uitgis.ciams.user.dto.classifyAnalysis.comprehensive.ClassComprehensiveDto$Info">
+        <result property="zoneNo" column="zone_no"/>
+        <result property="zoneName" column="zone_name"/>
+        <result property="mngType" column="mng_type"/>
+
+        <collection property="descs" ofType="com.uitgis.ciams.user.dto.classifyAnalysis.comprehensive.ClassComprehensiveDto$BaseDescDTO"
+                    columnPrefix="desc_">
+            <id column="category"/>
+
+            <result property="category" column="category"/>
+            <collection property="list" ofType="string">
+                <result column="description"/>
+            </collection>
+        </collection>
+
+        <collection property="industries" ofType="com.uitgis.ciams.user.dto.classifyAnalysis.comprehensive.ClassComprehensiveDto$IndustryDTO"
+                    columnPrefix="industry_">
+            <id column="category"/>
+
+            <result property="category" column="category"/>
+            <collection property="list" ofType="com.uitgis.ciams.model.CiamsPlanZoneIndustry">
+                <result property="industryCode" column="code"/>
+                <result property="industryName" column="name"/>
+            </collection>
+        </collection>
+
+        <collection property="images" ofType="com.uitgis.ciams.user.dto.classifyAnalysis.comprehensive.ClassComprehensiveDto$ImageDTO"
+                    columnPrefix="image_">
+            <id column="category"/>
+
+            <result property="category" column="category"/>
+            <collection property="list" ofType="com.uitgis.ciams.model.CiamsPlanZoneImage">
+                <result property="id" column="id"/>
+                <result property="title" column="title"/>
+                <result property="name" column="name"/>
+            </collection>
+        </collection>
+    </resultMap>
+
+
+    <sql id="ciamsAnalysis_where_search">
+        <trim prefix="WHERE" prefixOverrides="AND |OR ">
+            <!--<if test="planAreaId != null">AND plan_area_id = #{planAreaId} </if>-->
+            <if test="@com.uitgis.ciams.util.ValidUtil@notEmpty(name)">
+                <bind name="name" value="'%' + name + '%'"/>
+                OR zone_name like #{name}w
+                OR use_dist like #{name}
+            </if>
+        </trim>
+    </sql>
+
+
+    <select id="selectMenu2Sub4OverView"
+            parameterType="com.uitgis.ciams.user.dto.classifyAnalysis.comprehensive.ClassComprehensiveDto$Overview$Find$Params"
+            resultType="com.uitgis.ciams.user.dto.classifyAnalysis.comprehensive.ClassComprehensiveDto$Overview$Find$Result">
+        SELECT
+        <include refid="ciamsAnalysis_column"/>
+        FROM ciams_zone
+        WHERE zone_no = #{zoneNo}
+        LIMIT 1
+    </select>
+
+
+    <select id="findComprehensiveInfoById" parameterType="string" resultMap="info">
+        SELECT z.zone_no,
+               z.zone_name,
+               dsc.category                            as desc_category,
+               dsc.description                         as desc_description,
+               industry.category                       as industry_category,
+               industry.industry_code                  as industry_code,
+               get_cd_nm(industry.industry_code, null) as industry_name,
+               image.id                                as image_id,
+               image.category                          as image_category,
+               image.title                             as image_title,
+               image.name                              as image_name
+        FROM ciams_zone z
+                 LEFT OUTER JOIN ciams_analysis_description dsc ON z.zone_no = dsc.zone_no
+                 LEFT OUTER JOIN ciams_analysis_image image ON z.zone_no = image.zone_no
+                 LEFT OUTER JOIN ciams_analysis_industry industry ON z.zone_no = industry.zone_no
+        WHERE z.zone_no = #{zoneNo}
+        ORDER BY dsc.category, industry.category, industry.industry_code
+    </select>
+
+
+    <select id="selectImage" parameterType="int">
+        SELECT zone_no
+             , category
+             , title
+             , path
+             , name
+             , create_date
+        FROM ciams_analysis_image
+        WHERE id = #{id}
+    </select>
+
+</mapper>

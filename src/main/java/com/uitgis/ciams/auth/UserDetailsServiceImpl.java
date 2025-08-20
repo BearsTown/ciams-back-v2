@@ -1,8 +1,8 @@
 package com.uitgis.ciams.auth;
 
-import com.uitgis.ciams.dto.CiamsSsoUserDto;
+import com.uitgis.ciams.user.dto.CiamsSsoUserDto;
 import com.uitgis.ciams.enums.RoleEnum;
-import com.uitgis.ciams.mapper.CiamsSsoUserMapper;
+import com.uitgis.ciams.user.mapper.CiamsSsoUserMapper;
 import com.uitgis.ciams.model.CiamsSsoUser;
 import com.uitgis.ciams.model.OAuth2UserDetails;
 import lombok.RequiredArgsConstructor;

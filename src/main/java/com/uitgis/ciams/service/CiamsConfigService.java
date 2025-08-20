@@ -3,7 +3,7 @@ package com.uitgis.ciams.service;
 import java.util.List;
 import java.util.Optional;
 
-import com.uitgis.ciams.dto.CiamsConfigDto;
+import com.uitgis.ciams.user.dto.CiamsConfigDto;
 
 public interface CiamsConfigService {
 

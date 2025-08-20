@@ -22,8 +22,7 @@ public class OAuth2ResourceServerConfig {
             "/cmm/signUp",
             "/api/v1/login/**",
             "/api/v1/config/**",
-            "/api/v1/file/**",
-            "/api/v1/plan/area/list",
+            "/api/v1/file/**"
     };
 
     @Bean

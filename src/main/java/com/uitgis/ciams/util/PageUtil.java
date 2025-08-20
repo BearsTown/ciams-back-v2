@@ -1,6 +1,6 @@
 package com.uitgis.ciams.util;
 
-import com.uitgis.ciams.dto.PaginationDto;
+import com.uitgis.ciams.user.dto.PaginationDto;
 
 public class PageUtil {
     public static PaginationDto setTotalCount(PaginationDto pageDto, int total) {

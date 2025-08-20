@@ -4,10 +4,10 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.uitgis.ciams.dto.CiamsAccessDto;
-import com.uitgis.ciams.dto.CiamsAccessDto.Add;
-import com.uitgis.ciams.dto.CiamsAccessDto.UserResult;
-import com.uitgis.ciams.mapper.CiamsAccessMapper;
+import com.uitgis.ciams.user.dto.CiamsAccessDto;
+import com.uitgis.ciams.user.dto.CiamsAccessDto.Add;
+import com.uitgis.ciams.user.dto.CiamsAccessDto.UserResult;
+import com.uitgis.ciams.user.mapper.CiamsAccessMapper;
 import com.uitgis.ciams.model.CiamsAccessRoleLink;
 import com.uitgis.ciams.model.CiamsAccessUserLink;
 import com.uitgis.ciams.service.CiamsAccessService;

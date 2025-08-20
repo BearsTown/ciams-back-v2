@@ -94,7 +94,6 @@ public class OAuth2AuthorizationServerConfig {
 			"/api/v1/login/**",
 			"/api/v1/config/**",
 			"/api/v1/file/down/**",
-			"/api/v1/plan/area/list",
 	};
 
 	private final AuthenticationManager authenticationManager;

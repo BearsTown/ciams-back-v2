@@ -1,8 +1,8 @@
 package com.uitgis.ciams.service.impl;
 
-import com.uitgis.ciams.dto.CiamsConfigDto;
+import com.uitgis.ciams.user.dto.CiamsConfigDto;
 import com.uitgis.ciams.enums.ConfigValueTypeEnum;
-import com.uitgis.ciams.mapper.CiamsConfigMapper;
+import com.uitgis.ciams.user.mapper.CiamsConfigMapper;
 import com.uitgis.ciams.service.CiamsConfigService;
 import com.uitgis.ciams.util.ValidUtil;
 import jakarta.annotation.PostConstruct;

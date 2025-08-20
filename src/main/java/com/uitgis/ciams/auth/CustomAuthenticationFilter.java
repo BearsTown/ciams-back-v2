@@ -2,9 +2,9 @@ package com.uitgis.ciams.auth;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.uitgis.ciams.dto.CiamsSsoUserDto;
-import com.uitgis.ciams.mapper.CiamsLoginLogMapper;
-import com.uitgis.ciams.mapper.CiamsSsoUserMapper;
+import com.uitgis.ciams.user.dto.CiamsSsoUserDto;
+import com.uitgis.ciams.user.mapper.CiamsLoginLogMapper;
+import com.uitgis.ciams.user.mapper.CiamsSsoUserMapper;
 import com.uitgis.ciams.util.JsonUtil;
 import com.uitgis.ciams.util.ValidUtil;
 import jakarta.servlet.FilterChain;

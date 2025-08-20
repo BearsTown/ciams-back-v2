@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-import com.uitgis.ciams.dto.CiamsArchiveDto;
+import com.uitgis.ciams.user.dto.CiamsArchiveDto;
 import com.uitgis.ciams.model.CiamsFile;
 
 public interface CiamsArchiveService {

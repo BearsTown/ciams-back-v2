@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.uitgis.ciams.user.mapper.ContentMapper">
+
+    <!-- 컨텐츠 메뉴 그룹(ROOT) 목록 -->
+    <select id="findALlContentMenuGroups" resultType="com.uitgis.ciams.model.ContentMenu">
+        SELECT id
+             , parent_id
+             , title
+             , use_yn
+             , priority
+        FROM ciams_content_menu
+        WHERE parent_id IS NULL
+        AND use_yn = true
+        ORDER BY priority
+    </select>
+
+
+    <select id="findAllContentMenus" parameterType="com.uitgis.ciams.user.dto.ContentMenuDto$Find$Params"
+            resultType="com.uitgis.ciams.user.dto.ContentMenuDto$Find$Result">
+        WITH RECURSIVE menu_tree AS
+                           (SELECT id,
+                                   parent_id,
+                                   title,
+                                   use_yn,
+                                   priority,
+                                   0 as level
+                            FROM ciams_content_menu
+                            WHERE parent_id = #{parentId}
+                              AND use_yn = true
+                            UNION ALL
+                            SELECT c.id,
+                                   c.parent_id,
+                                   c.title,
+                                   c.use_yn,
+                                   c.priority,
+                                   h.level + 1
+                            FROM ciams_content_menu c
+                                     INNER JOIN menu_tree h ON c.parent_id = h.id
+                            WHERE c.use_yn = true)
+        SELECT id,
+               parent_id,
+               title,
+               use_yn,
+               priority
+        FROM menu_tree
+        ORDER BY level, priority
+    </select>
+
+
+    <select id="findAllContentsById" resultType="com.uitgis.ciams.user.dto.ContentDto$Find$Result">
+        SELECT id
+             , menu_id
+             , title
+             , use_yn
+             , use_collapse
+             , priority
+             , content
+             , create_date
+             , update_date
+        FROM ciams_content
+        WHERE menu_id = #{menuId}
+          AND use_yn = true
+        ORDER BY priority
+    </select>
+
+</mapper>

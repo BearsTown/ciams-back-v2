@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.uitgis.ciams.admin.mapper.AdminContentMenuMapper">
+
+    <!-- 컨텐츠 메뉴 그룹(ROOT) 목록 -->
+    <select id="findALlContentMenuGroups" resultType="com.uitgis.ciams.model.ContentMenu">
+        SELECT id
+             , parent_id
+             , title
+             , use_yn
+             , priority
+        FROM ciams_content_menu
+        WHERE parent_id IS NULL
+        ORDER BY priority
+    </select>
+
+
+    <select id="findAllContentMenus" parameterType="com.uitgis.ciams.admin.dto.ContentMenuDto$Find$Params"
+            resultType="com.uitgis.ciams.admin.dto.ContentMenuDto$Find$Result">
+        WITH RECURSIVE menu_tree AS
+                           (SELECT id,
+                                   parent_id,
+                                   title,
+                                   use_yn,
+                                   priority,
+                                   0 as level
+                            FROM ciams_content_menu
+                            WHERE parent_id = #{parentId}
+                            UNION ALL
+                            SELECT c.id,
+                                   c.parent_id,
+                                   c.title,
+                                   c.use_yn,
+                                   c.priority,
+                                   h.level + 1
+                            FROM ciams_content_menu c
+                                     INNER JOIN menu_tree h ON c.parent_id = h.id)
+        SELECT id,
+               parent_id,
+               level,
+               title,
+               use_yn,
+               priority
+        FROM menu_tree
+        ORDER BY level, priority
+    </select>
+
+
+    <select id="findContentMenuById"
+            parameterType="Integer"
+            resultType="com.uitgis.ciams.model.ContentMenu">
+        SELECT id
+             , parent_id
+             , title
+             , use_yn
+             , priority
+        FROM ciams_content_menu
+        WHERE id = #{id}
+    </select>
+
+
+    <insert id="insertContentMenu" parameterType="com.uitgis.ciams.admin.dto.ContentMenuDto$Add">
+        INSERT
+        INTO ciams_content_menu ( parent_id
+                                , title
+                                , use_yn
+                                , priority)
+        VALUES ( #{parentId}
+               , #{title}
+               , #{useYn}
+               , (SELECT COALESCE(MAX(priority), 0) + 1 AS priority FROM ciams_content_menu WHERE parent_id = #{parentId}))
+    </insert>
+
+
+    <update id="updateContentMenu" parameterType="com.uitgis.ciams.admin.dto.ContentMenuDto$Update">
+        UPDATE
+        ciams_content_menu
+        <set>
+            <if test="@com.uitgis.ciams.util.ValidUtil@notEmpty(title)">title = #{title},</if>
+            <if test="@com.uitgis.ciams.util.ValidUtil@notEmpty(useYn)">use_yn = #{useYn},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+
+    <delete id="deleteContentMenu" parameterType="Integer">
+        DELETE
+        FROM ciams_content_menu
+        WHERE id = #{id}
+    </delete>
+</mapper>

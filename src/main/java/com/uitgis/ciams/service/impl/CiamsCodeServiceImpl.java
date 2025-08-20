@@ -8,10 +8,10 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.uitgis.ciams.dto.CiamsCodeDto;
-import com.uitgis.ciams.dto.CiamsCodeDto.Modify;
+import com.uitgis.ciams.user.dto.CiamsCodeDto;
+import com.uitgis.ciams.user.dto.CiamsCodeDto.Modify;
 import com.uitgis.ciams.exception.CustomException;
-import com.uitgis.ciams.mapper.CiamsCodeMapper;
+import com.uitgis.ciams.user.mapper.CiamsCodeMapper;
 import com.uitgis.ciams.model.CiamsCode;
 import com.uitgis.ciams.service.CiamsCodeService;
 

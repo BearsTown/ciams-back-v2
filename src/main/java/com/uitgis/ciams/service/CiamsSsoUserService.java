@@ -1,25 +1,25 @@
 package com.uitgis.ciams.service;
 
+import com.uitgis.ciams.user.dto.CiamsSsoUserDto;
+import com.uitgis.ciams.user.dto.CiamsSsoUserDto.Lock;
+import com.uitgis.ciams.user.dto.CiamsSsoUserDto.Modify;
+
 import java.util.List;
 import java.util.Map;
 
-import com.uitgis.ciams.dto.CiamsSsoUserDto;
-import com.uitgis.ciams.dto.CiamsSsoUserDto.Lock;
-import com.uitgis.ciams.dto.CiamsSsoUserDto.Modify;
-
 public interface CiamsSsoUserService {
 
-	public Map<String, Object> selectList(CiamsSsoUserDto.Find find);
+	Map<String, Object> selectList(CiamsSsoUserDto.Find find);
 
-	public CiamsSsoUserDto.Select selectById(String loginId);
+	CiamsSsoUserDto.Select selectById(String loginId);
 
 	void addUser(CiamsSsoUserDto.Add param) throws Exception;
 
-	public void initPass(String loginId);
+	void initPass(String loginId);
 
-	public void removeByIds(List<String> userList);
+	void removeByIds(List<String> userList);
 
-	public void updateLockUsers(Lock lockUsers);
+	void updateLockUsers(Lock lockUsers);
 
-	public void modify(Modify param);
+	void modify(Modify param);
 }

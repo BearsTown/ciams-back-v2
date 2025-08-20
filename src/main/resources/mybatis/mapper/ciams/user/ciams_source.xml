@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.uitgis.ciams.user.mapper.CiamsSourceMapper">
+
+    <resultMap id="SourcesResultMap" type="com.uitgis.ciams.user.dto.CiamsSourceGroupDto$Find$Result">
+        <id property="targetId" column="target_id"/>
+        <result property="category" column="category"/>
+        <result property="targetId" column="target_id"/>
+        <result property="targetDesc" column="target_desc"/>
+
+        <collection property="sources" ofType="com.uitgis.ciams.user.dto.CiamsSourceGroupDto$SourceDTO">
+            <result property="sourceId" column="source_id"/>
+            <result property="timePoint" column="time_point"/>
+            <result property="priority" column="priority"/>
+
+            <association property="source" javaType="com.uitgis.ciams.model.CiamsSource">
+                <id property="id" column="source_id"/>
+                <result property="sourceOrgan" column="source_organ"/>
+                <result property="sourceService" column="source_service"/>
+                <result property="title" column="title"/>
+                <result property="sub" column="sub"/>
+            </association>
+        </collection>
+    </resultMap>
+
+
+    <select id="findAllSources" parameterType="com.uitgis.ciams.user.dto.CiamsSourceGroupDto$Find$Params" resultMap="SourcesResultMap">
+        SELECT
+            csg.id,
+            csg.category,
+            csg.target_id,
+            csg.target_desc,
+            csg.source_id,
+            csg.time_point,
+            csg.priority,
+            cs.source_organ,
+            cs.source_service,
+            cs.title,
+            cs.sub
+        FROM
+            ciams_source_group csg
+                JOIN
+            ciams_source cs ON csg.source_id = cs.id
+        WHERE
+        csg.category = #{category}
+        <if test="@com.uitgis.ciams.util.ValidUtil@notEmpty(targetId)">
+            AND csg.target_id = #{targetId}
+        </if>
+        ORDER BY target_id, priority
+    </select>
+</mapper>

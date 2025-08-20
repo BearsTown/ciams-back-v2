@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.uitgis.ciams.user.mapper.CiamsUserRoleMapper">
+
+	<sql id="default_column">
+		user_id
+		,user_nm
+		,user_role
+		,dept_nm
+		,role_yn
+		,reg_date
+		,update_date
+    </sql>
+
+    <sql id="join_column">
+		rol.user_nm
+		,rol.user_role
+		,rol.dept_nm
+		,rol.role_yn
+		,rol.reg_date
+		,rol.update_date
+    </sql>
+
+	<select id="selectById" parameterType="string" resultType="com.uitgis.ciams.model.CiamsUserRole">
+        SELECT
+        <include refid="default_column"/>
+        FROM ciams_user_role
+        WHERE 1=1
+        AND user_id = #{user_id}
+	</select>
+
+	<insert id="insert" parameterType="com.uitgis.ciams.user.dto.CiamsUserRoleDto$Add" >
+		INSERT INTO ciams_user_role(<include refid="default_column"/>)
+        VALUES (#{userId}, #{userNm}, #{userRole}, #{deptNm}, #{roleYn}, now(), null)
+	</insert>
+
+	<update id="updateById" parameterType="com.uitgis.ciams.model.CiamsUserRole">
+        UPDATE  ciams_user_role
+        SET
+        <if test="@com.uitgis.ciams.util.ValidUtil@notEmpty(userRole)">
+            user_role = #{userRole, jdbcType=VARCHAR},
+        </if>
+        <if test="@com.uitgis.ciams.util.ValidUtil@notEmpty(deptNm)">
+            dept_nm = #{deptNm, jdbcType=VARCHAR},
+        </if>
+        <if test="@com.uitgis.ciams.util.ValidUtil@notEmpty(roleYn)">
+            role_yn = #{roleYn, jdbcType=VARCHAR},
+        </if>
+        	update_date = now()
+        WHERE user_id = #{userId}
+    </update>
+
+	<update id="modifyApproveByIds" parameterType="com.uitgis.ciams.user.dto.CiamsUserRoleDto$Approve" >
+		Update ciams_user_role
+		set
+			role_yn = #{roleYn}
+		WHERE user_id in
+        <foreach collection="userList" item="userId" open="(" close=")" separator=",">
+            #{userId}
+        </foreach>
+	</update>
+
+	<delete id="deleteByIds" parameterType="list">
+    	DELETE FROM ciams_user_role
+        WHERE user_id in
+        <foreach collection="userList" item="userId" open="(" close=")" separator=",">
+            #{userId}
+        </foreach>
+    </delete>
+
+</mapper>

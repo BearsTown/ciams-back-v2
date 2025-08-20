@@ -1,6 +1,6 @@
 package com.uitgis.ciams.util;
 
-import com.uitgis.ciams.dto.CiamsFileDto;
+import com.uitgis.ciams.user.dto.CiamsFileDto;
 import com.uitgis.ciams.model.CiamsFile;
 import com.uitgis.ciams.model.CiamsImage;
 import jakarta.servlet.http.HttpServletRequest;

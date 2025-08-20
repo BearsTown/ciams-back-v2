@@ -19,7 +19,7 @@ import javax.sql.DataSource;
 
 @Configuration
 @EnableTransactionManagement
-@MapperScan(value = "com.uitgis.ciams.mapper", sqlSessionFactoryRef = "ciamsSqlSessionFactory")
+@MapperScan(value = "com.uitgis.ciams.**.mapper", sqlSessionFactoryRef = "ciamsSqlSessionFactory")
 public class CiamsDatabaseConfig {
 
     @Primary

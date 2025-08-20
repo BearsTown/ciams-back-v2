@@ -2,8 +2,8 @@ package com.uitgis.ciams.service;
 
 import java.util.List;
 
-import com.uitgis.ciams.dto.CiamsArchiveCategoryDto.Find;
-import com.uitgis.ciams.dto.CiamsArchiveCategoryDto.ListResult;
+import com.uitgis.ciams.user.dto.CiamsArchiveCategoryDto.Find;
+import com.uitgis.ciams.user.dto.CiamsArchiveCategoryDto.ListResult;
 import com.uitgis.ciams.model.CiamsArchiveCategory;
 
 public interface CiamsArchiveCategoryService {

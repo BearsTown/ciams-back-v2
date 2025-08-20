@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.uitgis.ciams.user.mapper.plan.ConceptMapper">
+    <resultMap id="info" type="com.uitgis.ciams.user.dto.plan.concept.ConceptDto$Info$Find$Result">
+        <result property="zoneNo" column="zone_no"/>
+        <result property="zoneName" column="zone_name"/>
+        <result property="mngCd" column="mng_cd"/>
+        <result property="mngType" column="mng_type"/>
+
+        <collection property="baseDescs" ofType="com.uitgis.ciams.user.dto.plan.concept.ConceptDto$BaseDescDTO"
+                    columnPrefix="cpbd_">
+            <id column="category"/>
+            <result property="category" column="category"/>
+
+            <collection property="list" ofType="string">
+                <result column="description" />
+            </collection>
+        </collection>
+
+        <collection property="zoneDescs" ofType="com.uitgis.ciams.user.dto.plan.concept.ConceptDto$ZoneDescDTO"
+                    columnPrefix="cpzd_">
+            <id column="category"/>
+
+            <result property="category" column="category"/>
+            <collection property="list" ofType="string">
+                <result column="description" />
+            </collection>
+        </collection>
+
+        <collection property="zoneIndustries" ofType="com.uitgis.ciams.user.dto.plan.concept.ConceptDto$ZoneIndustryDTO">
+            <id column="cpzi_category"/>
+
+            <result property="category" column="cpzi_category" />
+            <collection property="list" ofType="com.uitgis.ciams.model.CiamsPlanZoneIndustry">
+                <result property="industryCode" column="industry_code" />
+                <result property="industryName" column="industry_name" />
+            </collection>
+        </collection>
+
+        <collection property="zoneImages" ofType="com.uitgis.ciams.user.dto.plan.concept.ConceptDto$ZoneImageDTO">
+            <id column="image_category"/>
+
+            <result property="category" column="image_category" />
+            <collection property="list" ofType="com.uitgis.ciams.model.CiamsPlanZoneImage">
+                <result property="id" column="image_id" />
+                <result property="title" column="image_title" />
+                <result property="name" column="image_name" />
+            </collection>
+        </collection>
+    </resultMap>
+
+
+    <!-- 기본구상 대상지 상세정보 -->
+    <select id="findConceptInfo" parameterType="string" resultMap="info">
+        SELECT z.zone_no,
+               z.zone_name,
+               z.mng_cd,
+               z.mng_type,
+
+               cpbd.category                     as cpbd_category,
+               cpbd.description                  as cpbd_description,
+
+               cpzd.category                     as cpzd_category,
+               cpzd.description                  as cpzd_description,
+
+               cpzi.category                     as cpzi_category,
+               cpzi.industry_code                as industry_code,
+               get_cd_nm(cpzi.industry_code, NULL) as industry_name,
+--             cpzi.industry_name as industry_name,
+
+               cpzimg.id                         as image_id,
+               cpzimg.category                   as image_category,
+               cpzimg.title                      as image_title,
+               cpzimg.name                       as image_name
+        FROM ciams_zone z
+                 LEFT OUTER JOIN ciams_plan_base_description cpbd ON z.mng_type = cpbd.mng_type
+                 LEFT OUTER JOIN ciams_plan_zone_description cpzd ON z.zone_no = cpzd.zone_no
+                 LEFT OUTER JOIN ciams_plan_zone_image cpzimg ON z.zone_no = cpzimg.zone_no
+                 LEFT OUTER JOIN ciams_plan_zone_industry cpzi ON z.zone_no = cpzi.zone_no
+        WHERE z.zone_no = #{zoneNo}
+        ORDER BY cpzi.category, cpzi.industry_code
+    </select>
+
+
+    <select id="findImageById" parameterType="int">
+        SELECT zone_no
+             , category
+             , title
+             , path
+             , name
+             , create_date
+        FROM ciams_plan_zone_image
+        WHERE id = #{id}
+    </select>
+
+</mapper>

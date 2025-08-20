@@ -5,9 +5,9 @@ import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
-import com.uitgis.ciams.dto.CiamsArchiveCategoryDto.Find;
-import com.uitgis.ciams.dto.CiamsArchiveCategoryDto.ListResult;
-import com.uitgis.ciams.mapper.CiamsArchiveCategoryMapper;
+import com.uitgis.ciams.user.dto.CiamsArchiveCategoryDto.Find;
+import com.uitgis.ciams.user.dto.CiamsArchiveCategoryDto.ListResult;
+import com.uitgis.ciams.user.mapper.CiamsArchiveCategoryMapper;
 import com.uitgis.ciams.model.CiamsArchiveCategory;
 import com.uitgis.ciams.service.CiamsArchiveCategoryService;
 import com.uitgis.ciams.service.CiamsCommonService;

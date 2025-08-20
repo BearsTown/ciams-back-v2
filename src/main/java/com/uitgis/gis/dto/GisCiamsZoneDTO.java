@@ -1,6 +1,6 @@
 package com.uitgis.gis.dto;
 
-import com.uitgis.ciams.dto.PaginationDto;
+import com.uitgis.ciams.user.dto.PaginationDto;
 import com.uitgis.gis.model.GisCiamsZone;
 import lombok.Builder;
 import lombok.Getter;

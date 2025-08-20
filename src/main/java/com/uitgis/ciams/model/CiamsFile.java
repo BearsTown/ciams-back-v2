@@ -24,6 +24,7 @@ public class CiamsFile {
     private String ext;         // '파일 확장자';
     private Long size;          // '파일 사이즈';
     private String typeCode;    // '구분 코드';
+    private String status;    // '상태';
     private Integer sortSn;	// '파일 순서'
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date createDate;  // '생성일';

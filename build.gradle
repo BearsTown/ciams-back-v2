@@ -47,7 +47,7 @@ dependencies {
 //    implementation ('com.uitgis.ext:kras-client:2.1.1-SNAPSHOT') {
 //        exclude group: 'jakarta.xml.bind', module: 'jakarta.xml.bind-api'
 //    }
-    implementation('com.uitgis.openapi:k-geo:1.0.4-SNAPSHOT') {
+    implementation('com.uitgis.openapi:k-geo:1.0.5-SNAPSHOT') {
         exclude group: 'org.slf4j', module: 'slf4j-simple'
     }
 

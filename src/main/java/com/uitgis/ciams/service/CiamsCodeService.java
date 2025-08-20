@@ -2,7 +2,7 @@ package com.uitgis.ciams.service;
 
 import java.util.List;
 
-import com.uitgis.ciams.dto.CiamsCodeDto;
+import com.uitgis.ciams.user.dto.CiamsCodeDto;
 import com.uitgis.ciams.model.CiamsCode;
 
 public interface CiamsCodeService {

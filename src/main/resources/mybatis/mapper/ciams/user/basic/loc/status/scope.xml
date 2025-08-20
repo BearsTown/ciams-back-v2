@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.uitgis.ciams.user.mapper.basic.loc.status.ScopeMapper">
+
+    <resultMap id="ScopeDataResultMap"
+               type="com.uitgis.ciams.user.dto.basic.loc.status.ScopeDto$Data">
+        <result property="category" column="category"/>
+        <collection property="categoryItems" resultMap="CategoryItemsResultMap"/>
+    </resultMap>
+
+    <resultMap id="CategoryItemsResultMap"
+               type="com.uitgis.ciams.user.dto.basic.loc.status.ScopeDto$CategoryItem">
+        <result property="code" column="t_code"/>
+        <result property="codeNm" column="t_code_name"/>
+        <collection property="children" resultMap="CodeResultMap"/>
+    </resultMap>
+
+    <resultMap id="CodeResultMap"
+               type="com.uitgis.ciams.user.dto.basic.loc.status.ScopeDto$Code">
+        <result property="code" column="c_code"/>
+        <result property="codeNm" column="c_code_name"/>
+    </resultMap>
+
+
+    <!-- 산업의 범위 -->
+    <select id="findAllScopes" resultMap="ScopeDataResultMap">
+        SELECT category,
+               cis.t_code                                                         AS t_code,
+               REGEXP_REPLACE(get_cd_nm(concat(cis.t_code), ''), '\([^)]*\)', '') AS t_code_name,
+               cis.c_code                                                         AS c_code,
+               get_cd_nm(concat(cis.t_code, cis.c_code), '')                      AS c_code_name
+        FROM ciams_industry_scope cis
+        ORDER BY category, t_code, priority
+    </select>
+
+</mapper>

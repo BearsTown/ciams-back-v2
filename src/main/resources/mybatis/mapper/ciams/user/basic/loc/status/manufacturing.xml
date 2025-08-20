@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.uitgis.ciams.user.mapper.basic.loc.status.ManufacturingMapper">
+
+    <resultMap id="categoryResultMap"
+               type="com.uitgis.ciams.user.dto.basic.loc.status.ManufacturingDto$CategoryStatus$Category">
+        <result property="code" column="code"/>
+        <result property="codeName" column="code_name"/>
+    </resultMap>
+
+    <resultMap id="categoryGroupResultMap"
+               type="com.uitgis.ciams.user.dto.basic.loc.status.ManufacturingDto$CategoryStatus$CategoryGroup">
+        <result property="groupCode" column="group_code"/>
+        <result property="groupName" column="group_name"/>
+        <collection property="categories" resultMap="categoryResultMap"/>
+    </resultMap>
+
+
+    <!-- 지역별 밀도 목록 -->
+    <select id="findAllDensities" parameterType="com.uitgis.ciams.user.dto.basic.loc.status.ManufacturingDto$Find$Params"
+            resultType="com.uitgis.ciams.user.dto.basic.loc.status.ManufacturingDto$Density">
+        SELECT *
+        FROM ciams_region_indust_density
+        WHERE category = #{category}
+        ORDER BY priority
+    </select>
+
+
+    <!-- 현황 목록 -->
+    <select id="findAllStatuses" parameterType="com.uitgis.ciams.user.dto.basic.loc.status.ManufacturingDto$Find$Params"
+            resultType="com.uitgis.ciams.user.dto.basic.loc.status.ManufacturingDto$Status">
+        SELECT cis.code
+             , cd.code_name
+             , cis.corp_cnt_1
+             , cis.corp_cnt_2
+             , cis.corp_cnt_3
+             , cis.worker_cnt_1
+             , cis.worker_cnt_2
+             , cis.worker_cnt_3
+        FROM ciams_industry_status cis
+                 LEFT JOIN ciams_code cd
+                           ON cis.code = cd.code
+        WHERE cis.category = #{category}
+        ORDER BY cd.sort_sn
+    </select>
+
+
+    <!-- 사업체수/종사자수 증감 -->
+    <select id="findAllIncreases" parameterType="com.uitgis.ciams.user.dto.basic.loc.status.ManufacturingDto$Find$Params"
+            resultType="com.uitgis.ciams.user.dto.basic.loc.status.ManufacturingDto$Increase">
+        SELECT cd.code
+             , cd.code_name
+             , crii.corp_increase
+             , crii.worker_increase
+        FROM ciams_region_indust_increase crii
+                 LEFT JOIN ciams_code cd
+                           ON crii.code = cd.code
+        WHERE category = #{category}
+        ORDER BY cd.sort_sn
+    </select>
+
+
+    <!-- 제조업 유형별 현황 -->
+    <select id="findAllCategoryStatuses"
+            resultType="com.uitgis.ciams.user.dto.basic.loc.status.ManufacturingDto$CategoryStatus$Status">
+        SELECT t.t_code                         as group_code,
+               get_cd_nm(t.t_code, '')          AS group_name,
+               COALESCE(SUM(s.corp_cnt_1), 0)   AS corp_cnt_1_sum,
+               COALESCE(SUM(s.corp_cnt_2), 0)   AS corp_cnt_2_sum,
+               COALESCE(SUM(s.corp_cnt_3), 0)   AS corp_cnt_3_sum,
+               COALESCE(SUM(s.worker_cnt_1), 0) AS worker_cnt_1_sum,
+               COALESCE(SUM(s.worker_cnt_2), 0) AS worker_cnt_2_sum,
+               COALESCE(SUM(s.worker_cnt_3), 0) AS worker_cnt_3_sum
+        FROM ciams_industry_type t
+                 LEFT JOIN
+             ciams_industry_status s
+             ON s.code = t.c_code
+        GROUP BY t.t_code
+        ORDER BY t.t_code
+    </select>
+
+
+    <!-- 제조업 유형분류 -->
+    <select id="findAllCategoryGroups" resultMap="categoryGroupResultMap">
+        SELECT cd1.code      AS group_code
+             , cd1.code_name AS group_name
+             , cit.c_code    AS code
+             , cd2.code_name
+        FROM ciams_industry_type cit
+                 LEFT JOIN ciams_code cd1
+                           ON cit.t_code = cd1.code
+                 LEFT JOIN ciams_code cd2
+                           ON cit.c_code = cd2.code
+        ORDER BY cd1.sort_sn, cd2.sort_sn
+    </select>
+
+</mapper>

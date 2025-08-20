@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.uitgis.ciams.user.mapper.basic.loc.general.GeneralDataMapper">
+
+    <resultMap id="DataItemMap" type="com.uitgis.ciams.user.dto.basic.loc.general.GeneralDataDto$DataItem">
+        <id property="id" column="id"/>
+        <result property="parentId" column="parent_id"/>
+        <result property="title" column="title"/>
+        <result property="priority" column="priority"/>
+        <collection property="children" ofType="com.uitgis.ciams.user.dto.basic.loc.general.GeneralDataDto$DataItem">
+            <id property="id" column="child_id"/>
+            <result property="parentId" column="child_parent_id"/>
+            <result property="title" column="child_title"/>
+            <result property="priority" column="child_priority"/>
+        </collection>
+    </resultMap>
+
+
+    <!-- 일반현황 데이터 Item 목록 -->
+    <select id="findAllGeneralDataItems" resultMap="DataItemMap">
+        WITH RECURSIVE hierarchy AS (
+            -- 루트 노드 선택
+            SELECT
+                id,
+                parent_id,
+                title,
+                priority,
+                0 as level
+            FROM ciams_status
+            WHERE parent_id IS NULL
+            UNION ALL
+            -- 자식 노드 재귀 선택
+            SELECT
+                c.id,
+                c.parent_id,
+                c.title,
+                c.priority,
+                h.level + 1
+            FROM ciams_status c
+                     INNER JOIN hierarchy h ON c.parent_id = h.id
+        )
+        SELECT
+            id,
+            parent_id,
+            title,
+            priority
+        FROM hierarchy
+        ORDER BY level, priority
+    </select>
+
+
+    <!-- 데이터 그룹 목록 -->
+    <select id="findAllDataGroupsById"
+            parameterType="int"
+            resultType="com.uitgis.ciams.user.dto.basic.loc.general.GeneralDataDto$DataGroup">
+        SELECT csg.id AS status_group_id,
+               csg.status_id,
+               csg.title,
+               csg.chart_axis,
+               csg.view,
+               csg.priority,
+               csdg.data_id
+        FROM ciams_status_group csg
+                 INNER JOIN
+             ciams_status_data_group csdg
+             ON
+                 csg.id = csdg.status_group_id
+        WHERE csg.status_id = #{statusId}
+        ORDER BY csg.priority
+    </select>
+
+
+    <!-- 데이터 테이블 -->
+    <select id="findDataTableById" parameterType="int"
+            resultType="com.uitgis.ciams.user.dto.basic.loc.general.GeneralDataDto$DataTable">
+        SELECT data_name, pivot
+        FROM ciams_status_data
+        WHERE id = #{dataId}
+    </select>
+
+
+    <!-- 데이터 컬럼 목록 -->
+    <select id="findAllDataColumnsById" parameterType="int"
+            resultType="com.uitgis.ciams.user.dto.basic.loc.general.GeneralDataDto$DataColumn">
+        SELECT CASE
+                   WHEN csdc.use_code = true THEN LOWER(csdc.label)
+                   ELSE LOWER(csdc.name)
+                   END AS name,
+               CASE
+                   WHEN csdc.use_code = true THEN get_cd_nm(csdc.label, '')
+                   ELSE LOWER(csdc.label)
+                   END AS label,
+               csdc.use_code,
+               csdc.use_axis,
+               csdc.data_type,
+               csdc.unit,
+               csdc.series_type
+        FROM ciams_status_data_column_group csdcg
+                 INNER JOIN
+             ciams_status_data_column csdc
+             ON
+                 csdcg.column_id = csdc.id
+        WHERE csdcg.data_id = #{dataId}
+          AND csdc.use_yn = true
+        ORDER BY csdcg.priority
+    </select>
+
+
+    <!-- 피벗 속성 -->
+    <select id="findPivotById" parameterType="int"
+            resultType="com.uitgis.ciams.user.dto.basic.loc.general.GeneralDataDto$Pivot">
+        SELECT r_column,
+               c_column,
+               v_column
+        FROM ciams_status_pivot
+        WHERE data_id = #{dataId}
+    </select>
+
+
+    <!-- 피벗 컬럼 목록-->
+    <select id="findAllPivotByIdColumns" parameterType="map"
+            resultType="com.uitgis.ciams.user.dto.basic.loc.general.GeneralDataDto$PivotColumn">
+        SELECT *
+        FROM (VALUES ('A0', '구분', false, 'STRING')) AS static_row(name, label, use_axis, data_type)
+        UNION ALL
+        SELECT 'A' || ROW_NUMBER() OVER (ORDER BY ${cColumn}) AS name,
+               ${cColumn}                                     AS label,
+               true                                           AS use_axis,
+               #{dataType}                                    AS data_type
+        FROM ${tableName}
+        GROUP BY ${cColumn}
+    </select>
+
+
+    <!-- 데이터 전체 레코드 -->
+    <select id="findAllRecordsByName" parameterType="string"
+            resultType="java.util.HashMap">
+        SELECT *
+        FROM ${dataName}
+    </select>
+
+
+    <!-- 피벗 데이터 전체 레코드 -->
+    <select id="findAllPivotRecords"
+            parameterType="com.uitgis.ciams.user.dto.basic.loc.general.GeneralDataDto$PivotParams"
+            resultType="java.util.HashMap">
+        SELECT
+--         csdc.label AS "A0",
+        CASE
+        WHEN csdc.use_code = true THEN get_cd_nm(csdc.label, '')
+        ELSE csdc.label
+        END AS "A0",
+        <foreach collection="columns" item="col" index="idx" open="" separator="," close="">
+            MAX(CASE WHEN DT.${pivot.cColumn} = #{col} THEN ${pivot.vColumn} END) AS "A${idx + 1}"
+        </foreach>
+        FROM
+        ciams_status_data_column_group csdcg
+        INNER JOIN
+        ciams_status_data_column csdc
+        ON
+        csdcg.column_id = csdc.id
+        INNER JOIN
+        ${dataName} AS DT
+        ON
+        DT.${pivot.rColumn} = csdc.label
+        WHERE
+        csdcg.data_id = #{dataId}
+        AND
+        csdc.use_yn = true
+        GROUP BY
+        csdcg.priority, csdc.use_code, csdc.label
+        ORDER BY
+        csdcg.priority
+    </select>
+
+</mapper>

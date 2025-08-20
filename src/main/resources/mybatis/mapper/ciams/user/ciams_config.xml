@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.uitgis.ciams.user.mapper.CiamsConfigMapper">
+
+ 	<resultMap id="JoinResultMap" type="com.uitgis.ciams.user.dto.CiamsConfigDto$WithFile">
+        <result property="id" column="id"/>
+        <result property="confName" column="conf_name"/>
+        <result property="confValue" column="conf_value"/>
+        <result property="confType" column="conf_type"/>
+        <result property="used" column="used"/>
+        <result property="confValueType" column="conf_value_type"/>
+        <result property="confDesc" column="conf_desc"/>
+        <result property="regDate" column="reg_date"/>
+        <result property="chgDate" column="chg_date"/>
+
+        <association property="attachFile" javaType="com.uitgis.ciams.model.CiamsFile" columnPrefix="file_" resultMap="com.uitgis.ciams.user.mapper.CiamsFileMapper.BaseResultMap"/>
+    </resultMap>
+
+	<sql id="default_column">
+		 id, conf_name, conf_value, conf_type, used, conf_value_type, conf_desc, reg_date, chg_date, conf_url
+ 	</sql>
+
+ 	<sql id="join_column">
+		 cn.id,
+		 cn.conf_name,
+		 cn.conf_value,
+		 cn.conf_type,
+		 cn.used,
+		 cn.conf_value_type,
+		 cn.conf_desc,
+		 cn.reg_date,
+		 cn.chg_date,
+		 cn.conf_url
+ 	</sql>
+
+	<sql id="default_join_where">
+        <if test="@com.uitgis.ciams.util.ValidUtil@notEmpty(confName)">
+            <bind name="configName" value="'%'+confName+'%'"/>
+            AND cn.conf_name = #{configName}
+        </if>
+        <if test="@com.uitgis.ciams.util.ValidUtil@notEmpty(id)">
+            AND cn.id = #{id}
+        </if>
+        <if test="used != null">
+            AND cn.used = #{used}
+        </if>
+        <if test="@com.uitgis.ciams.util.ValidUtil@notEmpty(confType)">
+            AND cn.conf_type = #{confType}
+        </if>
+    </sql>
+
+    <select id="selectById" parameterType="java.lang.String" resultMap="JoinResultMap">
+        SELECT
+        <include refid="join_column"/>
+         ,
+        <include refid="com.uitgis.ciams.user.mapper.CiamsFileMapper.join_column"/>
+        FROM ciams_config cn
+        LEFT OUTER JOIN ciams_file file
+        ON cn.id = file.link_id
+        WHERE cn.id = #{id}
+    </select>
+
+    <delete id="deleteById" parameterType="java.lang.String">
+        DELETE
+        FROM ciams_config
+        WHERE id = #{id}
+    </delete>
+
+
+    <insert id="insert" parameterType="com.uitgis.ciams.user.dto.CiamsConfigDto$Add">
+        INSERT INTO ciams_config (
+        	id,
+        	conf_name,
+        	conf_value,
+        	conf_type,
+        	conf_value_type,
+        	conf_desc,
+        	conf_url
+        )
+        VALUES (
+	        #{id},
+	        #{confName},
+	        #{confValue},
+	        #{confType},
+	        #{confValueType},
+			#{confDesc},
+			#{confUrl}
+		)
+    </insert>
+
+
+    <update id="updateById" parameterType="com.uitgis.ciams.model.CiamsConfig">
+        UPDATE ciams_config
+        <set>
+            <if test="@com.uitgis.ciams.util.ValidUtil@notEmpty(confName)">
+                conf_name = #{confName},
+            </if>
+            <if test="confValue != null">
+                conf_value = #{confValue},
+            </if>
+            <if test="@com.uitgis.ciams.util.ValidUtil@notEmpty(confType)">
+                conf_type = #{confType},
+            </if>
+            <if test="used != null">
+                used = #{used},
+            </if>
+            <if test="confValueType != null">
+                conf_value_type = #{confValueType},
+            </if>
+            <if test="confDesc != null">
+                conf_desc = #{confDesc},
+            </if>
+            <if test="confUrl != null">
+                conf_url = #{confUrl},
+            </if>
+            chg_date = now()
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <select id="selectList" parameterType="com.uitgis.ciams.user.dto.CiamsConfigDto$Find" resultMap="JoinResultMap">
+        SELECT
+        <include refid="join_column"/>
+        ,
+        <include refid="com.uitgis.ciams.user.mapper.CiamsFileMapper.join_column"/>
+        FROM ciams_config cn
+        LEFT OUTER JOIN ciams_file file
+        ON cn.id = file.link_id
+        <where>
+            <include refid="default_join_where"/>
+        </where>
+        ORDER BY cn.conf_type, cn.conf_name, cn.id
+    </select>
+
+</mapper>

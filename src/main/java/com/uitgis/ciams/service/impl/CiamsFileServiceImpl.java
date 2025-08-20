@@ -1,5 +1,20 @@
 package com.uitgis.ciams.service.impl;
 
+import com.uitgis.ciams.model.CiamsFile;
+import com.uitgis.ciams.service.CiamsFileService;
+import com.uitgis.ciams.user.dto.CiamsFileDto;
+import com.uitgis.ciams.user.dto.PaginationDto;
+import com.uitgis.ciams.user.mapper.CiamsFileMapper;
+import com.uitgis.ciams.util.FileUtil;
+import com.uitgis.ciams.util.PageUtil;
+import com.uitgis.ciams.util.StringUtil;
+import com.uitgis.ciams.util.ValidUtil;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -8,28 +23,11 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
-
-import com.uitgis.ciams.dto.CiamsFileDto;
-import com.uitgis.ciams.dto.PaginationDto;
-import com.uitgis.ciams.mapper.CiamsFileMapper;
-import com.uitgis.ciams.model.CiamsFile;
-import com.uitgis.ciams.service.CiamsFileService;
-import com.uitgis.ciams.util.FileUtil;
-import com.uitgis.ciams.util.PageUtil;
-import com.uitgis.ciams.util.StringUtil;
-import com.uitgis.ciams.util.ValidUtil;
-
-import lombok.extern.slf4j.Slf4j;
-
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class CiamsFileServiceImpl implements CiamsFileService {
-    @Autowired
-    private CiamsFileMapper ciamsFileMapper;
+    private final CiamsFileMapper ciamsFileMapper;
 
 
     @Override
@@ -37,16 +35,18 @@ public class CiamsFileServiceImpl implements CiamsFileService {
         return ciamsFileMapper.selectById(id);
     }
 
+
     @Override
     public List<CiamsFileDto.TempFile> uploadTempFiles(List<MultipartFile> files) throws Exception {
         return uploadTempFiles(files, "etc");
     }
 
+
     @Override
     public List<CiamsFileDto.TempFile> uploadTempFiles(List<MultipartFile> files, String typeCode) throws Exception {
         List<CiamsFileDto.TempFile> tempFiles = new ArrayList<>();
 
-        if (files == null) {
+        if (ValidUtil.empty(files)) {
             throw new NullPointerException("NULL");
         }
 
@@ -75,13 +75,20 @@ public class CiamsFileServiceImpl implements CiamsFileService {
             /**
              * -ToDo : 파일 타입
              */
-            CiamsFileDto.TempFile tempFile = CiamsFileDto.TempFile.builder().orgName(orgName).newName(newName).size(file.getSize()).ext(StringUtil.getFileExt(orgName)).typeCode(typeCode).build();
+            CiamsFileDto.TempFile tempFile = CiamsFileDto.TempFile.builder()
+                    .orgName(orgName)
+                    .newName(newName)
+                    .size(file.getSize())
+                    .ext(StringUtil.getFileExt(orgName))
+                    .typeCode(typeCode)
+                    .build();
 
             tempFiles.add(tempFile);
         }
 
         return tempFiles;
     }
+
 
     @Override
     public int uploadFiles(List<MultipartFile> files, String typeCode, String linkId) throws Exception {
@@ -97,7 +104,6 @@ public class CiamsFileServiceImpl implements CiamsFileService {
             Files.createDirectories(Paths.get(filePath));
         }
 
-        //정렬값
         List<String> linkIds = new ArrayList<>();
         linkIds.add(linkId);
         List<CiamsFile> list = ciamsFileMapper.selectByLinkIds(linkIds);
@@ -171,6 +177,7 @@ public class CiamsFileServiceImpl implements CiamsFileService {
         return result;
     }
 
+
     /**
      * 첨부파일 sortSn 재정렬
      */
@@ -193,6 +200,7 @@ public class CiamsFileServiceImpl implements CiamsFileService {
     	return result;
     }
 
+
     @Override
     @Transactional
     public int deleteFilesByLinkIds(List<String> linkIds) throws IOException {
@@ -208,6 +216,7 @@ public class CiamsFileServiceImpl implements CiamsFileService {
 
         return result;
     }
+
 
     @Override
     @Transactional
@@ -230,6 +239,7 @@ public class CiamsFileServiceImpl implements CiamsFileService {
         return ciamsFileMapper.searchCount(params);
     }
 
+
     @Override
     public CiamsFileDto.Search.Result search(CiamsFileDto.Search.Params params) {
         int totalCount = ciamsFileMapper.searchCount(params);
@@ -241,4 +251,54 @@ public class CiamsFileServiceImpl implements CiamsFileService {
         return result;
     }
 
+
+    @Override
+    @Transactional
+    public List<CiamsFile> uploadEditorImages(CiamsFileDto.EditorImage.Upload params) throws Exception {
+        List<CiamsFile> uploadFiles = new ArrayList<>();
+
+        if (ValidUtil.empty(params.getFiles())) {
+            throw new NullPointerException("NULL");
+        }
+
+        String filePath = FileUtil.getPathPrefix() + "/" + params.getTypeCode();
+
+        if (!Files.exists(Paths.get(filePath))) {
+            Files.createDirectories(Paths.get(filePath));
+        }
+
+        for (MultipartFile file : params.getFiles()) {
+            String fileId = UUID.randomUUID().toString();
+            String orgName = file.getOriginalFilename();
+            String fileExt = StringUtil.getFileExt(orgName);
+            String newName = fileId + "." + fileExt;
+
+            /**
+             * - ToDo : 타입, 사이즈 체크
+             */
+            try {
+                file.transferTo(Paths.get(filePath + "/" + newName));
+            } catch (IOException e) {
+                log.error(e.getMessage());
+                continue;
+            }
+
+            CiamsFile _file = CiamsFile.builder()
+                    .id(fileId)
+                    .orgName(orgName)
+                    .newName(newName)
+                    .size(file.getSize())
+                    .ext(StringUtil.getFileExt(orgName))
+                    .path("/" + params.getTypeCode())
+                    .typeCode(params.getTypeCode())
+                    .linkId(params.getLinkId())
+                    .build();
+
+            uploadFiles.add(_file);
+        }
+
+        ciamsFileMapper.insertFiles(uploadFiles);
+
+        return uploadFiles;
+    }
 }

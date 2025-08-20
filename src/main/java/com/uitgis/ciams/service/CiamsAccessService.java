@@ -2,8 +2,8 @@ package com.uitgis.ciams.service;
 
 import java.util.List;
 
-import com.uitgis.ciams.dto.CiamsAccessDto;
-import com.uitgis.ciams.dto.CiamsAccessDto.MenuAccess;
+import com.uitgis.ciams.user.dto.CiamsAccessDto;
+import com.uitgis.ciams.user.dto.CiamsAccessDto.MenuAccess;
 
 public interface CiamsAccessService {
 
