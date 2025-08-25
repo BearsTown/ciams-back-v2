@@ -1,15 +1,26 @@
 package com.uitgis.ciams.service.impl;
 
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.crypto.BadPaddingException;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
-
+import com.uitgis.ciams.config.UitPasswordEncoder;
+import com.uitgis.ciams.model.CiamsAccessUserLink;
+import com.uitgis.ciams.model.CiamsSsoUser;
+import com.uitgis.ciams.model.CiamsUserRole;
+import com.uitgis.ciams.service.CiamsSsoUserService;
+import com.uitgis.ciams.user.dto.CiamsConfigDto;
+import com.uitgis.ciams.user.dto.CiamsSsoUserDto;
+import com.uitgis.ciams.user.dto.CiamsSsoUserDto.Lock;
+import com.uitgis.ciams.user.dto.CiamsSsoUserDto.Modify;
+import com.uitgis.ciams.user.dto.CiamsSsoUserDto.Select;
+import com.uitgis.ciams.user.dto.CiamsUserRoleDto;
+import com.uitgis.ciams.user.dto.PaginationDto;
+import com.uitgis.ciams.user.mapper.CiamsAccessMapper;
+import com.uitgis.ciams.user.mapper.CiamsConfigMapper;
+import com.uitgis.ciams.user.mapper.CiamsSsoUserMapper;
+import com.uitgis.ciams.user.mapper.CiamsUserRoleMapper;
+import com.uitgis.ciams.util.CipherUtil;
+import com.uitgis.ciams.util.PageUtil;
+import com.uitgis.ciams.util.ValidUtil;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -18,33 +29,27 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.uitgis.ciams.user.dto.PaginationDto;
-import com.uitgis.ciams.user.dto.CiamsUserRoleDto;
-import com.uitgis.ciams.user.dto.CiamsSsoUserDto;
-import com.uitgis.ciams.user.dto.CiamsSsoUserDto.Lock;
-import com.uitgis.ciams.user.dto.CiamsSsoUserDto.Modify;
-import com.uitgis.ciams.user.dto.CiamsSsoUserDto.Select;
-import com.uitgis.ciams.user.mapper.CiamsUserRoleMapper;
-import com.uitgis.ciams.user.mapper.CiamsSsoUserMapper;
-import com.uitgis.ciams.model.CiamsUserRole;
-import com.uitgis.ciams.model.CiamsSsoUser;
-import com.uitgis.ciams.service.CiamsSsoUserService;
-import com.uitgis.ciams.util.CipherUtil;
-import com.uitgis.ciams.util.PageUtil;
-import com.uitgis.ciams.util.ValidUtil;
-
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @RequiredArgsConstructor
 @Service
 public class CiamsSsoUserServiceImpl implements CiamsSsoUserService {
 
+	private final CiamsAccessMapper ciamsAccessMapper;
+	private final CiamsConfigMapper ciamsConfigMapper;
 	private final CiamsSsoUserMapper ciamsSsoUserMapper;
 	private final CiamsUserRoleMapper ciamsUserRoleMapper;
 	private final PasswordEncoder passwordEncoder;
 //	private final UitPasswordEncoder uitPasswordEncoder;
+
 
 	@Override
 	public Map<String, Object> selectList(CiamsSsoUserDto.Find find) {
@@ -80,16 +85,29 @@ public class CiamsSsoUserServiceImpl implements CiamsSsoUserService {
 			String encPass = passwordEncoder.encode(rsaEncPass);
 			dto.setPassword(encPass);
 
+			CiamsConfigDto.WithFile signUpConfig = ciamsConfigMapper.selectById("SIGNUP_AUTO");
+			String roleYn = (signUpConfig != null && signUpConfig.getUsed()) ? "Y" : "N";
+
 			ciamsSsoUserMapper.insertUser(dto);
 
 			CiamsUserRoleDto.Add roleDto = CiamsUserRoleDto.Add.builder()
 											.userId(dto.getId())
 											.userNm(dto.getName())
 											.userRole("R0001")
-											.roleYn("N")
+					.roleYn(roleYn)
 											.build();
 
 			ciamsUserRoleMapper.insert(roleDto);
+
+
+//			if (roleYn.equals("Y")) {
+			CiamsAccessUserLink userLink = CiamsAccessUserLink.builder()
+					.accessRoleCode("R0190")
+					.userId(dto.getId())
+					.regUser(dto.getName())
+					.build();
+			ciamsAccessMapper.insertUser(userLink);
+//			}
 		}
 	}
 
@@ -144,10 +162,10 @@ public class CiamsSsoUserServiceImpl implements CiamsSsoUserService {
 			}
 
 			if (!passwordEncoder.matches(curPassword, model.getUserPassword())) {
-				throw new BadCredentialsException("패스워드 불일치");
+				throw new BadCredentialsException("Invalid password");
 			}
-			modify.setUserPassword(passwordEncoder.encode(param.getNewPassword()));
-//			modify.setUserPassword(uitPasswordEncoder.encode(param.getNewPassword()));
+//			modify.setUserPassword(passwordEncoder.encode(param.getNewPassword()));
+			modify.setUserPassword(uitPasswordEncoder().encode(param.getNewPassword()));
 			ciamsSsoUserMapper.updateById(modify);
 		}else {
 			ciamsSsoUserMapper.updateById(modify);
@@ -177,4 +195,7 @@ public class CiamsSsoUserServiceImpl implements CiamsSsoUserService {
 		return result;
 	}
 
+	public PasswordEncoder uitPasswordEncoder() {
+		return new UitPasswordEncoder();
+	}
 }
