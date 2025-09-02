@@ -68,6 +68,7 @@
         , "path"
         , "ext"
         , "size"
+        , "status"
         , sort_sn
         , "create_user"
         , "create_date"
@@ -83,6 +84,7 @@
             , #{item.path}
             , #{item.ext}
             , #{item.size}
+            , #{item.status}
             , #{item.sortSn}
             , #{item.createUser}
             , now()

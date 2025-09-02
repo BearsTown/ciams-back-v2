@@ -139,6 +139,7 @@ public class CiamsFileServiceImpl implements CiamsFileService {
             							.path("/" + typeCode)
             							.typeCode(typeCode)
             							.linkId(linkId)
+                                        .status("completed")
             							.sortSn(++maxSortnum)
             							.build();
 
