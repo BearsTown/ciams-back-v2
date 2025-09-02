@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.uitgis.ciams.admin.mapper.AdminCodeMapper">
+	<sql id="default_column">
+		code, code_name, sort_sn, parent_code, code_val, code_desc, use_yn
+ 	</sql>
+
+ 	<sql id="join_column">
+		cod.code, cod.code_name, cod.sort_sn, cod.parent_code, cod.code_val, cod.code_desc, cod.use_yn
+ 	</sql>
+
+
+    <select id="selectCodeListByParentCode" parameterType="string" resultType="com.uitgis.ciams.admin.dto.CodeDto$Find">
+        SELECT<include refid="default_column"/>, (SELECT NOT EXISTS (SELECT code FROM CIAMS_CODE b WHERE b.parent_code =
+        cod.code) _a ) AS leaf
+        FROM CIAMS_CODE cod
+        WHERE 1=1
+        <if test="@com.uitgis.ciams.util.ValidUtil@empty(parentCode)">
+            AND cod.PARENT_CODE IS NULL
+        </if>
+        <if test="@com.uitgis.ciams.util.ValidUtil@notEmpty(parentCode)">
+            AND cod.PARENT_CODE = #{parentCode}
+        </if>
+        ORDER BY cod.SORT_SN, cod.CODE
+    </select>
+
+
+    <select id="selectCodeByCode" parameterType="string" resultType="com.uitgis.ciams.admin.dto.CodeDto$Find">
+        SELECT<include refid="default_column"/>, (SELECT NOT EXISTS (SELECT code FROM CIAMS_CODE b WHERE b.parent_code =
+        cod.code) _a ) AS leaf
+        FROM CIAMS_CODE cod
+        WHERE 1=1
+            AND CODE = #{code}
+    </select>
+
+
+    <insert id="insertCode" parameterType="com.uitgis.ciams.model.CiamsCode">
+        INSERT INTO CIAMS_CODE (
+            CODE, PARENT_CODE, CODE_NAME, CODE_VAL, CODE_DESC,
+            <if test="sortSn != null">
+                SORT_SN,
+            </if>
+            USE_YN
+        )
+        VALUES(
+            #{code, jdbcType=VARCHAR}, #{parentCode, jdbcType=VARCHAR}, #{codeName, jdbcType=VARCHAR}
+            , #{codeVal, jdbcType=VARCHAR}, #{codeDesc, jdbcType=VARCHAR},
+            <if test="sortSn != null">
+                #{sortSn},
+            </if>
+            #{useYn, jdbcType=VARCHAR}
+        )
+    </insert>
+
+
+    <update id="updateCode" parameterType="com.uitgis.ciams.model.CiamsCode">
+        UPDATE CIAMS_CODE
+        <set>
+            <if test="@com.uitgis.ciams.util.ValidUtil@notEmpty(codeName)">
+                CODE_NAME = #{codeName},
+            </if>
+            <if test="@com.uitgis.ciams.util.ValidUtil@notEmpty(useYn)">
+                USE_YN = #{useYn},
+            </if>
+            <if test="parentCode != null">
+                PARENT_CODE = #{parentCode},
+            </if>
+            <if test="sortSn != null">
+                SORT_SN = #{sortSn},
+            </if>
+            <if test="codeVal != null">
+                CODE_VAL = #{codeVal},
+            </if>
+            <if test="codeDesc != null">
+                CODE_DESC = #{codeDesc},
+            </if>
+        </set>
+        WHERE CODE = #{code}
+    </update>
+
+
+    <delete id="deleteByCodes" parameterType="list">
+    	DELETE FROM CIAMS_CODE
+        WHERE code IN
+        <foreach collection="codeList" item="code" open="(" close=")" separator=",">
+            #{code}
+        </foreach>
+    </delete>
+
+
+    <update id="deleteByCode" parameterType="String">
+        DELETE FROM CIAMS_CODE
+        WHERE code = #{code}
+    </update>
+
+</mapper>

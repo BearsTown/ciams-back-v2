@@ -1,21 +1,13 @@
 package com.uitgis.ciams.user.mapper;
 
-import java.util.List;
-
+import com.uitgis.ciams.user.dto.CiamsConfigDto;
 import org.apache.ibatis.annotations.Mapper;
 
-import com.uitgis.ciams.user.dto.CiamsConfigDto;
-import com.uitgis.ciams.model.CiamsConfig;
+import java.util.List;
 
 @Mapper
 public interface CiamsConfigMapper {
-	int deleteById(String id);
-
-    int insert(CiamsConfigDto.Add record);
-
     CiamsConfigDto.WithFile selectById(String id);
-
-    int updateById(CiamsConfig record);
 
     List<CiamsConfigDto.WithFile> selectList(CiamsConfigDto.Find find);
 }

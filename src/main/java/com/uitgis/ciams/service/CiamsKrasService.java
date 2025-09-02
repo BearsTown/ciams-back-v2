@@ -1,5 +1,6 @@
 package com.uitgis.ciams.service;
 
+import com.uitgis.ciams.admin.service.AdminConfigService;
 import com.uitgis.spatial.adpater.mapstudio.dto.MapStudioResult;
 import com.uitgis.spatial.dto.LayerFileInfo;
 import com.uitgis.spatial.dto.TableSchemaDto;
@@ -55,7 +56,7 @@ public class CiamsKrasService {
 
     private final MapStudio mapStudio;
     private final CiamsGisService ciamsGisService;
-    private final CiamsConfigService ciamsConfigService;
+    private final AdminConfigService adminConfigService;
 
 
     public void renewalKrasData() throws CustomException, IOException {
@@ -182,10 +183,10 @@ public class CiamsKrasService {
 
 
     private KrasConfig.ShpParam getKrasShpParam() throws IOException {
-        CiamsConfig KRAS_URL = ciamsConfigService.getConfById("KRAS_URL").orElse(null);
-        CiamsConfig KRAS_SYS_ID = ciamsConfigService.getConfById("KRAS_SYS_ID").orElse(null);
-        CiamsConfig SIDO_CODE = ciamsConfigService.getConfById("SIDO_CODE").orElse(null);
-        CiamsConfig SGG_CODE = ciamsConfigService.getConfById("SGG_CODE").orElse(null);
+        CiamsConfig KRAS_URL = adminConfigService.getConfById("KRAS_URL").orElse(null);
+        CiamsConfig KRAS_SYS_ID = adminConfigService.getConfById("KRAS_SYS_ID").orElse(null);
+        CiamsConfig SIDO_CODE = adminConfigService.getConfById("SIDO_CODE").orElse(null);
+        CiamsConfig SGG_CODE = adminConfigService.getConfById("SGG_CODE").orElse(null);
 
         String krasSysId = KRAS_SYS_ID.getConfValue();
         String krasSvcUrl = KRAS_URL.getConfValue();

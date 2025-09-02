@@ -6,9 +6,9 @@ import java.util.List;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import com.uitgis.ciams.user.dto.CiamsSsoUserDto;
+import com.uitgis.ciams.user.dto.CiamsUserDto;
 
-public class OAuth2UserDetails extends CiamsSsoUserDto.Data implements UserDetails{
+public class OAuth2UserDetails extends CiamsUserDto.Data implements UserDetails{
 
 	private int access_level;
 

@@ -3,7 +3,7 @@ package com.uitgis.ciams.config;
 
 import com.uitgis.ciams.exception.CustomException;
 import com.uitgis.ciams.model.CiamsConfig;
-import com.uitgis.ciams.service.CiamsConfigService;
+import com.uitgis.ciams.admin.service.AdminConfigService;
 import com.uitgis.ext.kras.dto.KrasConfig;
 import com.uitgis.openapi.kgeo.KGeoConfig;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +19,7 @@ public class OpenApiConfig {
     private static String krasKey;
     private static String krasUrl;
     private static KrasConfig.KrasMode krasMode;
-    private final CiamsConfigService ciamsConfigService;
+    private final AdminConfigService adminConfigService;
 
     @Bean
     @Profile({"local", "dev"})
@@ -56,11 +56,11 @@ public class OpenApiConfig {
     }
 
     private void setKrasConfig() throws CustomException {
-        krasUrl = ciamsConfigService.getConfById("KRAS_URL")
+        krasUrl = adminConfigService.getConfById("KRAS_URL")
                 .map(CiamsConfig::getConfValue)
                 .orElseThrow(() -> new CustomException("KRAS_URL does not config."));
 
-        krasKey = ciamsConfigService.getConfById("KRAS_SYS_ID")
+        krasKey = adminConfigService.getConfById("KRAS_SYS_ID")
                 .map(CiamsConfig::getConfValue)
                 .orElseThrow(() -> new CustomException("KRAS_SYS_ID does not config."));
     }
@@ -77,11 +77,11 @@ public class OpenApiConfig {
 //                })
 //                .orElseThrow(() -> new CustomException("KGEO_API_USE does not config."));
 
-        String kGeoUrl = ciamsConfigService.getConfById("KGEO_API_URL")
+        String kGeoUrl = adminConfigService.getConfById("KGEO_API_URL")
                 .map(CiamsConfig::getConfValue)
                 .orElseThrow(() -> new CustomException("KGEO_API_URL does not config."));
 
-        String kGeoKey = ciamsConfigService.getConfById("KGEO_API_KEY")
+        String kGeoKey = adminConfigService.getConfById("KGEO_API_KEY")
                 .map(CiamsConfig::getConfValue)
                 .orElseThrow(() -> new CustomException("KGEO_API_KEY does not config."));
 

@@ -14,13 +14,8 @@
         </if>
     </sql>
 
-    <select id="selectById" parameterType="String" resultType="com.uitgis.ciams.model.CiamsArchiveCategory">
-        SELECT <include refid="default_column"/>
-        FROM ciams_archive_category
-        WHERE category_id = #{categoryId}
-    </select>
 
-     <select id="selectList" parameterType="com.uitgis.ciams.user.dto.CiamsArchiveCategoryDto$Find"
+    <select id="selectList" parameterType="com.uitgis.ciams.user.dto.CiamsArchiveCategoryDto$Find"
             resultType="com.uitgis.ciams.user.dto.CiamsArchiveCategoryDto$ListResult">
         SELECT
         <include refid="default_column"/>
@@ -30,28 +25,5 @@
         </where>
         ORDER BY sort_sn ASC
     </select>
-
-    <insert id="insert" parameterType="com.uitgis.ciams.model.CiamsArchiveCategory">
-        INSERT INTO
-        	ciams_archive_category (category_id, "name", sort_sn, reg_date, reg_user, is_link, link_url)
-		VALUES(#{categoryId}, #{name}, #{sortSn}, now(), #{regUser}, #{isLink}, #{linkUrl})
-    </insert>
-
-    <update id="updateById" parameterType="com.uitgis.ciams.model.CiamsArchiveCategory">
-        UPDATE ciams_archive_category
-        	SET
-	            "name" = #{name},
-	            chg_user = #{chgUser},
-	            chg_date = now(),
-	            is_link = #{isLink},
-	            link_url = #{linkUrl}
-        WHERE category_id = #{categoryId}
-    </update>
-
-    <update id="deleteById" parameterType="String">
-        DELETE
-        FROM ciams_archive_category
-        WHERE category_id = #{categoryId}
-    </update>
 
 </mapper>

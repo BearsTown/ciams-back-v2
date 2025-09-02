@@ -19,7 +19,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Service
 public class CiamsCommonService {
-
 	/**
 	 * 관리자 여부
 	 * @return true / false
@@ -30,6 +29,7 @@ public class CiamsCommonService {
 				.getAuthorities();
 		return roles.contains(new SimpleGrantedAuthority("ROLE_ADMIN"));
 	}
+
 
 	/**
 	 * 세션 사용자
@@ -60,9 +60,9 @@ public class CiamsCommonService {
 			}
 		}
 
-
 		return authentication.getName();
 	}
+
 
 	/**
 	 * 시스템 로그
@@ -75,6 +75,7 @@ public class CiamsCommonService {
 		key = keys.stream().map(a->String.valueOf(a)).collect(Collectors.joining(","));
 		log(menu,actionType, key);
 	}
+
 
 	/**
 	 * 시스템 로그(메인)

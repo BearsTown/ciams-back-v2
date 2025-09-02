@@ -1,9 +1,9 @@
 package com.uitgis.ciams.auth;
 
-import com.uitgis.ciams.user.dto.CiamsSsoUserDto;
+import com.uitgis.ciams.user.dto.CiamsUserDto;
 import com.uitgis.ciams.enums.RoleEnum;
-import com.uitgis.ciams.user.mapper.CiamsSsoUserMapper;
-import com.uitgis.ciams.model.CiamsSsoUser;
+import com.uitgis.ciams.user.mapper.CiamsUserMapper;
+import com.uitgis.ciams.model.CiamsUser;
 import com.uitgis.ciams.model.OAuth2UserDetails;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,14 +24,14 @@ import java.util.List;
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService{
 
-	private final CiamsSsoUserMapper ssoUserMapper;
+	private final CiamsUserMapper ciamsUserMapper;
 
 	@Value("${auth.user-fail-cnt}")
 	private Integer loginFailCnt;
 
 	@Override
 	public UserDetails loadUserByUsername(String loginId) throws UsernameNotFoundException {
-		CiamsSsoUserDto.Data userDto = ssoUserMapper.selectById(loginId);
+		CiamsUserDto.Data userDto = ciamsUserMapper.selectById(loginId);
 
 		if (userDto == null) {
 			throw new UsernameNotFoundException("LoginIdNotFound => " + loginId);
@@ -51,7 +51,7 @@ public class UserDetailsServiceImpl implements UserDetailsService{
 		return userDetails;
 	}
 
-	private void checkAccountStatus(CiamsSsoUserDto.Data userDto, OAuth2UserDetails userDetails) {
+	private void checkAccountStatus(CiamsUserDto.Data userDto, OAuth2UserDetails userDetails) {
 		if (!userDetails.isEnabled()) {
 			log.warn("Account not approved for user: {}", userDto.getLoginId());
 			throw new LockedException("Waiting for account approval");
@@ -65,18 +65,18 @@ public class UserDetailsServiceImpl implements UserDetailsService{
 
 	}
 
-	private List<GrantedAuthority> getAuthorities(CiamsSsoUserDto.Data userDto) {
+	private List<GrantedAuthority> getAuthorities(CiamsUserDto.Data userDto) {
 		return RoleEnum.ROLE_ADMIN.getType().equals(userDto.getUserRole()) ?
 				List.of(new SimpleGrantedAuthority("ROLE_ADMIN")) :
 				List.of(new SimpleGrantedAuthority("ROLE_USER"));
 	}
 
-	private void lockUser(CiamsSsoUserDto.Data user) {
-		CiamsSsoUser modify = new CiamsSsoUser();
+	private void lockUser(CiamsUserDto.Data user) {
+		CiamsUser modify = new CiamsUser();
 		modify.setLoginId(user.getLoginId());
 		modify.setLock(true);
 
-		ssoUserMapper.updateById(modify);
+		ciamsUserMapper.updateById(modify);
 	}
 
 }

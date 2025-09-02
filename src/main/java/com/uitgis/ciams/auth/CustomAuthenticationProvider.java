@@ -1,9 +1,9 @@
 package com.uitgis.ciams.auth;
 
+import com.uitgis.ciams.admin.mapper.AdminUserMapper;
 import com.uitgis.ciams.config.UitPasswordEncoder;
 import com.uitgis.ciams.user.dto.CiamsLoginLogDto;
-import com.uitgis.ciams.user.mapper.CiamsLoginLogMapper;
-import com.uitgis.ciams.user.mapper.CiamsSsoUserMapper;
+import com.uitgis.ciams.admin.mapper.AdminLoginLogMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,9 +25,8 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 @RequiredArgsConstructor
 @Component
 public class CustomAuthenticationProvider extends DaoAuthenticationProvider {
-
-    private final CiamsSsoUserMapper ciamsSsoUserMapper;
-    private final CiamsLoginLogMapper ciamsLoginlogMapper;
+    private final AdminUserMapper adminUserMapper;
+    private final AdminLoginLogMapper adminLoginlogMapper;
 
 	@Autowired
     public void setCustomUserDetailsService(UserDetailsService userDetailsService) {
@@ -52,12 +51,12 @@ public class CustomAuthenticationProvider extends DaoAuthenticationProvider {
         	throw new UsernameNotFoundException("User not found: " + username);
         }else if(!getPasswordEncoder().matches(password, user.getPassword())) {	//패스워드 검증
         	// 로그인 실패 횟수 증가
-            ciamsSsoUserMapper.updateLoginFailCnt(username);
+            adminUserMapper.updateLoginFailCnt(username);
         	throw new BadCredentialsException("Invalid password");
         }else {
         	 log.debug("로그인 성공! 후처리 실행 - 사용자: " + username);
         	// 로그인 실패 횟수 초기화
-            ciamsSsoUserMapper.initLoginFailCnt(username);
+            adminUserMapper.initLoginFailCnt(username);
         	addLoginHistory(username, getClientIp());
         }
 
@@ -74,7 +73,7 @@ public class CustomAuthenticationProvider extends DaoAuthenticationProvider {
 				.ip(ip)
 				.build();
 
-        ciamsLoginlogMapper.insert(add);
+        adminLoginlogMapper.insert(add);
 	}
 
     private String getClientIp() {

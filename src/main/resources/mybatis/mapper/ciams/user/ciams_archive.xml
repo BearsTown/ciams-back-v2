@@ -30,20 +30,20 @@
     </sql>
 
     <sql id="join_column">
-        ar.archive_id as archive_id,
-        ar.title as title,
-        ar.contents as contents,
-        ar.num_of_read as num_of_read,
-        ar.hidden as hidden,
-        ar.reg_date as reg_date,
-        ar.chg_date as chg_date,
-        ar.reg_user as reg_user,
-        ar.chg_user as chg_user,
-        ar.category_id as category_id
+        ar.archive_id AS archive_id,
+        ar.title AS title,
+        ar.contents AS contents,
+        ar.num_of_read AS num_of_read,
+        ar.hidden AS hidden,
+        ar.reg_date AS reg_date,
+        ar.chg_date AS chg_date,
+        ar.reg_user AS reg_user,
+        ar.chg_user AS chg_user,
+        ar.category_id AS category_id
     </sql>
 
     <sql id="list_column">
-        ar.archive_id as archive_id
+        ar.archive_id AS archive_id
         , ar.title AS title
         , ar.num_of_read AS num_of_read
         , ar.category_id AS category_id
@@ -67,6 +67,7 @@
         </if>
     </sql>
 
+
     <select id="count" parameterType="com.uitgis.ciams.user.dto.CiamsArchiveDto$Find" resultType="int">
         SELECT COUNT(*) AS cnt
         FROM ciams_archive
@@ -75,12 +76,14 @@
         </where>
     </select>
 
+
     <select id="selectById" parameterType="String" resultMap="BaseResultMap">
-        select
+        SELECT
         <include refid="default_column"/>
-        from ciams_archive
-        where archive_id = #{archiveId}
+        FROM ciams_archive
+        WHERE archive_id = #{archiveId}
     </select>
+
 
     <select id="selectDetailById" parameterType="String" resultMap="JoinResultMap">
         SELECT
@@ -92,49 +95,13 @@
         WHERE ar.archive_id = #{archiveId}
     </select>
 
-    <delete id="deleteById" parameterType="String">
-        DELETE
-        FROM ciams_archive
-        WHERE archive_id = #{archiveId}
-    </delete>
-
-    <update id="insert" parameterType="com.uitgis.ciams.user.dto.CiamsArchiveDto$Add">
-        INSERT INTO ciams_archive (archive_id, title, contents, category_id,
-                                   reg_user, reg_date)
-        VALUES (#{archiveId}, #{title}, #{contents},
-                #{categoryId},
-                #{regUser},
-                now())
-    </update>
-
-    <update id="updateById" parameterType="com.uitgis.ciams.model.CiamsArchive">
-        update ciams_archive
-        <set>
-            <if test="title != null">
-                title = #{title},
-            </if>
-            <if test="contents != null">
-                contents = #{contents},
-            </if>
-            <if test="hidden != null">
-                hidden = #{hidden},
-            </if>
-            <if test="categoryId != null">
-                category_id = #{categoryId},
-            </if>
-            <if test="chgUser != null">
-                chg_user = #{chgUser},
-            </if>
-            chg_date = now()
-        </set>
-        where archive_id = #{archiveId}
-    </update>
 
     <update id="updateNumOfRead" parameterType="String">
         UPDATE ciams_archive
         SET num_of_read = num_of_read + 1
         WHERE archive_id = #{archiveId}
     </update>
+
 
     <select id="selectListWithFile" parameterType="com.uitgis.ciams.user.dto.CiamsArchiveDto$Find"
             resultMap="ListResultMap">
@@ -160,29 +127,7 @@
         FROM ciams_file
         )file ON ar.archive_id = file.link_id
         ORDER BY TO_TIMESTAMP(ar.reg_date, 'YYYY-MM-DD HH24:MI:SS') DESC ,
-                                  ar.archive_id
-
+        ar.archive_id
     </select>
 
-    <update id="updateByIds" parameterType="com.uitgis.ciams.user.dto.CiamsArchiveDto$ModifyAll">
-        UPDATE ciams_archive
-        SET
-        <if test="hidden != null">
-            hidden = #{hidden},
-        </if>
-        chg_user = #{username},
-        chg_date = now()
-        WHERE archive_id IN
-        <foreach collection="ids" item="archiveId" open="(" separator="," close=")">
-            #{archiveId}
-        </foreach>
-    </update>
-
-    <update id="deleteByIds" parameterType="list">
-        DELETE FROM ciams_archive
-        WHERE archive_id IN
-        <foreach collection="ids" item="archiveId" open="(" separator="," close=")">
-            #{archiveId}
-        </foreach>
-    </update>
 </mapper>

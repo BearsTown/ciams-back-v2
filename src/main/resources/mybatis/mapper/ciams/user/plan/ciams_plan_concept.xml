@@ -67,14 +67,14 @@
                cpzi.category                     as cpzi_category,
                cpzi.industry_code                as industry_code,
                get_cd_nm(cpzi.industry_code, NULL) as industry_name,
---             cpzi.industry_name as industry_name,
 
                cpzimg.id                         as image_id,
                cpzimg.category                   as image_category,
                cpzimg.title                      as image_title,
                cpzimg.name                       as image_name
         FROM ciams_zone z
-                 LEFT OUTER JOIN ciams_plan_base_description cpbd ON z.mng_type = cpbd.mng_type
+--                  LEFT OUTER JOIN ciams_plan_base_description cpbd ON z.mng_type = cpbd.mng_type
+                 LEFT OUTER JOIN ciams_plan_base_description cpbd ON z.mng_cd = cpbd.mng_cd
                  LEFT OUTER JOIN ciams_plan_zone_description cpzd ON z.zone_no = cpzd.zone_no
                  LEFT OUTER JOIN ciams_plan_zone_image cpzimg ON z.zone_no = cpzimg.zone_no
                  LEFT OUTER JOIN ciams_plan_zone_industry cpzi ON z.zone_no = cpzi.zone_no

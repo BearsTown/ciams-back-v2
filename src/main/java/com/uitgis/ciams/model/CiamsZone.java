@@ -21,20 +21,20 @@ public class CiamsZone {
     private String mngType;
     private String mngCd;
     private Double localArea;
-    private Double localCs;
-    private Double baseCsC;
+    private Integer localCs;
+    private Integer baseCsC;
     private Double density;
     private String densityRe;
-    private Double pastCsC;
-    private Double variation;
+    private Integer pastCsC;
+    private Integer variation;
     private String variaRe;
-    private Double sssC;
+    private Integer sssC;
     private Double sssRate;
     private String sssRe;
     private String itaResult;
     private String itaReCd;
-    private Double csB;
-    private Double csB20;
+    private Integer csB;
+    private Integer csB20;
     private Double deterio;
     private String deterioRe;
     private Double roadA;
@@ -43,6 +43,6 @@ public class CiamsZone {
     private String locResult;
     private String locReCd;
     private String division;
-    private Double baseYear;
-    private Double pastYear;
+    private String baseYear;
+    private String pastYear;
 }

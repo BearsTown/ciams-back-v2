@@ -2,20 +2,19 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.uitgis.ciams.user.mapper.CiamsCodeMapper">
-	<sql id="default_column">
-		code, code_name, sort_sn, parent_code, code_val, code_desc, use_yn
- 	</sql>
+    <sql id="default_column">
+        code, code_name, sort_sn, parent_code, code_val, code_desc, use_yn
+    </sql>
 
- 	<sql id="join_column">
-		cod.code, cod.code_name, cod.sort_sn, cod.parent_code, cod.code_val, cod.code_desc, cod.use_yn
- 	</sql>
 
-    <select id="selectCodeListByParentCode" parameterType="string" resultType="com.uitgis.ciams.user.dto.CiamsCodeDto$Find">
-        SELECT <include refid="default_column"/>, (select not exists (select code from CIAMS_CODE b where b.parent_code = cod.code) _a ) as leaf
+    <select id="selectCodeListByParentCode" parameterType="string"
+            resultType="com.uitgis.ciams.user.dto.CiamsCodeDto$Find">
+        SELECT<include refid="default_column"/>, (SELECT NOT EXISTS (SELECT code FROM CIAMS_CODE b WHERE b.parent_code =
+        cod.code) _a ) AS leaf
         FROM CIAMS_CODE cod
         WHERE 1=1
         <if test="@com.uitgis.ciams.util.ValidUtil@empty(parentCode)">
-            AND cod.PARENT_CODE is null
+            AND cod.PARENT_CODE IS nuUll
         </if>
         <if test="@com.uitgis.ciams.util.ValidUtil@notEmpty(parentCode)">
             AND cod.PARENT_CODE = #{parentCode}
@@ -23,81 +22,30 @@
         ORDER BY cod.SORT_SN, cod.CODE
     </select>
 
+
     <select id="selectCodeByCode" parameterType="string" resultType="com.uitgis.ciams.user.dto.CiamsCodeDto$Find">
-        SELECT <include refid="default_column"/>, (select not exists (select code from CIAMS_CODE b where b.parent_code = cod.code) _a ) as leaf
+        SELECT<include refid="default_column"/>, (SELECT NOT EXISTS (SELECT code FROM CIAMS_CODE b WHERE b.parent_code =
+        cod.code) _a ) AS leaf
         FROM CIAMS_CODE cod
         WHERE 1=1
-            AND CODE = #{code}
+        AND CODE = #{code}
     </select>
 
-	<insert id="insertCode" parameterType="com.uitgis.ciams.model.CiamsCode">
-        INSERT INTO CIAMS_CODE (
-            CODE, PARENT_CODE, CODE_NAME, CODE_VAL, CODE_DESC,
-            <if test="sortSn != null">
-                SORT_SN,
-            </if>
-            USE_YN
-        )
-        VALUES(
-            #{code, jdbcType=VARCHAR}, #{parentCode, jdbcType=VARCHAR}, #{codeName, jdbcType=VARCHAR}
-            , #{codeVal, jdbcType=VARCHAR}, #{codeDesc, jdbcType=VARCHAR},
-            <if test="sortSn != null">
-                #{sortSn},
-            </if>
-            #{useYn, jdbcType=VARCHAR}
-        )
-    </insert>
-
-    <update id="updateCode" parameterType="com.uitgis.ciams.model.CiamsCode">
-        UPDATE CIAMS_CODE
-        <set>
-            <if test="@com.uitgis.ciams.util.ValidUtil@notEmpty(codeName)">
-                CODE_NAME = #{codeName},
-            </if>
-            <if test="@com.uitgis.ciams.util.ValidUtil@notEmpty(useYn)">
-                USE_YN = #{useYn},
-            </if>
-            <if test="parentCode != null">
-                PARENT_CODE = #{parentCode},
-            </if>
-            <if test="sortSn != null">
-                SORT_SN = #{sortSn},
-            </if>
-            <if test="codeVal != null">
-                CODE_VAL = #{codeVal},
-            </if>
-            <if test="codeDesc != null">
-                CODE_DESC = #{codeDesc},
-            </if>
-        </set>
-        WHERE CODE = #{code}
-    </update>
-
-    <delete id="deleteByCodes" parameterType="list">
-    	DELETE FROM CIAMS_CODE
-        WHERE code in
-        <foreach collection="codeList" item="code" open="(" close=")" separator=",">
-            #{code}
-        </foreach>
-    </delete>
-
-    <update id="deleteByCode" parameterType="String">
-        DELETE FROM CIAMS_CODE
-        WHERE code = #{code}
-    </update>
 
     <select id="selectCodeSublist" parameterType="map" resultType="com.uitgis.ciams.model.CiamsCode">
         WITH RECURSIVE dept_record(code, parent_code, code_name, code_val, code_desc, use_yn, level, path, cycle)
-        AS (SELECT d.code, d.parent_code, d.code_name, d.code_val, d.code_desc, d.use_yn, 0, array[d.code]::varchar[], false
+        AS (SELECT d.code, d.parent_code, d.code_name, d.code_val, d.code_desc, d.use_yn, 0, array[d.code]::varchar[],
+        false
         FROM ciams_code d
-        WHERE d.parent_code IS null
+        WHERE d.parent_code IS NULL
         <if test="@com.uitgis.ciams.util.ValidUtil@notEmpty(code)">
             and code = #{code}
         </if>
 
         UNION ALL
 
-        SELECT d.code, d.parent_code, d.code_name, d.code_val, d.code_desc, d.use_yn, level + 1, path || d.code, d.code = ANY (path)
+        SELECT d.code, d.parent_code, d.code_name, d.code_val, d.code_desc, d.use_yn, level + 1, path || d.code, d.code
+        = ANY (path)
         FROM ciams_code d,
         dept_record dr
         WHERE d.parent_code = dr.code
@@ -115,4 +63,5 @@
         </trim>
         ORDER BY path
     </select>
+
 </mapper>

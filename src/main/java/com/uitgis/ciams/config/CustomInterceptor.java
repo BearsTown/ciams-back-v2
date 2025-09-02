@@ -2,10 +2,10 @@ package com.uitgis.ciams.config;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.uitgis.ciams.admin.dto.UserDto;
+import com.uitgis.ciams.admin.mapper.AdminUserMapper;
 import com.uitgis.ciams.user.dto.CiamsLoginLogDto;
-import com.uitgis.ciams.user.dto.CiamsSsoUserDto;
-import com.uitgis.ciams.user.mapper.CiamsLoginLogMapper;
-import com.uitgis.ciams.user.mapper.CiamsSsoUserMapper;
+import com.uitgis.ciams.admin.mapper.AdminLoginLogMapper;
 import com.uitgis.ciams.util.JsonUtil;
 import com.uitgis.ciams.util.ValidUtil;
 import jakarta.servlet.http.HttpServletRequest;
@@ -27,8 +27,8 @@ import java.util.HashMap;
 @Component
 public class CustomInterceptor implements HandlerInterceptor {
 
-	private final CiamsSsoUserMapper ciamsSsoUserMapper;
-	private final CiamsLoginLogMapper ciamsLoginlogMapper;
+	private final AdminUserMapper adminUserMapper;
+	private final AdminLoginLogMapper adminLoginlogMapper;
 
 	public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception {
 		String grantType = request.getParameter("grant_type");
@@ -40,13 +40,13 @@ public class CustomInterceptor implements HandlerInterceptor {
 				if (grantType.equals("password")) {
 					String id = request.getParameter("username");
 					addLoginHistory(id, request.getRemoteAddr());
-					ciamsSsoUserMapper.initLoginFailCnt(id);
+					adminUserMapper.initLoginFailCnt(id);
 				}
 				if (grantType.equals("refresh_token")) {
 					String token = request.getParameter("refresh_token");
 					String username = getUsernameFromToken(token);
 
-					ciamsSsoUserMapper.initLoginFailCnt(username);
+					adminUserMapper.initLoginFailCnt(username);
 				}
 			}
 		}else{
@@ -55,12 +55,12 @@ public class CustomInterceptor implements HandlerInterceptor {
 				String token = request.getParameter("token");
 				String username = getUsernameFromToken(token);
 
-				CiamsSsoUserDto.Data user = ciamsSsoUserMapper.selectById(username);
+				UserDto.Data user = adminUserMapper.selectById(username);
 				if(user != null && user.getLock()){
 					throw new OAuth2AuthenticationException("User account is locked");
 				}
 
-				ciamsSsoUserMapper.initLoginFailCnt(username);
+				adminUserMapper.initLoginFailCnt(username);
 			}
 		}
 	}
@@ -75,7 +75,7 @@ public class CustomInterceptor implements HandlerInterceptor {
     	if (ValidUtil.notEmpty(grantType) && grantType.equals("refresh_token")) {
 			String token = request.getParameter("refresh_token");
 			String username = getUsernameFromToken(token);
-			ciamsSsoUserMapper.initLoginFailCnt(username);
+			adminUserMapper.initLoginFailCnt(username);
 		}
 	}
 
@@ -98,6 +98,6 @@ public class CustomInterceptor implements HandlerInterceptor {
 				.ip(ip)
 				.build();
 
-		ciamsLoginlogMapper.insert(add);
+		adminLoginlogMapper.insert(add);
 	}
 }

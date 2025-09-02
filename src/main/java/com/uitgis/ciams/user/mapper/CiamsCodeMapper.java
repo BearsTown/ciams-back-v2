@@ -1,27 +1,17 @@
 package com.uitgis.ciams.user.mapper;
 
-import java.util.List;
-
+import com.uitgis.ciams.admin.dto.CodeDto;
+import com.uitgis.ciams.model.CiamsCode;
 import com.uitgis.ciams.user.dto.CiamsCodeDto;
 import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
 
-import com.uitgis.ciams.model.CiamsCode;
+import java.util.List;
 
 @Mapper
 public interface CiamsCodeMapper {
-
     List<CiamsCodeDto.Find> selectCodeListByParentCode(String parentCode);
 
     CiamsCodeDto.Find selectCodeByCode(String code);
 
-    int insertCode(CiamsCode code);
-
-    int deleteByCode(String code);
-
-    int updateCode(CiamsCode code);
-
-    public void deleteByCodes(@Param("codeList") List<String> codeList);
-
-    public List<CiamsCode> selectCodeSublist(CiamsCodeDto.Sub sub);
+    List<CiamsCode> selectCodeSublist(CiamsCodeDto.Sub sub);
 }

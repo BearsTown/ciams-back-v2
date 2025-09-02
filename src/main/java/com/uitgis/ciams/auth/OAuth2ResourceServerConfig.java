@@ -19,7 +19,7 @@ public class OAuth2ResourceServerConfig {
             "/kras",
             "/rsa/key",
             "/error/**",
-            "/cmm/signUp",
+            "/api/v1/user/signUp",
             "/api/v1/login/**",
             "/api/v1/config/**",
             "/api/v1/file/**"

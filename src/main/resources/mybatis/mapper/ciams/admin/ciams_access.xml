@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.uitgis.ciams.admin.mapper.AdminAccessMapper">
+    <sql id="user_column">
+        lnk.user_id, lnk.access_role_code, lnk.reg_date, lnk.reg_user
+    </sql>
+
+    <sql id="role_column">
+        lnk.access_role_code, lnk.access_menu_code, lnk.reg_date, lnk.reg_user
+    </sql>
+
+
+    <select id="selectRoleByUserList" parameterType="com.uitgis.ciams.admin.dto.AccessDto"
+            resultType="com.uitgis.ciams.admin.dto.AccessDto$UserResult">
+        SELECT
+        <include refid="user_column"/>
+        ,usr.user_name
+        ,cd.code_name AS access_role_code_name
+        FROM ciams_access_user_link lnk
+        LEFT OUTER JOIN ciams_sso_user usr
+        ON lnk.user_id = usr.login_id
+        LEFT OUTER JOIN ciams_code cd
+        ON lnk.access_role_code = cd.code
+        WHERE 1=1
+        <if test="@com.uitgis.ciams.util.ValidUtil@notEmpty(roleCode)">
+            AND lnk.access_role_code = #{roleCode}
+        </if>
+    </select>
+
+    <select id="selectRoleByMenuList" parameterType="com.uitgis.ciams.admin.dto.AccessDto"
+            resultType="com.uitgis.ciams.admin.dto.AccessDto$RoleResult">
+        SELECT
+        <include refid="role_column"/>
+        ,cd.code_name AS access_role_code_name
+        ,cd2.code_name AS access_menu_code_name
+        FROM ciams_access_role_link lnk
+        LEFT OUTER JOIN ciams_code cd
+        ON lnk.access_role_code = cd.code
+        LEFT OUTER JOIN ciams_code cd2
+        ON lnk.access_menu_code = cd2.code
+        WHERE 1=1
+        <if test="@com.uitgis.ciams.util.ValidUtil@notEmpty(roleCode)">
+            and lnk.access_role_code = #{roleCode}
+        </if>
+    </select>
+
+
+    <insert id="insertUser" parameterType="com.uitgis.ciams.model.CiamsAccessUserLink">
+        INSERT INTO CIAMS_ACCESS_USER_LINK (user_id, access_role_code, reg_date, reg_user)
+        VALUES (#{userId, jdbcType=VARCHAR},
+                #{accessRoleCode, jdbcType=VARCHAR},
+                now(),
+                #{regUser, jdbcType=VARCHAR})
+    </insert>
+
+
+    <insert id="insertRole" parameterType="com.uitgis.ciams.model.CiamsAccessRoleLink">
+        INSERT INTO CIAMS_ACCESS_ROLE_LINK (access_role_code, access_menu_code, reg_date, reg_user)
+        VALUES (#{accessRoleCode, jdbcType=VARCHAR},
+                #{accessMenuCode, jdbcType=VARCHAR},
+                now(),
+                #{regUser, jdbcType=VARCHAR})
+    </insert>
+
+
+    <delete id="deleteByIds" parameterType="list">
+        DELETE FROM CIAMS_ACCESS_USER_LINK
+        WHERE user_id in
+        <foreach collection="userList" item="user_id" open="(" close=")" separator=",">
+            #{user_id}
+        </foreach>
+    </delete>
+
+
+    <delete id="deleteUsers" parameterType="com.uitgis.ciams.admin.dto.AccessDto$Delete">
+        DELETE FROM CIAMS_ACCESS_USER_LINK
+        WHERE user_id IN
+        <foreach collection="users" item="user" open="(" close=")" separator=",">
+            #{user}
+        </foreach>
+        AND access_role_code = #{roleCode}
+    </delete>
+
+
+    <update id="deleteRoles" parameterType="com.uitgis.ciams.admin.dto.AccessDto$Delete">
+        DELETE FROM CIAMS_ACCESS_ROLE_LINK
+        WHERE access_menu_code IN
+        <foreach collection="menus" item="menu" open="(" close=")" separator=",">
+            #{menu}
+        </foreach>
+        AND access_role_code = #{roleCode}
+    </update>
+
+</mapper>

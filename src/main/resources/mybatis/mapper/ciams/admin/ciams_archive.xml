@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.uitgis.ciams.admin.mapper.AdminArchiveMapper">
+    <resultMap id="BaseResultMap" type="com.uitgis.ciams.model.CiamsArchive">
+        <id column="archive_id" jdbcType="VARCHAR" property="archiveId"/>
+        <result column="title" jdbcType="VARCHAR" property="title"/>
+        <result column="contents" jdbcType="VARCHAR" property="contents"/>
+        <result column="num_of_read" jdbcType="INTEGER" property="numOfRead"/>
+        <result column="category_id" jdbcType="VARCHAR" property="categoryId"/>
+        <result column="hidden" jdbcType="BOOLEAN" property="hidden"/>
+        <result column="reg_user" jdbcType="VARCHAR" property="regUser"/>
+        <result column="reg_date" jdbcType="VARCHAR" property="regDate"/>
+        <result column="chg_user" jdbcType="VARCHAR" property="chgUser"/>
+        <result column="chg_date" jdbcType="VARCHAR" property="chgDate"/>
+    </resultMap>
+
+    <resultMap id="JoinResultMap" type="com.uitgis.ciams.admin.dto.ArchiveDto$WithFile" extends="BaseResultMap">
+        <collection property="archiveFiles" columnPrefix="file_"
+                    resultMap="com.uitgis.ciams.user.mapper.CiamsFileMapper.BaseResultMap"
+                    ofType="com.uitgis.ciams.model.CiamsFile"/>
+    </resultMap>
+
+    <resultMap id="ListResultMap" type="com.uitgis.ciams.admin.dto.ArchiveDto$ListResult" extends="JoinResultMap">
+    </resultMap>
+
+    <sql id="default_column">
+        archive_id
+        , title, contents, num_of_read, hidden, TO_CHAR(reg_date, 'YYYY-MM-DD HH24:MI:SS') as reg_date, TO_CHAR(chg_date, 'YYYY-MM-DD HH24:MI:SS') as chg_date, reg_user, chg_user, category_id
+    </sql>
+
+    <sql id="join_column">
+        ar.archive_id AS archive_id,
+        ar.title AS title,
+        ar.contents AS contents,
+        ar.num_of_read AS num_of_read,
+        ar.hidden AS hidden,
+        ar.reg_date AS reg_date,
+        ar.chg_date AS chg_date,
+        ar.reg_user AS reg_user,
+        ar.chg_user AS chg_user,
+        ar.category_id AS category_id
+    </sql>
+
+    <sql id="list_column">
+        ar.archive_id AS archive_id
+        , ar.title AS title
+        , ar.num_of_read AS num_of_read
+        , ar.category_id AS category_id
+        , ar.hidden AS hidden
+        , ar.reg_user AS reg_user
+        , ar.reg_date AS reg_date
+        , ar.chg_user AS chg_user
+        , ar.chg_date AS chg_date
+    </sql>
+
+    <sql id="default_where">
+        <if test="@com.uitgis.ciams.util.ValidUtil@notEmpty(categoryId)">
+            AND category_id = #{categoryId}
+        </if>
+        <if test="@com.uitgis.ciams.util.ValidUtil@notEmpty(title)">
+            <bind name="archiveTitle" value="'%'+title+'%'"/>
+            AND title LIKE #{archiveTitle}
+        </if>
+        <if test="hidden != null">
+            AND hidden = #{hidden}
+        </if>
+    </sql>
+
+
+    <select id="count" parameterType="com.uitgis.ciams.admin.dto.ArchiveDto$Find" resultType="int">
+        SELECT COUNT(*) AS cnt
+        FROM ciams_archive
+        <where>
+            <include refid="default_where"/>
+        </where>
+    </select>
+
+
+    <select id="selectById" parameterType="String" resultMap="BaseResultMap">
+        SELECT
+        <include refid="default_column"/>
+        FROM ciams_archive
+        WHERE archive_id = #{archiveId}
+    </select>
+
+
+    <select id="selectDetailById" parameterType="String" resultMap="JoinResultMap">
+        SELECT
+        <include refid="join_column"/>
+        ,
+        <include refid="com.uitgis.ciams.user.mapper.CiamsFileMapper.join_column"/>
+        FROM ciams_archive ar
+        LEFT OUTER JOIN ciams_file file ON ar.archive_id = file.link_id
+        WHERE ar.archive_id = #{archiveId}
+    </select>
+
+
+    <delete id="deleteById" parameterType="String">
+        DELETE
+        FROM ciams_archive
+        WHERE archive_id = #{archiveId}
+    </delete>
+
+
+    <update id="insert" parameterType="com.uitgis.ciams.admin.dto.ArchiveDto$Add">
+        INSERT INTO ciams_archive (archive_id, title, contents, category_id,
+                                   reg_user, reg_date)
+        VALUES (#{archiveId}, #{title}, #{contents},
+                #{categoryId},
+                #{regUser},
+                now())
+    </update>
+
+
+    <update id="updateById" parameterType="com.uitgis.ciams.model.CiamsArchive">
+        UPDATE ciams_archive
+        <set>
+            <if test="title != null">
+                title = #{title},
+            </if>
+            <if test="contents != null">
+                contents = #{contents},
+            </if>
+            <if test="hidden != null">
+                hidden = #{hidden},
+            </if>
+            <if test="categoryId != null">
+                category_id = #{categoryId},
+            </if>
+            <if test="chgUser != null">
+                chg_user = #{chgUser},
+            </if>
+            chg_date = now()
+        </set>
+        WHERE archive_id = #{archiveId}
+    </update>
+
+
+    <select id="selectListWithFile" parameterType="com.uitgis.ciams.admin.dto.ArchiveDto$Find"
+            resultMap="ListResultMap">
+
+        SELECT
+        <include refid="list_column"/>
+        ,
+        <include refid="com.uitgis.ciams.user.mapper.CiamsFileMapper.join_column"/>
+        FROM (
+        <include refid="pagination.page_top"/>
+        SELECT
+        <include refid="default_column"/>
+        FROM ciams_archive
+        <where>
+            <include refid="default_where"/>
+        </where>
+        ORDER BY reg_date DESC ,archive_id
+        <include refid="pagination.page_bottom"/>
+        ) ar
+        LEFT OUTER JOIN
+        (SELECT
+        <include refid="com.uitgis.ciams.user.mapper.CiamsFileMapper.default_column"/>
+        FROM ciams_file
+        )file ON ar.archive_id = file.link_id
+        ORDER BY TO_TIMESTAMP(ar.reg_date, 'YYYY-MM-DD HH24:MI:SS') DESC ,
+                                  ar.archive_id
+
+    </select>
+
+
+    <update id="updateByIds" parameterType="com.uitgis.ciams.admin.dto.ArchiveDto$ModifyAll">
+        UPDATE ciams_archive
+        SET
+        <if test="hidden != null">
+            hidden = #{hidden},
+        </if>
+        chg_user = #{username},
+        chg_date = now()
+        WHERE archive_id IN
+        <foreach collection="ids" item="archiveId" open="(" separator="," close=")">
+            #{archiveId}
+        </foreach>
+    </update>
+
+
+    <update id="deleteByIds" parameterType="list">
+        DELETE FROM ciams_archive
+        WHERE archive_id IN
+        <foreach collection="ids" item="archiveId" open="(" separator="," close=")">
+            #{archiveId}
+        </foreach>
+    </update>
+
+</mapper>

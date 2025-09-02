@@ -17,9 +17,6 @@
         <association property="attachFile" javaType="com.uitgis.ciams.model.CiamsFile" columnPrefix="file_" resultMap="com.uitgis.ciams.user.mapper.CiamsFileMapper.BaseResultMap"/>
     </resultMap>
 
-	<sql id="default_column">
-		 id, conf_name, conf_value, conf_type, used, conf_value_type, conf_desc, reg_date, chg_date, conf_url
- 	</sql>
 
  	<sql id="join_column">
 		 cn.id,
@@ -50,6 +47,7 @@
         </if>
     </sql>
 
+
     <select id="selectById" parameterType="java.lang.String" resultMap="JoinResultMap">
         SELECT
         <include refid="join_column"/>
@@ -61,63 +59,6 @@
         WHERE cn.id = #{id}
     </select>
 
-    <delete id="deleteById" parameterType="java.lang.String">
-        DELETE
-        FROM ciams_config
-        WHERE id = #{id}
-    </delete>
-
-
-    <insert id="insert" parameterType="com.uitgis.ciams.user.dto.CiamsConfigDto$Add">
-        INSERT INTO ciams_config (
-        	id,
-        	conf_name,
-        	conf_value,
-        	conf_type,
-        	conf_value_type,
-        	conf_desc,
-        	conf_url
-        )
-        VALUES (
-	        #{id},
-	        #{confName},
-	        #{confValue},
-	        #{confType},
-	        #{confValueType},
-			#{confDesc},
-			#{confUrl}
-		)
-    </insert>
-
-
-    <update id="updateById" parameterType="com.uitgis.ciams.model.CiamsConfig">
-        UPDATE ciams_config
-        <set>
-            <if test="@com.uitgis.ciams.util.ValidUtil@notEmpty(confName)">
-                conf_name = #{confName},
-            </if>
-            <if test="confValue != null">
-                conf_value = #{confValue},
-            </if>
-            <if test="@com.uitgis.ciams.util.ValidUtil@notEmpty(confType)">
-                conf_type = #{confType},
-            </if>
-            <if test="used != null">
-                used = #{used},
-            </if>
-            <if test="confValueType != null">
-                conf_value_type = #{confValueType},
-            </if>
-            <if test="confDesc != null">
-                conf_desc = #{confDesc},
-            </if>
-            <if test="confUrl != null">
-                conf_url = #{confUrl},
-            </if>
-            chg_date = now()
-        </set>
-        WHERE id = #{id}
-    </update>
 
     <select id="selectList" parameterType="com.uitgis.ciams.user.dto.CiamsConfigDto$Find" resultMap="JoinResultMap">
         SELECT

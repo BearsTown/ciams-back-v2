@@ -1,7 +1,6 @@
 package com.uitgis.ciams.user.dto;
 
 import com.uitgis.ciams.model.CiamsCode;
-
 import lombok.Getter;
 import lombok.Setter;
 

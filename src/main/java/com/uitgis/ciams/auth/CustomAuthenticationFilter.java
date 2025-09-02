@@ -2,9 +2,9 @@ package com.uitgis.ciams.auth;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.uitgis.ciams.user.dto.CiamsSsoUserDto;
-import com.uitgis.ciams.user.mapper.CiamsLoginLogMapper;
-import com.uitgis.ciams.user.mapper.CiamsSsoUserMapper;
+import com.uitgis.ciams.user.dto.CiamsUserDto;
+import com.uitgis.ciams.admin.mapper.AdminLoginLogMapper;
+import com.uitgis.ciams.user.mapper.CiamsUserMapper;
 import com.uitgis.ciams.util.JsonUtil;
 import com.uitgis.ciams.util.ValidUtil;
 import jakarta.servlet.FilterChain;
@@ -27,8 +27,8 @@ import java.util.HashMap;
 @Component
 public class CustomAuthenticationFilter extends OncePerRequestFilter {
 
-	private final CiamsSsoUserMapper ciamsSsoUserMapper;
-	private final CiamsLoginLogMapper ciamsLoginlogMapper;
+	private final CiamsUserMapper ciamsUserMapper;
+	private final AdminLoginLogMapper adminLoginlogMapper;
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -46,7 +46,7 @@ public class CustomAuthenticationFilter extends OncePerRequestFilter {
 				String token = request.getParameter("token");
 				String username = getUsernameFromToken(token);
 
-				CiamsSsoUserDto.Data user = ciamsSsoUserMapper.selectById(username);
+				CiamsUserDto.Data user = ciamsUserMapper.selectById(username);
 				if (user != null && user.getLock()) {
 					throw new OAuth2AuthenticationException("User account is locked");
 				}
